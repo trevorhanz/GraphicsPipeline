@@ -130,4 +130,9 @@ TargetUserDataPtr Context::CreateTarget()
   return ptr;
 }
 
+void Context::Bind(GP::TargetPtr target)
+{
+  
+}
+
 

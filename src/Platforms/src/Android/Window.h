@@ -15,40 +15,23 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#ifndef __GP_ANDROID_WINDOW_H__
+#define __GP_ANDROID_WINDOW_H__
 
-#include <GraphicsPipeline.h>
-#include <API/GL/Pipeline.h>
+#include <android/native_window.h>
 
-#include <GL/glew.h>
-#include <GL/glx.h>
+#include "System.h"
 
 namespace GP
 {
-  namespace GL
+  namespace Android
   {
-    class Context : public ContextBase
+    class Window : public GP::Window
     {
     public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
-      
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      Window                  mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
+      Window(ANativeWindow* window);
     };
-  }
+  };
 };
 
-
-#endif // __GP_CONTEXT_X11_H__
+#endif // __GP_ANDROID_WINDOW_H__

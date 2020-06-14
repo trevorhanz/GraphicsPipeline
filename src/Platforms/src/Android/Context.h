@@ -15,40 +15,35 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#ifndef __GP_CONTEXT_ANDROID_H__
+#define __GP_CONTEXT_ANDROID_H__
 
 #include <GraphicsPipeline.h>
-#include <API/GL/Pipeline.h>
 
-#include <GL/glew.h>
-#include <GL/glx.h>
+#include <EGL/egl.h> // requires ndk r5 or newer
+#include <GLES2/gl2.h>
 
 namespace GP
 {
-  namespace GL
+  namespace GLES
   {
-    class Context : public ContextBase
+    class Context : public GP::Context
     {
     public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
+      Context();
       
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
+      GP::PipelinePtr CreatePipeline() override;
       
       void Bind(GP::TargetPtr target) override;
       
     private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      Window                  mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
+      EGLDisplay                      mDisplay;
+      EGLConfig                       mConfig;
+      EGLint                          mFormat;
+      EGLContext                      mShare;
+      EGLSurface                      mShareSurface;
     };
-  }
-};
+  };
+}
 
-
-#endif // __GP_CONTEXT_X11_H__
+#endif // __GP_CONTEXT_ANDROID_H__

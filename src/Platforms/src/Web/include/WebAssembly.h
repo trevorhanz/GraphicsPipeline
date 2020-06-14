@@ -86,6 +86,8 @@ namespace GP
       Context();
       GP::PipelinePtr CreatePipeline() override;
       
+      void Bind(GP::TargetPtr target) override;
+      
     private:
       EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mShare;
     };

@@ -13,7 +13,32 @@ if(EMSCRIPTEN)
     Platforms/src/Web/src/Window.cpp)
   list(APPEND INC
     Platforms/src/Web/include)
-else(EMSCRIPTEN)
+elseif(ANDROID)
+  find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
+    HINTS ${ANDROID_NDK})
+  find_library(GLES2_LIBRARY libGLESv2.so
+    HINTS ${GLES2_INCLUDE_DIR}/../lib)
+  find_path(EGL_INCLUDE_DIR EGL/egl.h
+    HINTS ${ANDROID_NDK})
+  find_library(EGL_LIBRARY libEGL.so
+    HINTS ${EGL_INCLUDE_DIR}/../lib)
+  
+  find_library( # Sets the name of the path variable.
+              log-lib
+
+              # Specifies the name of the NDK library that
+              # you want CMake to locate.
+              log)
+  
+  list(APPEND SRC API/GLES/Pipeline.cpp)
+  list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/src/Android/)
+  list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
+  
+  list(APPEND SRC
+    Platforms/src/Android/Context.cpp
+    Platforms/src/Android/System.cpp
+    Platforms/src/Android/Window.cpp)
+else(ANDROID)
   find_package(OpenGL REQUIRED)
   list(APPEND SRC API/GL/Pipeline.cpp)
   list(APPEND INC ${OPENGL_INCLUDE_DIRS})

@@ -15,40 +15,32 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#include <System.h>
+#include "Context.h"
 
-#include <GraphicsPipeline.h>
-#include <API/GL/Pipeline.h>
+using namespace GP;
 
-#include <GL/glew.h>
-#include <GL/glx.h>
-
-namespace GP
+System::System()
 {
-  namespace GL
-  {
-    class Context : public ContextBase
-    {
-    public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
-      
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      Window                  mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
-    };
-  }
-};
+}
 
+System::~System()
+{
+}
 
-#endif // __GP_CONTEXT_X11_H__
+WindowPtr System::CreateWindow(const std::string& title, int width, int height)
+{
+}
+
+ContextPtr System::CreateContext()
+{
+  return std::make_shared<GLES::Context>();
+}
+
+void System::Poll()
+{
+}
+
+void System::Run()
+{
+}

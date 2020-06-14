@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "Pipeline.h"
+#include "Types.h"
 
 namespace GP
 {
@@ -33,6 +34,8 @@ namespace GP
   public:
     Context() {}
     virtual PipelinePtr CreatePipeline() = 0;
+    
+    virtual void Bind(TargetPtr target) = 0;
   };
   typedef std::shared_ptr<Context> ContextPtr;
 };

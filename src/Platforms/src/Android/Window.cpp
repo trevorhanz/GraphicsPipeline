@@ -15,40 +15,41 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#include <System.h>
+#include "Window.h"
+#include "Android.h"
 
-#include <GraphicsPipeline.h>
-#include <API/GL/Pipeline.h>
+using namespace GP;
 
-#include <GL/glew.h>
-#include <GL/glx.h>
-
-namespace GP
+class GP::Window::Data
 {
-  namespace GL
-  {
-    class Context : public ContextBase
-    {
-    public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
-      
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      Window                  mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
-    };
-  }
+public:
+  ANativeWindow*    mWindow;
+  TargetPtr         mTarget;
 };
 
+Window::Window(Init* init)
+  : mData(new Data())
+{
+  mData->mWindow = init->mWindow;
+  mData->mTarget = std::make_shared<Target>();
+  auto userData = std::make_shared<TargetUserData>();
+  userData->mBound = false;
+  userData->mWindow = mData->mWindow;
+  mData->mTarget->mUserData = userData;
+}
 
-#endif // __GP_CONTEXT_X11_H__
+Window::~Window()
+{
+}
+
+TargetPtr Window::GetTarget()
+{
+  return mData->mTarget;
+}
+
+Android::Window::Window(ANativeWindow* window)
+  : GP::Window(new Init({window}))
+{
+  
+}

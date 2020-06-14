@@ -202,6 +202,10 @@ GP::PipelinePtr Context::CreatePipeline()
   return std::make_shared<Pipeline>();
 }
 
+void Context::Bind(GP::TargetPtr target)
+{
+}
+
 // EMSCRIPTEN_BINDINGS(GP) {
 //   emscripten::class_<GP::Target>("_Target")
 //     .smart_ptr_constructor("_Target", &std::make_shared<GP::Target>);
