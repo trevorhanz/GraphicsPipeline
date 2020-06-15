@@ -33,11 +33,16 @@ build_web:
 
 build_android:
   stage: build
-  image: bitriseio/android-ndk:v2020_06_13-08_35-b1999
+  image: trevorhanz/android-ndk:r21d
   tags:
     - docker
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/Emscripten.cmake ../
+    - >
+       cmake 
+       -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake 
+       -DANDROID_ABI=x86 
+       -DANDROID_NATIVE_API_LEVEL=28 
+       ../
     - make
