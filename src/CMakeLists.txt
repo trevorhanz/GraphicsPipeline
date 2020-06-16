@@ -7,10 +7,11 @@ set(LIB "")
 set(INC "")
 
 if(EMSCRIPTEN)
+  list(APPEND SRC API/GLES/Pipeline.cpp)
   list(APPEND SRC
-    Platforms/src/Web/src/System.cpp
-    Platforms/src/Web/src/WebAssembly.cpp
-    Platforms/src/Web/src/Window.cpp)
+    Platforms/src/Web/System.cpp
+    Platforms/src/Web/Context.cpp
+    Platforms/src/Web/Window.cpp)
   list(APPEND INC
     Platforms/src/Web/include)
 elseif(ANDROID)
@@ -74,7 +75,7 @@ if(EMSCRIPTEN)
   set_target_properties(GraphicsPipeline PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
   
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
-  add_executable(GraphicsPipeline-main Platforms/src/Web/src/main.cpp)
+  add_executable(GraphicsPipeline-main Platforms/src/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
   target_link_libraries(GraphicsPipeline-main GraphicsPipeline)
 endif(EMSCRIPTEN)

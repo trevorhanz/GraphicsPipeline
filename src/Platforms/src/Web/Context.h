@@ -47,39 +47,6 @@ namespace GP
     };
     typedef std::shared_ptr<Target> TargetPtr;
     
-    class Pipeline : public GP::Pipeline
-    {
-    public:
-      class Context;
-      
-      void AddOperation(GP::OperationPtr operation) override;
-      void RemoveOperation(OperationPtr operation) override;
-      void ClearPipeline() override;
-      
-      void Execute() override;
-      
-    private:
-      std::list<GP::OperationPtr>           mOperations;
-    };
-    typedef std::shared_ptr<Pipeline> PipelinePtr;
-    
-    class Pipeline::Context : public GP::Pipeline::Context
-    {
-    public:
-      void SetTarget(GP::TargetPtr target) override;
-      void ClearColor() override;
-      void ClearDepth() override;
-      void LoadArray(ArrayPtr array, ArrayDataPtr data) override;
-      void LoadShader(ShaderPtr shader, const char* vertex, const char* fragment) override;
-      void SetShader(ShaderPtr shader) override;
-      void AttachArray(ArrayPtr array, const std::string& name) override;
-      void Draw() override;
-      
-    private:
-      GP::TargetPtr                 mCurrentTarget;
-      GP::ShaderPtr                 mCurrentShader;
-    };
-    
     class Context : public GP::Context
     {
     public:

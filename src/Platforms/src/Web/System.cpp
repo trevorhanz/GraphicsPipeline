@@ -15,19 +15,37 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_WEB_H__
-#define __GP_WEB_H__
-
 #include <System.h>
-#include <WebAssembly.h>
+#include "Context.h"
+#include "Web.h"
 
-namespace GP
+using namespace GP;
+
+System::System()
 {
-  class Window::Init
-  {
-  public:
-    Web::TargetPtr          mTarget;
-  };
 }
 
-#endif // __GP_WEB_H__
+System::~System()
+{
+}
+
+WindowPtr System::CreateWindow(const std::string& title, int width, int height)
+{
+  Window::Init* init = new Window::Init();
+  init->mTarget = std::make_shared<Web::Target>(title);
+  return std::make_shared<Window>(init);
+}
+
+ContextPtr System::CreateContext()
+{
+  return std::make_shared<Web::Context>();
+}
+
+void System::Poll()
+{
+}
+
+void System::Run()
+{
+}
+

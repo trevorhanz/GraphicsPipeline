@@ -16,7 +16,7 @@
 ************************************************************************/
 
 #include <GraphicsPipeline.h>
-#include <WebAssembly.h>
+#include <System.h>
 
 using namespace GP;
 
@@ -33,13 +33,15 @@ const char* fragmentSource =
     "{                                            \n"
     "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
     "}                                            \n";
-GLfloat vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
+float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argv, char* argc[])
 {
-  Context* context = new Web::Context();
+  System* system = new System();
   
-  TargetPtr target = std::make_shared<Web::Target>("#canvas1");
+  ContextPtr context = system->CreateContext();
+  
+  WindowPtr window = system->CreateWindow("#canvas1", 640, 480);
   
   ArrayPtr array = std::make_shared<Array>();
   ShaderPtr shader = std::make_shared<Shader>();

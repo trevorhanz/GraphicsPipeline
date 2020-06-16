@@ -73,7 +73,6 @@ int main(int argc, char* argv[])
   pipeline->AddOperation(draw);
   
   pipeline->Execute();
-//   pipeline->Execute();
   
   system->Run();
 }

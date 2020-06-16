@@ -15,29 +15,19 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#ifndef __GP_WEB_H__
+#define __GP_WEB_H__
+
 #include <System.h>
-#include <WebAssembly.h>
-#include "Web.h"
+#include "Context.h"
 
-using namespace GP;
-
-class Window::Data
+namespace GP
 {
-public:
-  Web::TargetPtr        mTarget;
-};
-
-Window::Window(Init* init)
-  : mData(new Data())
-{
-  mData->mTarget = init->mTarget;
+  class Window::Init
+  {
+  public:
+    Web::TargetPtr          mTarget;
+  };
 }
 
-Window::~Window()
-{
-}
-
-TargetPtr Window::GetTarget()
-{
-  return mData->mTarget;
-}
+#endif // __GP_WEB_H__

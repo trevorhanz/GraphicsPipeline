@@ -16,36 +16,28 @@
 ************************************************************************/
 
 #include <System.h>
-#include <WebAssembly.h>
+#include "Context.h"
 #include "Web.h"
 
 using namespace GP;
 
-System::System()
+class Window::Data
+{
+public:
+  Web::TargetPtr        mTarget;
+};
+
+Window::Window(Init* init)
+  : mData(new Data())
+{
+  mData->mTarget = init->mTarget;
+}
+
+Window::~Window()
 {
 }
 
-System::~System()
+TargetPtr Window::GetTarget()
 {
+  return mData->mTarget;
 }
-
-WindowPtr System::CreateWindow(const std::string& title, int width, int height)
-{
-  Window::Init* init = new Window::Init();
-  init->mTarget = std::make_shared<Web::Target>(title);
-  return std::make_shared<Window>(init);
-}
-
-ContextPtr System::CreateContext()
-{
-  return std::make_shared<Web::Context>();
-}
-
-void System::Poll()
-{
-}
-
-void System::Run()
-{
-}
-
