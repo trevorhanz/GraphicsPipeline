@@ -99,7 +99,7 @@ Context::~Context()
 
 GP::PipelinePtr Context::CreatePipeline()
 {
-  return std::make_shared<PipelineBase>(this);
+  return std::make_shared<Pipeline>(this);
 }
 
 TargetUserDataPtr Context::CreateTarget()

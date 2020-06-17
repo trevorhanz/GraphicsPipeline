@@ -41,13 +41,13 @@ namespace GP
       virtual TargetUserDataPtr CreateTarget() = 0;
     };
     
-    class PipelineBase : public GP::Pipeline
+    class Pipeline : public GP::Pipeline
     {
     public:
       class Context;
       
-      PipelineBase(ContextBase* context);
-      ~PipelineBase() override;
+      Pipeline(ContextBase* context);
+      ~Pipeline() override;
       
       void AddOperation(OperationPtr operation) override;
       void RemoveOperation(OperationPtr operation) override;
@@ -63,10 +63,10 @@ namespace GP
       std::list<GP::OperationPtr>           mOperations;
     };
     
-    class PipelineBase::Context : public GP::Pipeline::Context
+    class Pipeline::Context : public GP::Pipeline::Context
     {
     public:
-      Context(PipelineBase* pipeline);
+      Context(Pipeline* pipeline);
       ~Context() override;
       void SetTarget(TargetPtr target) override;
       void ClearColor() override;
@@ -78,7 +78,7 @@ namespace GP
       void Draw() override;
       
     private:
-      PipelineBase*                     mPipeline;
+      Pipeline*                     mPipeline;
       
       GP::TargetPtr                 mCurrentTarget;
       GP::ShaderPtr                 mCurrentShader;

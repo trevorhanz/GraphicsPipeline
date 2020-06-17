@@ -83,7 +83,7 @@ Context::Context()
 
 GP::PipelinePtr Context::CreatePipeline()
 {
-  return std::make_shared<GLES::PipelineBase>(this);
+  return std::make_shared<GLES::Pipeline>(this);
 }
 
 void Context::Bind(GP::TargetPtr target)

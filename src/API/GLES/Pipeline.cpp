@@ -47,31 +47,31 @@ public:
 };
 typedef std::shared_ptr<ShaderUserData> ShaderUserDataPtr;
 
-PipelineBase::PipelineBase(GP::Context* context)
+Pipeline::Pipeline(GP::Context* context)
   : mContext(context)
 {
 }
 
-PipelineBase::~PipelineBase()
+Pipeline::~Pipeline()
 {
 }
 
-void PipelineBase::AddOperation(OperationPtr operation)
+void Pipeline::AddOperation(OperationPtr operation)
 {
   mOperations.push_back(operation);
 }
 
-void PipelineBase::RemoveOperation(OperationPtr operation)
+void Pipeline::RemoveOperation(OperationPtr operation)
 {
   mOperations.remove(operation);
 }
 
-void PipelineBase::ClearPipeline()
+void Pipeline::ClearPipeline()
 {
   mOperations.clear();
 }
 
-void PipelineBase::Execute()
+void Pipeline::Execute()
 {
   auto ctx = CreateContext();
   for(auto op : mOperations)
@@ -81,21 +81,21 @@ void PipelineBase::Execute()
   delete ctx;
 }
 
-PipelineBase::Context* PipelineBase::CreateContext()
+Pipeline::Context* Pipeline::CreateContext()
 {
   return new Context(this);
 }
 
-PipelineBase::Context::Context(PipelineBase* pipeline)
+Pipeline::Context::Context(Pipeline* pipeline)
   : mPipeline(pipeline)
 {
 }
 
-PipelineBase::Context::~Context()
+Pipeline::Context::~Context()
 {
 }
 
-void PipelineBase::Context::SetTarget(GP::TargetPtr target)
+void Pipeline::Context::SetTarget(GP::TargetPtr target)
 {
   mPipeline->mContext->Bind(target);
   
@@ -106,18 +106,18 @@ void PipelineBase::Context::SetTarget(GP::TargetPtr target)
   mCurrentTarget = target;
 }
 
-void PipelineBase::Context::ClearColor()
+void Pipeline::Context::ClearColor()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void PipelineBase::Context::ClearDepth()
+void Pipeline::Context::ClearDepth()
 {
   glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void PipelineBase::Context::LoadArray(ArrayPtr array, ArrayDataPtr data)
+void Pipeline::Context::LoadArray(ArrayPtr array, ArrayDataPtr data)
 {
   ArrayUserDataPtr ptr = std::dynamic_pointer_cast<ArrayUserData>(array->mUserData);
   if(!ptr)
@@ -131,7 +131,7 @@ void PipelineBase::Context::LoadArray(ArrayPtr array, ArrayDataPtr data)
   glBufferData(GL_ARRAY_BUFFER, data->GetSize()*sizeof(float), data->GetData(), GL_STATIC_DRAW);
 }
 
-void PipelineBase::Context::LoadShader(ShaderPtr shader, const char* vertex, const char* fragment)
+void Pipeline::Context::LoadShader(ShaderPtr shader, const char* vertex, const char* fragment)
 {
   ShaderUserDataPtr ptr;
   if(!shader->mUserData)
@@ -176,7 +176,7 @@ void PipelineBase::Context::LoadShader(ShaderPtr shader, const char* vertex, con
   ptr->mAttribute = glGetAttribLocation(ptr->mProgram, "position");
 }
 
-void PipelineBase::Context::SetShader(ShaderPtr shader)
+void Pipeline::Context::SetShader(ShaderPtr shader)
 {
   ShaderUserDataPtr ptr = std::dynamic_pointer_cast<ShaderUserData>(shader->mUserData);
   glUseProgram(ptr->mProgram);
@@ -185,7 +185,7 @@ void PipelineBase::Context::SetShader(ShaderPtr shader)
   mCurrentShader = shader;
 }
 
-void PipelineBase::Context::AttachArray(ArrayPtr array, const std::string& name)
+void Pipeline::Context::AttachArray(ArrayPtr array, const std::string& name)
 {
   ArrayUserDataPtr ptr = std::dynamic_pointer_cast<ArrayUserData>(array->mUserData);
   glBindBuffer(GL_ARRAY_BUFFER, ptr->mVBO);
@@ -196,7 +196,7 @@ void PipelineBase::Context::AttachArray(ArrayPtr array, const std::string& name)
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void PipelineBase::Context::Draw()
+void Pipeline::Context::Draw()
 {
   glDrawArrays(GL_TRIANGLES, 0, 3);
   
