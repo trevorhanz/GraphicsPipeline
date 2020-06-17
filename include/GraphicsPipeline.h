@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file GraphicsPipeline.h
+
 #ifndef __GRAPHICS_PIPELINE_H__
 #define __GRAPHICS_PIPELINE_H__
 

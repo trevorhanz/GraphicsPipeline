@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Operations.h
+
 #ifndef __GP_OPERATIONS_H__
 #define __GP_OPERATIONS_H__
 
@@ -25,16 +27,23 @@
 
 namespace GP
 {
-  /*
-   * Base class describing a pipeline operation
+  /*!
+   * Base class describing a Pipeline operation
    */
   class Operation
   {
   public:
+    //! Constructor
     Operation();
+    //! Descructor
     virtual ~Operation();
     
   public:
+    /*!
+     * Executes the operation implemented in the derived classes.
+     * This function should only be called by a Pipeline.
+     * \param context The Pipeline::Context on which the operation will be performed.
+     */
     virtual void Execute(Pipeline::Context* context) {};
     
   private:
@@ -42,17 +51,32 @@ namespace GP
     
     friend class Pipeline;
   };
+  //! Shared pointer to Operation object.
   typedef std::shared_ptr<Operation> OperationPtr;
   
-  /*
-   * Operation to load numerical data into an Array
+  /*!
+   * Operation to load numerical data into an Array.
+   * When executed, data stored in an ArrayData obect will be
+   * loaded into an Array object.  This operation may be
+   * preformed asynchronously, so the ArrayData should not
+   * be continued to be used.
    */
   class LoadArray : public Operation
   {
   public:
+    //! Constructor
     LoadArray();
     
+    /*!
+     * Sets the Array for which data will be loaded.
+     * \param array Array to be used.
+     */
     void SetArray(ArrayPtr array);
+    
+    /*!
+     * Sets the ArrayData for which will be loaded into the Array
+     * \param data ArrayData to be used
+     */
     void SetData(ArrayDataPtr data);
     
   public:
@@ -62,18 +86,34 @@ namespace GP
     ArrayPtr                mArray;
     ArrayDataPtr            mData;
   };
+  //! Shared pointer to LoadArray object.
   typedef std::shared_ptr<LoadArray> LoadArrayPtr;
   
-  /*
-   * Operation to load a Shader
+  /*!
+   * Operation to load a Shader.
    */
   class LoadShader : public Operation
   {
   public:
+    //! Constructor
     LoadShader();
     
+    /*!
+     * Sets the Shader for which is to be loaded.
+     * \param shader Shader for which is to be loaded.
+     */
     void SetShader(ShaderPtr shader);
+    
+    /*!
+     * Sets the coded used in the vertex shader.
+     * \param code String containing vertex code.
+     */
     void SetVertexCode(const std::string& code);
+    
+    /*!
+     * Sets the coded used in the fragment shader.
+     * \param code String containing fragment code.
+     */
     void SetFragmentCode(const std::string& code);
     
   public:
@@ -84,17 +124,28 @@ namespace GP
     std::string               mVertex;
     std::string               mFragment;
   };
+  //! Shared pointer to LoadShader object.
   typedef std::shared_ptr<LoadShader> LoadShaderPtr;
   
-  /*
-   * Operation to draw
+  /*!
+   * Operation to draw.
    */
   class Draw : public Operation
   {
   public:
+    //! Constructor
     Draw();
     
+    /*!
+     * Sets the Shader for which will be used to render.
+     * \param shader Shader to be used.
+     */
     void SetShader(ShaderPtr shader);
+    
+    /*!
+     * Sets the Array for which will be used to render.
+     * \param array Array to be used.
+     */
     void SetArray(ArrayPtr array);
     
   public:
@@ -104,14 +155,19 @@ namespace GP
     ShaderPtr                 mShader;
     ArrayPtr                  mArray;
   };
+  //! Shared pointer to Draw object.
   typedef std::shared_ptr<Draw> DrawPtr;
   
-  /*
-   * Operation to set Target for future operations
+  /*!
+   * Operation to set Target for future operations.
    */
   class TargetFocus : public Operation
   {
   public:
+    /*!
+     * Sets the Target to be focused.
+     * \param target Target to be focused.
+     */
     void SetTarget(TargetPtr target);
     
   public:
@@ -120,16 +176,19 @@ namespace GP
   private:
     TargetPtr                 mTarget;
   };
+  //! Shared pointer to TargetFocus object.
   typedef std::shared_ptr<TargetFocus> TargetFocusPtr;
   
-  /*
-   * Operation to clear data off of the Target
+  /*!
+   * Operation to clear data off of the Target.
+   * Clears both color and depth buffer.
    */
   class Clear : public Operation
   {
   public:
     void Execute(Pipeline::Context* context) override;
   };
+  //! Shared pointer to Clear object.
   typedef std::shared_ptr<Clear> ClearPtr;
 }
 

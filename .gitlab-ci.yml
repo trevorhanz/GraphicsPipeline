@@ -22,7 +22,7 @@ build_ubuntu_18:
 
 build_web:
   stage: build
-  image: trzeci/emscripten:1.39.4-ubuntu
+  image: trevorhanz/emscripten:1.39.4
   tags:
     - docker
   script:
@@ -46,3 +46,16 @@ build_android:
        -DANDROID_NATIVE_API_LEVEL=28 
        ../
     - make
+
+pages:
+  image: trevorhanz/emscripten:1.39.4
+  tags:
+    - docker
+  script:
+    - doxygen doxygen/Doxyfile
+    - mv build/doxygen/html/ public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

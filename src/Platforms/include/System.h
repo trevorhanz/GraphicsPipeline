@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file System.h
+
 #ifndef __GP_SYSTEM_H__
 #define __GP_SYSTEM_H__
 
@@ -25,8 +27,8 @@
 
 namespace GP
 {
-  /*
-   * Object for managing a system window
+  /*!
+   * Object for managing a system window.
    */
   class Window
   {
@@ -35,29 +37,54 @@ namespace GP
     Window(Init* init);
     virtual ~Window();
     
+    /*!
+     * Get unerlying render target.
+     * \return Target.
+     */
     TargetPtr GetTarget();
     
   private:
     class Data;
     Data*           mData;
   };
+  //! Shared pointer to Window object.
   typedef std::shared_ptr<Window> WindowPtr;
   
-  /*
-   * Top-Level system object
+  /*!
+   * Top-Level system object.
+   * Abstraction for OS specific window system and event loop.
    */
   class System
   {
   public:
+    //! Constructor
     System();
+    //! Destructor
     ~System();
     
+    /*!
+     * Create a new Window object for this system.
+     * \param title Window title.
+     * \param width Window width in pixels.
+     * \param height Window height in pixels.
+     * \return Pointer to Window object.
+     */
     WindowPtr CreateWindow(const std::string& title, int width, int height);
     
+    /*!
+     * Creates a new Context bound to this System.
+     * \return Pointer to new Context.
+     */
     ContextPtr CreateContext();
     
+    /*!
+     * Process pending events.
+     */
     void Poll();
     
+    /*!
+     * Process all events in a loop.
+     */
     void Run();
     
   private:
