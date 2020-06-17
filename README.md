@@ -1,0 +1,2 @@
+# Overview
+This project is a graphics abstraction layer.  It is not intended to be a full graphics engine.  It make no efforts to manage any form of data format or implement any graphical effects.  The goal is to abstract out all aspects of platform and API used to remove the need to write large amounts of boiler plate code to allow developers to focus on implementing the specific graphical effects needed for their application.
