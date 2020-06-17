@@ -52,6 +52,7 @@ pages:
   tags:
     - docker
   script:
+    - mkdir -p build/doxygen/
     - doxygen doxygen/Doxyfile
     - mv build/doxygen/html/ public
   artifacts:
