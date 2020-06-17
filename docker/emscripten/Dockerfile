@@ -6,7 +6,7 @@ FROM trzeci/emscripten:1.39.4-ubuntu
 
 RUN apt-get update -qq
 
-RUN apt install -y doxygen
+RUN apt install -y doxygen graphviz
 
 # ------------------------------------------------------
 # Cleanup and rev num
