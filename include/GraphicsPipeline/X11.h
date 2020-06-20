@@ -15,48 +15,28 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file X11.h
+
 #ifndef __GP_X11_H__
 #define __GP_X11_H__
 
-#include <Types.h>
-#include <Window.h>
-
-#include <X11/Xlib.h>
-
-#include <System.h>
-#include <API/GL/Pipeline.h>
-
-#include <GL/glew.h>
-#include <GL/glx.h>
+#include "Window.h"
 
 namespace GP
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    TargetPtr         mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
-  class TargetUserData : public GL::TargetUserData
-  {
-  public:
-    Display*          mDisplay;
-    ::Window          mWindow;
-    GLXContext        mContext;
-    
-    void MakeCurrent() override {glXMakeCurrent(mDisplay, mWindow, mContext);}
-    void Present() override {glXSwapBuffers(mDisplay, mWindow); printf("Swap\n");}
-  };
-  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-  
   namespace X11
   {
+    /*!
+     * Window with X11 specific features.
+     */
     class Window : public GP::Window
     {
     public:
+      //! Constructor
       Window();
     };
+    //! Shared pointer to Window object.
+    typedef std::shared_ptr<Window> WindowPtr;
   }
 }
 

@@ -15,15 +15,49 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GraphicsPipeline.h
+#include <GraphicsPipeline/System.h>
+#include <GraphicsPipeline/Window.h>
+#include <GraphicsPipeline/X11.h>
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include "X11.h"
 
-#include "Context.h"
-#include "Pipeline.h"
-#include "Operations.h"
-#include "Types.h"
-#include "Window.h"
+#include <GL/glew.h>
+#include <GL/glx.h>
 
-#endif // __GRAPHICS_PIPELINE_H__
+using namespace GP;
+
+GP::Window::Window(UserDataPtr windowData)
+  : mUserData(windowData)
+{
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  data->mTarget = std::make_shared<Target>();
+}
+
+GP::Window::~Window()
+{
+}
+
+unsigned int GP::Window::GetWidth()
+{
+  return 0;
+}
+
+unsigned int GP::Window::GetHeight()
+{
+  return 0;
+}
+
+TargetPtr GP::Window::GetTarget()
+{
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  return data->mTarget;
+}
+
+GP::X11::Window::Window()
+  : GP::Window(std::make_shared<WindowUserData>())
+  {
+    
+  }
+
+
+

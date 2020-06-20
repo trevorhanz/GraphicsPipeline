@@ -17,7 +17,7 @@
 ************************************************************************/
 
 #include "Pipeline.h"
-#include <Operations.h>
+#include <GraphicsPipeline/Operations.h>
 
 #include <iostream>
 

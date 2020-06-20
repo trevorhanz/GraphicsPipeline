@@ -15,7 +15,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include "../include/Operations.h"
+#include <GraphicsPipeline/Operations.h>
 
 using namespace GP;
 

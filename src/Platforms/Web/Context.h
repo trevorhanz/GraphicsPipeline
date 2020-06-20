@@ -18,7 +18,7 @@
 #ifndef __GP_WEB_ASSEMBLY_H__
 #define __GP_WEB_ASSEMBLY_H__
 
-#include <GraphicsPipeline.h>
+#include <GraphicsPipeline/GP.h>
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>

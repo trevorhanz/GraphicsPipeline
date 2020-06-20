@@ -15,7 +15,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include "../include/Types.h"
+#include <GraphicsPipeline/Types.h>
 
 #include <cstring>
 

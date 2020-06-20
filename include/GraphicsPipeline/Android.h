@@ -15,35 +15,34 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_ANDROID_H__
-#define __GP_CONTEXT_ANDROID_H__
+//! \file Android.h
 
-#include <GraphicsPipeline.h>
+#ifndef __GP_ANDROID_H__
+#define __GP_ANDROID_H__
 
-#include <EGL/egl.h> // requires ndk r5 or newer
-#include <GLES2/gl2.h>
+#include <android/native_window.h>
+
+#include "Window.h"
 
 namespace GP
 {
-  namespace GLES
+  namespace Android
   {
-    class Context : public GP::Context
+    /*!
+     * Window with Android specific features.
+     */
+    class Window : public GP::Window
     {
     public:
-      Context();
-      
-      GP::PipelinePtr CreatePipeline() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      EGLDisplay                      mDisplay;
-      EGLConfig                       mConfig;
-      EGLint                          mFormat;
-      EGLContext                      mShare;
-      EGLSurface                      mShareSurface;
+      /*!
+       * Constructor.
+       * \param window a native reference to the Android window.
+       */
+      Window(ANativeWindow* window);
     };
+    //! Shared pointer to Window object.
+    typedef std::shared_ptr<Window> WindowPtr;
   };
-}
+};
 
-#endif // __GP_CONTEXT_ANDROID_H__
+#endif // __GP_ANDROID_H__

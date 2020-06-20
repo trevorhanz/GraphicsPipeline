@@ -15,7 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <System.h>
+#include <GraphicsPipeline/System.h>
+#include <GraphicsPipeline/X11.h>
 #include "Context.h"
 #include "X11.h"
 

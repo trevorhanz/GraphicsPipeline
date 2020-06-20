@@ -18,8 +18,8 @@
 #ifndef __GP_PIPELINE_GL_H__
 #define __GP_PIPELINE_GL_H__
 
-#include <Context.h>
-#include <Pipeline.h>
+#include <GraphicsPipeline/Context.h>
+#include <GraphicsPipeline/Pipeline.h>
 
 #include <list>
 

@@ -15,7 +15,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <System.h>
+#include <GraphicsPipeline/System.h>
 #include "Context.h"
 
 using namespace GP;

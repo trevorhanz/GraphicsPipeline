@@ -15,7 +15,9 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline.h>
+#include <GraphicsPipeline/GP.h>
+#include <GraphicsPipeline/System.h>
+#include <GraphicsPipeline/Web.h>
 #include "Web.h"
 
 #include <emscripten/bind.h>

@@ -15,8 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline.h>
-#include <System.h>
+#include <GraphicsPipeline/GP.h>
+#include <GraphicsPipeline/Desktop.h>
 
 using namespace GP;
 

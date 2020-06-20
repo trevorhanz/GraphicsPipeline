@@ -22,8 +22,9 @@
 
 #include <string>
 
-#include "GraphicsPipeline.h"
+#include "Context.h"
 #include "Types.h"
+#include "Window.h"
 
 namespace GP
 {

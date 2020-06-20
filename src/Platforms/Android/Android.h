@@ -15,8 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_ANDROID_H__
-#define __GP_ANDROID_H__
+#ifndef __GP_ANDROID_COMMON_H__
+#define __GP_ANDROID_COMMON_H__
 
 #include <EGL/egl.h> // requires ndk r5 or newer
 #include <GLES2/gl2.h>
@@ -24,7 +24,7 @@
 #include <android/native_window.h>
 #include <android/log.h>
 
-#include <System.h>
+#include <GraphicsPipeline/System.h>
 #include <API/GLES/Pipeline.h>
 
 #define ANDROID_LOG(...) __android_log_print(ANDROID_LOG_INFO, "GP", __VA_ARGS__);
@@ -55,4 +55,4 @@ namespace GP
 }
 
 
-#endif
+#endif // __GP_ANDROID_COMMON_H__

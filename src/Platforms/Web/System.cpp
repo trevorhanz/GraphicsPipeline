@@ -15,23 +15,36 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_ANDROID_WINDOW_H__
-#define __GP_ANDROID_WINDOW_H__
+#include <GraphicsPipeline/System.h>
+#include <GraphicsPipeline/Web.h>
+#include "Context.h"
+#include "Web.h"
 
-#include <android/native_window.h>
+using namespace GP;
 
-#include "System.h"
-
-namespace GP
+System::System()
 {
-  namespace Android
-  {
-    class Window : public GP::Window
-    {
-    public:
-      Window(ANativeWindow* window);
-    };
-  };
-};
+}
 
-#endif // __GP_ANDROID_WINDOW_H__
+System::~System()
+{
+}
+
+WindowPtr System::CreateWindow(const std::string& title, int width, int height)
+{
+  return std::make_shared<Web::Window>(title);
+}
+
+ContextPtr System::CreateContext()
+{
+  return std::make_shared<Web::Context>();
+}
+
+void System::Poll()
+{
+}
+
+void System::Run()
+{
+}
+

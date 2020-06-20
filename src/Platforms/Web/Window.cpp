@@ -15,7 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <System.h>
+#include <GraphicsPipeline/Window.h>
+#include <GraphicsPipeline/Web.h>
 #include "Context.h"
 #include "Web.h"
 

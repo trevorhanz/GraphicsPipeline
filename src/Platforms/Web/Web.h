@@ -15,35 +15,20 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <System.h>
-#include "Window.h"
-#include "Android.h"
+#ifndef __GP_WEB_COMMON_H__
+#define __GP_WEB_COMMON_H__
 
-using namespace GP;
+#include <GraphicsPipeline/System.h>
+#include "Context.h"
 
-Window::Window(UserDataPtr userData)
-  : mUserData(userData)
+namespace GP
 {
+  class WindowUserData : public UserData
+  {
+  public:
+    TargetPtr         mTarget;
+  };
+  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
 }
 
-Window::~Window()
-{
-}
-
-TargetPtr Window::GetTarget()
-{
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  return data->mTarget;
-}
-
-Android::Window::Window(ANativeWindow* window)
-  : GP::Window(std::make_shared<WindowUserData>())
-{
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  data->mWindow = window;
-  data->mTarget = std::make_shared<Target>();
-  auto targetData = std::make_shared<TargetUserData>();
-  targetData->mBound = false;
-  targetData->mWindow = data->mWindow;
-  data->mTarget->mUserData = targetData;
-}
+#endif // __GP_WEB_COMMON_H__

@@ -9,11 +9,9 @@ set(INC "")
 if(EMSCRIPTEN)
   list(APPEND SRC API/GLES/Pipeline.cpp)
   list(APPEND SRC
-    Platforms/src/Web/System.cpp
-    Platforms/src/Web/Context.cpp
-    Platforms/src/Web/Window.cpp)
-  list(APPEND INC
-    Platforms/src/Web/include)
+    Platforms/Web/System.cpp
+    Platforms/Web/Context.cpp
+    Platforms/Web/Window.cpp)
 elseif(ANDROID)
   find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
     HINTS ${ANDROID_NDK})
@@ -32,13 +30,13 @@ elseif(ANDROID)
               log)
   
   list(APPEND SRC API/GLES/Pipeline.cpp)
-  list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/src/Android/)
+  list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
   list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   
   list(APPEND SRC
-    Platforms/src/Android/Context.cpp
-    Platforms/src/Android/System.cpp
-    Platforms/src/Android/Window.cpp)
+    Platforms/Android/Context.cpp
+    Platforms/Android/System.cpp
+    Platforms/Android/Window.cpp)
 else(ANDROID)
   find_package(OpenGL REQUIRED)
   list(APPEND SRC API/GL/Pipeline.cpp)
@@ -49,9 +47,9 @@ else(ANDROID)
     
   elseif(UNIX)
     list(APPEND SRC
-      Platforms/src/X11/Context.cpp
-      Platforms/src/X11/System.cpp
-      Platforms/src/X11/Window.cpp)
+      Platforms/X11/Context.cpp
+      Platforms/X11/System.cpp
+      Platforms/X11/Window.cpp)
     
     find_package(X11 REQUIRED)
     list(APPEND LIB ${X11_LIBRARIES})
@@ -67,7 +65,7 @@ else(ANDROID)
 endif(EMSCRIPTEN)
 
 add_library(GraphicsPipeline ${SRC})
-target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include Platforms/include/)
+target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include)
 target_include_directories(GraphicsPipeline PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(GraphicsPipeline ${LIB})
 
@@ -75,7 +73,7 @@ if(EMSCRIPTEN)
   set_target_properties(GraphicsPipeline PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
   
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
-  add_executable(GraphicsPipeline-main Platforms/src/Web/main.cpp)
+  add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
   target_link_libraries(GraphicsPipeline-main GraphicsPipeline)
 endif(EMSCRIPTEN)

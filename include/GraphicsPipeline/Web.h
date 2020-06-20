@@ -15,28 +15,29 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Web.h
+
 #ifndef __GP_WEB_H__
 #define __GP_WEB_H__
 
-#include <System.h>
-#include "Context.h"
-
 namespace GP
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    TargetPtr         mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
   namespace Web
   {
+    /*!
+     * Window with web specific features.
+     */
     class Window : public GP::Window
     {
     public:
+      /*!
+       * Constructor.
+       * \param id HTML id of canvas element.
+       */
       Window(const std::string& id);
     };
+    //! Shared pointer to Window object.
+    typedef std::shared_ptr<Window> WindowPtr;
   }
 }
 

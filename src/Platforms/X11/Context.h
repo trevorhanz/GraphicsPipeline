@@ -15,35 +15,40 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <System.h>
-#include "Context.h"
-#include "Web.h"
+#ifndef __GP_CONTEXT_X11_H__
+#define __GP_CONTEXT_X11_H__
 
-using namespace GP;
+#include <GraphicsPipeline/GP.h>
+#include <API/GL/Pipeline.h>
 
-System::System()
+#include <GL/glew.h>
+#include <GL/glx.h>
+
+namespace GP
 {
-}
+  namespace GL
+  {
+    class Context : public ContextBase
+    {
+    public:
+      Context(Display* display, XVisualInfo* vi, ::Window window);
+      virtual ~Context();
+      
+      virtual PipelinePtr CreatePipeline();
+      
+      TargetUserDataPtr CreateTarget() override;
+      
+      void Bind(GP::TargetPtr target) override;
+      
+    private:
+      Display*                mDisplay;
+      XVisualInfo*            mVisualInfo;
+      ::Window                mWindow;
+      Colormap                mColorMap;
+      GLXContext              mShare;
+    };
+  }
+};
 
-System::~System()
-{
-}
 
-WindowPtr System::CreateWindow(const std::string& title, int width, int height)
-{
-  return std::make_shared<Web::Window>(title);
-}
-
-ContextPtr System::CreateContext()
-{
-  return std::make_shared<Web::Context>();
-}
-
-void System::Poll()
-{
-}
-
-void System::Run()
-{
-}
-
+#endif // __GP_CONTEXT_X11_H__

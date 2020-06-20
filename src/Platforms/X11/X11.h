@@ -15,40 +15,39 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#ifndef __GP_X11_COMMON_H__
+#define __GP_X11_COMMON_H__
 
-#include <GraphicsPipeline.h>
+#include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Window.h>
+#include <GraphicsPipeline/System.h>
 #include <API/GL/Pipeline.h>
+
+#include <X11/Xlib.h>
 
 #include <GL/glew.h>
 #include <GL/glx.h>
 
 namespace GP
 {
-  namespace GL
+  class WindowUserData : public UserData
   {
-    class Context : public ContextBase
-    {
-    public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
-      
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      ::Window                mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
-    };
-  }
-};
+  public:
+    TargetPtr         mTarget;
+  };
+  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
+  
+  class TargetUserData : public GL::TargetUserData
+  {
+  public:
+    Display*          mDisplay;
+    ::Window          mWindow;
+    GLXContext        mContext;
+    
+    void MakeCurrent() override {glXMakeCurrent(mDisplay, mWindow, mContext);}
+    void Present() override {glXSwapBuffers(mDisplay, mWindow); printf("Swap\n");}
+  };
+  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
+}
 
-
-#endif // __GP_CONTEXT_X11_H__
+#endif // __GP_X11_COMMON_H__
