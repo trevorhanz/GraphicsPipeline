@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Window.h
+
 #ifndef __GP_WINDOW_H__
 #define __GP_WINDOW_H__
 
