@@ -19,6 +19,7 @@
 #define __GP_X11_H__
 
 #include <Types.h>
+#include <Window.h>
 
 #include <X11/Xlib.h>
 
@@ -30,11 +31,12 @@
 
 namespace GP
 {
-  class Window::Init
+  class WindowUserData : public UserData
   {
   public:
-    Display*          mDisplay;
+    TargetPtr         mTarget;
   };
+  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
   
   class TargetUserData : public GL::TargetUserData
   {
@@ -47,6 +49,15 @@ namespace GP
     void Present() override {glXSwapBuffers(mDisplay, mWindow); printf("Swap\n");}
   };
   typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
+  
+  namespace X11
+  {
+    class Window : public GP::Window
+    {
+    public:
+      Window();
+    };
+  }
 }
 
 #endif // __GP_X11_H__

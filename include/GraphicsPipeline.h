@@ -24,5 +24,6 @@
 #include "Pipeline.h"
 #include "Operations.h"
 #include "Types.h"
+#include "Window.h"
 
 #endif // __GRAPHICS_PIPELINE_H__

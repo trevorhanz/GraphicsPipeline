@@ -43,7 +43,7 @@ namespace GP
     private:
       Display*                mDisplay;
       XVisualInfo*            mVisualInfo;
-      Window                  mWindow;
+      ::Window                mWindow;
       Colormap                mColorMap;
       GLXContext              mShare;
     };

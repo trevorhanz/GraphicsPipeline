@@ -16,6 +16,7 @@
 ************************************************************************/
 
 #include <System.h>
+#include <Window.h>
 
 #include "X11.h"
 
@@ -24,27 +25,38 @@
 
 using namespace GP;
 
-class GP::Window::Data
+GP::Window::Window(UserDataPtr windowData)
+  : mUserData(windowData)
 {
-public:
-  Display*          mDisplay;
-  TargetPtr         mTarget;
-};
-
-GP::Window::Window(Init* init)
-  : mData(new Data())
-{
-  mData->mDisplay = init->mDisplay;
-  mData->mTarget = std::make_shared<Target>();
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  data->mTarget = std::make_shared<Target>();
 }
 
 GP::Window::~Window()
 {
-  delete mData;
+}
+
+unsigned int GP::Window::GetWidth()
+{
+  return 0;
+}
+
+unsigned int GP::Window::GetHeight()
+{
+  return 0;
 }
 
 TargetPtr GP::Window::GetTarget()
 {
-  return mData->mTarget;
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  return data->mTarget;
 }
+
+GP::X11::Window::Window()
+  : GP::Window(std::make_shared<WindowUserData>())
+  {
+    
+  }
+
+
 

@@ -28,29 +28,6 @@
 namespace GP
 {
   /*!
-   * Object for managing a system window.
-   */
-  class Window
-  {
-  public:
-    class Init;
-    Window(Init* init);
-    virtual ~Window();
-    
-    /*!
-     * Get unerlying render target.
-     * \return Target.
-     */
-    TargetPtr GetTarget();
-    
-  private:
-    class Data;
-    Data*           mData;
-  };
-  //! Shared pointer to Window object.
-  typedef std::shared_ptr<Window> WindowPtr;
-  
-  /*!
    * Top-Level system object.
    * Abstraction for OS specific window system and event loop.
    */

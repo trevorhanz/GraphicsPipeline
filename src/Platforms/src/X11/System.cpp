@@ -114,11 +114,8 @@ System::~System()
 
 WindowPtr System::CreateWindow(const std::string& title, int width, int height)
 {
-  Window::Init* init = new Window::Init();
-  init->mDisplay = mData->mDisplay;
-  auto result = std::make_shared<Window>(init);
-  delete init;
-  return result;
+  auto data = std::make_shared<WindowUserData>();
+  return std::make_shared<X11::Window>();
 }
 
 ContextPtr System::CreateContext()

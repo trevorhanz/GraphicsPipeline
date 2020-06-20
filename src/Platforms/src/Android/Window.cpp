@@ -21,22 +21,9 @@
 
 using namespace GP;
 
-class GP::Window::Data
+Window::Window(UserDataPtr userData)
+  : mUserData(userData)
 {
-public:
-  ANativeWindow*    mWindow;
-  TargetPtr         mTarget;
-};
-
-Window::Window(Init* init)
-  : mData(new Data())
-{
-  mData->mWindow = init->mWindow;
-  mData->mTarget = std::make_shared<Target>();
-  auto userData = std::make_shared<TargetUserData>();
-  userData->mBound = false;
-  userData->mWindow = mData->mWindow;
-  mData->mTarget->mUserData = userData;
 }
 
 Window::~Window()
@@ -45,11 +32,18 @@ Window::~Window()
 
 TargetPtr Window::GetTarget()
 {
-  return mData->mTarget;
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  return data->mTarget;
 }
 
 Android::Window::Window(ANativeWindow* window)
-  : GP::Window(new Init({window}))
+  : GP::Window(std::make_shared<WindowUserData>())
 {
-  
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  data->mWindow = window;
+  data->mTarget = std::make_shared<Target>();
+  auto targetData = std::make_shared<TargetUserData>();
+  targetData->mBound = false;
+  targetData->mWindow = data->mWindow;
+  data->mTarget->mUserData = targetData;
 }

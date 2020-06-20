@@ -15,29 +15,48 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_WEB_H__
-#define __GP_WEB_H__
+#ifndef __GP_WINDOW_H__
+#define __GP_WINDOW_H__
 
-#include <System.h>
-#include "Context.h"
+#include "Types.h"
 
 namespace GP
 {
-  class WindowUserData : public UserData
+  /*!
+   * Base class for a top-level window.
+   */
+  class Window
   {
+  protected:
+    //! Constructor \param windowData Pointer to internal data provided by derived class
+    Window(UserDataPtr windowData);
+    
   public:
-    TargetPtr         mTarget;
+    //! Destructor
+    virtual ~Window();
+    
+    /*!
+     * Get unerlying render target.
+     * \return Target.
+     */
+    TargetPtr GetTarget();
+    
+    /*!
+     * Get Window width in pixels.
+     * \return Width in pixels.
+     */
+    unsigned int GetWidth();
+    
+    /*!
+     * Get Window height in pixels.
+     * \return Height in pixels.
+     */
+    unsigned int GetHeight();
+    
+    UserDataPtr           mUserData;
   };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
-  namespace Web
-  {
-    class Window : public GP::Window
-    {
-    public:
-      Window(const std::string& id);
-    };
-  }
+  //! Shared pointer to Window object.
+  typedef std::shared_ptr<Window> WindowPtr;
 }
 
-#endif // __GP_WEB_H__
+#endif // __GP_WINDOW_H__

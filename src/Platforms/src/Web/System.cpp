@@ -31,9 +31,7 @@ System::~System()
 
 WindowPtr System::CreateWindow(const std::string& title, int width, int height)
 {
-  Window::Init* init = new Window::Init();
-  init->mTarget = std::make_shared<Web::Target>(title);
-  return std::make_shared<Window>(init);
+  return std::make_shared<Web::Window>(title);
 }
 
 ContextPtr System::CreateContext()

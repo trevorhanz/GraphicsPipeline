@@ -31,11 +31,13 @@
 
 namespace GP
 {
-  class Window::Init
+  class WindowUserData : public UserData
   {
   public:
     ANativeWindow*        mWindow;
+    TargetPtr             mTarget;
   };
+  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
   
   class TargetUserData : public GLES::TargetUserData
   {

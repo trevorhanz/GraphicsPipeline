@@ -21,16 +21,9 @@
 
 using namespace GP;
 
-class Window::Data
+Window::Window(UserDataPtr userData)
+  : mUserData(userData)
 {
-public:
-  Web::TargetPtr        mTarget;
-};
-
-Window::Window(Init* init)
-  : mData(new Data())
-{
-  mData->mTarget = init->mTarget;
 }
 
 Window::~Window()
@@ -39,5 +32,13 @@ Window::~Window()
 
 TargetPtr Window::GetTarget()
 {
-  return mData->mTarget;
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  return data->mTarget;
+}
+
+Web::Window::Window(const std::string& id)
+  : GP::Window(std::make_shared<WindowUserData>())
+{
+  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
+  data->mTarget = std::make_shared<Web::Target>(id);
 }
