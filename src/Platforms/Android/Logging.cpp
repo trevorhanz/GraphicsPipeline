@@ -15,16 +15,41 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#include <GraphicsPipeline/Logging.h>
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include <stdarg.h>
 
-#include "Context.h"
-#include "Pipeline.h"
-#include "Logging.h"
-#include "Operations.h"
-#include "Types.h"
-#include "Window.h"
+#include <android/log.h>
 
-#endif // __GRAPHICS_PIPELINE_H__
+using namespace GP;
+
+#define LOG(level)\
+  va_list args;\
+  va_start(args, format);\
+  __android_log_vprint(level, "GP", format, args);\
+  va_end(args);
+
+void GP::Log(const char* format, ...)
+{
+  LOG(ANDROID_LOG_DEFAULT);
+}
+
+void GP::LogI(const char* format, ...)
+{
+  LOG(ANDROID_LOG_INFO);
+}
+
+void GP::LogD(const char* format, ...)
+{
+  LOG(ANDROID_LOG_DEBUG);
+}
+
+void GP::LogW(const char* format, ...)
+{
+  LOG(ANDROID_LOG_WARN);
+}
+
+void GP::LogE(const char* format, ...)
+{
+  LOG(ANDROID_LOG_ERROR);
+}

@@ -15,16 +15,48 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#include <GraphicsPipeline/Logging.h>
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include <string>
+#include <stdarg.h>
+#include <unistd.h>
 
-#include "Context.h"
-#include "Pipeline.h"
-#include "Logging.h"
-#include "Operations.h"
-#include "Types.h"
-#include "Window.h"
+using namespace GP;
 
-#endif // __GRAPHICS_PIPELINE_H__
+#define LOG(color, prefix)\
+  std::string fmt = prefix;\
+  fmt += format;\
+  if((isatty(fileno(stdout)) != 0))\
+  {\
+    fmt = color + fmt + "\033[0m";\
+  }\
+  fmt += '\n';\
+  va_list args;\
+  va_start(args, format);\
+  vprintf(fmt.c_str(), args);\
+  va_end(args);
+
+void GP::Log(const char* format, ...)
+{
+  LOG("", "");
+}
+
+void GP::LogI(const char* format, ...)
+{
+  LOG("\033[36m", "INFO: ");
+}
+
+void GP::LogD(const char* format, ...)
+{
+  LOG("\033[34m", "DEBUG: ");
+}
+
+void GP::LogW(const char* format, ...)
+{
+  LOG("\033[33m", "WARNING: ");
+}
+
+void GP::LogE(const char* format, ...)
+{
+  LOG("\033[31m", "ERROR: ");
+}

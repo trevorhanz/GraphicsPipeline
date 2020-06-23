@@ -22,12 +22,9 @@
 #include <GLES2/gl2.h>
 
 #include <android/native_window.h>
-#include <android/log.h>
 
 #include <GraphicsPipeline/System.h>
 #include <API/GLES/Pipeline.h>
-
-#define ANDROID_LOG(...) __android_log_print(ANDROID_LOG_INFO, "GP", __VA_ARGS__);
 
 namespace GP
 {

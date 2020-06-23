@@ -15,16 +15,39 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#include <GraphicsPipeline/Logging.h>
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include <emscripten.h>
 
-#include "Context.h"
-#include "Pipeline.h"
-#include "Logging.h"
-#include "Operations.h"
-#include "Types.h"
-#include "Window.h"
+#include <stdarg.h>
 
-#endif // __GRAPHICS_PIPELINE_H__
+#define LOG(level)\
+  va_list args;\
+  va_start(args, format);\
+  emscripten_log(level, format, args);\
+  va_end(args);
+
+void Log(const char* format, ...)
+{
+  LOG(EM_LOG_INFO);
+}
+
+void LogI(const char* format, ...)
+{
+  LOG(EM_LOG_INFO);
+}
+
+void LogD(const char* format, ...)
+{
+  LOG(EM_LOG_DEBUG);
+}
+
+void LogW(const char* format, ...)
+{
+  LOG(EM_LOG_WARN);
+}
+
+void LogE(const char* format, ...)
+{
+  LOG(EM_LOG_ERROR);
+}

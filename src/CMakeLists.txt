@@ -11,6 +11,7 @@ if(EMSCRIPTEN)
   list(APPEND SRC
     Platforms/Web/System.cpp
     Platforms/Web/Context.cpp
+    Platforms/Web/Logging.cpp
     Platforms/Web/Window.cpp)
 elseif(ANDROID)
   find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
@@ -35,6 +36,7 @@ elseif(ANDROID)
   
   list(APPEND SRC
     Platforms/Android/Context.cpp
+    Platforms/Android/Logging.cpp
     Platforms/Android/System.cpp
     Platforms/Android/Window.cpp)
 else(ANDROID)
@@ -48,6 +50,7 @@ else(ANDROID)
   elseif(UNIX)
     list(APPEND SRC
       Platforms/X11/Context.cpp
+      Platforms/X11/Logging.cpp
       Platforms/X11/System.cpp
       Platforms/X11/Window.cpp)
     

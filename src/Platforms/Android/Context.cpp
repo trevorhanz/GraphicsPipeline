@@ -35,22 +35,22 @@ Context::Context()
   EGLint numConfigs;
   
   if ((mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY) {
-    ANDROID_LOG("eglGetDisplay() returned error %d", eglGetError());
+    GP::LogE("eglGetDisplay() returned error %d", eglGetError());
     return;
   }
   if (!eglInitialize(mDisplay, 0, 0)) {
-    ANDROID_LOG("eglInitialize() returned error %d", eglGetError());
+    GP::LogE("eglInitialize() returned error %d", eglGetError());
     return;
   }
 
   if (!eglChooseConfig(mDisplay, attribs, &mConfig, 1, &numConfigs)) {
-    ANDROID_LOG("eglChooseConfig() returned error %d", eglGetError());
+    GP::LogE("eglChooseConfig() returned error %d", eglGetError());
 
     return;
   }
 
   if (!eglGetConfigAttrib(mDisplay, mConfig, EGL_NATIVE_VISUAL_ID, &mFormat)) {
-    ANDROID_LOG("eglGetConfigAttrib() returned error %d", eglGetError());
+    GP::LogE("eglGetConfigAttrib() returned error %d", eglGetError());
     return;
   }
   
@@ -60,7 +60,7 @@ Context::Context()
   };
   
   if (!(mShare = eglCreateContext(mDisplay, mConfig, 0, contextAttribs))) {
-    ANDROID_LOG("eglCreateContext() returned error %d", eglGetError());
+    GP::LogE("eglCreateContext() returned error %d", eglGetError());
     return;
   }
   
@@ -69,16 +69,16 @@ Context::Context()
   };
   
   if (!(mShareSurface = eglCreatePbufferSurface(mDisplay, mConfig, surfaceAttribs))) {
-    ANDROID_LOG("eglCreatePbufferSurface() returned error %d", eglGetError());
+    GP::LogE("eglCreatePbufferSurface() returned error %d", eglGetError());
     return;
   }
   
   if (!eglMakeCurrent(mDisplay, mShareSurface, mShareSurface, mShare)) {
-      ANDROID_LOG("eglMakeCurrent() returned error %d", eglGetError());
+      GP::LogE("eglMakeCurrent() returned error %d", eglGetError());
       return;
     }
   
-  ANDROID_LOG("GL Version: %s", glGetString(GL_VERSION));
+  GP::LogE("GL Version: %s", glGetString(GL_VERSION));
 }
 
 GP::PipelinePtr Context::CreatePipeline()
@@ -103,7 +103,7 @@ void Context::Bind(GP::TargetPtr target)
     ANativeWindow_setBuffersGeometry(ptr->mWindow, 0, 0, mFormat);
 
     if (!(ptr->mSurface = eglCreateWindowSurface(mDisplay, mConfig, ptr->mWindow, 0))) {
-      ANDROID_LOG("eglCreateWindowSurface() returned error %d", eglGetError());
+      GP::LogE("eglCreateWindowSurface() returned error %d", eglGetError());
       return;
     }
     
@@ -113,12 +113,12 @@ void Context::Bind(GP::TargetPtr target)
     };
     
     if (!(ptr->mContext = eglCreateContext(mDisplay, mConfig, mShare, contextAttribs))) {
-      ANDROID_LOG("eglCreateContext() returned error %d", eglGetError());
+      GP::LogE("eglCreateContext() returned error %d", eglGetError());
       return;
     }
     
     if (!eglMakeCurrent(mDisplay, ptr->mSurface, ptr->mSurface, ptr->mContext)) {
-      ANDROID_LOG("eglMakeCurrent() returned error %d", eglGetError());
+      GP::LogE("eglMakeCurrent() returned error %d", eglGetError());
       return;
     }
     
