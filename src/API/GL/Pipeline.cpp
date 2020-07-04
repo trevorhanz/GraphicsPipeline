@@ -38,7 +38,7 @@ typedef std::shared_ptr<ArrayUserData> ArrayUserDataPtr;
 class ShaderUserData : public GP::UserData
 {
 public:
-  ShaderUserData() {}
+  ShaderUserData() : mProgram(0), mAttribute(0) {}
   virtual ~ShaderUserData() {}
   
   GLuint                mProgram;
@@ -165,14 +165,13 @@ void Pipeline::Context::LoadShader(ShaderPtr shader, const char* vertex, const c
   glGetProgramiv(ptr->mProgram, GL_LINK_STATUS, &linkStatus);
   if(!linkStatus)
   {
-    int charsWritten  = 0;
     int length;
     glGetProgramiv(ptr->mProgram, GL_INFO_LOG_LENGTH, &length);
     if(length > 0)
     {
-      char infoLog[length];
-      glGetProgramInfoLog(ptr->mProgram, length, &length, infoLog);
-      cerr << "ShaderError: " << infoLog << endl;
+      std::vector<char> infoLog(length);
+      glGetProgramInfoLog(ptr->mProgram, length, &length, infoLog.data());
+      cerr << "ShaderError: " << infoLog.data() << endl;
     }
   }
   

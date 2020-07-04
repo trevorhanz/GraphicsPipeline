@@ -20,6 +20,7 @@
 #ifndef __GP_PIPELINE_H__
 #define __GP_PIPELINE_H__
 
+#include <string>
 #include <memory>
 
 #include "Types.h"

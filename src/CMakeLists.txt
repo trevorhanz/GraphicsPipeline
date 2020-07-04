@@ -46,7 +46,11 @@ else(ANDROID)
   list(APPEND LIB ${OPENGL_LIBRARIES})
   
   if(WIN32)
-    
+    list(APPEND SRC
+      Platforms/Windows/Context.cpp
+      Platforms/Windows/Logging.cpp
+      Platforms/Windows/System.cpp
+      Platforms/Windows/Window.cpp)
   elseif(UNIX)
     list(APPEND SRC
       Platforms/X11/Context.cpp
@@ -71,6 +75,7 @@ add_library(GraphicsPipeline ${SRC})
 target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include)
 target_include_directories(GraphicsPipeline PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(GraphicsPipeline ${LIB})
+set_property(TARGET GraphicsPipeline PROPERTY CXX_STANDARD 11)
 
 if(EMSCRIPTEN)
   set_target_properties(GraphicsPipeline PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
