@@ -29,25 +29,35 @@
 
 void Log(const char* format, ...)
 {
-  LOG(EM_LOG_INFO);
+  LOG(EM_LOG_CONSOLE);
 }
 
 void LogI(const char* format, ...)
 {
-  LOG(EM_LOG_INFO);
+  // EM_LOG_INFO added in 1.39.9
+#ifdef EM_LOG_INFO
+  LOG(EM_LOG_CONSOLE|EM_LOG_INFO);
+#else
+  LOG(EM_LOG_CONSOLE);
+#endif
 }
 
 void LogD(const char* format, ...)
 {
-  LOG(EM_LOG_DEBUG);
+  // EM_LOG_DEBUG added in 1.39.9
+#ifdef EM_LOG_INFO
+  LOG(EM_LOG_CONSOLE|EM_LOG_DEBUG);
+#else
+  LOG(EM_LOG_CONSOLE);
+#endif
 }
 
 void LogW(const char* format, ...)
 {
-  LOG(EM_LOG_WARN);
+  LOG(EM_LOG_CONSOLE|EM_LOG_WARN);
 }
 
 void LogE(const char* format, ...)
 {
-  LOG(EM_LOG_ERROR);
+  LOG(EM_LOG_CONSOLE|EM_LOG_ERROR|EM_LOG_C_STACK);
 }
