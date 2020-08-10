@@ -48,3 +48,7 @@ void System::Run()
 {
 }
 
+void System::SetExposeCallback(std::function<void()> callback)
+{
+}
+
