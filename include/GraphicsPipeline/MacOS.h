@@ -40,4 +40,4 @@ namespace GP
   }
 }
 
-#endif // __GP_X11_H__
+#endif // __GP_MACOS_H__
