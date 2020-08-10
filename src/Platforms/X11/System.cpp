@@ -22,7 +22,6 @@
 
 #include <GL/glew.h>
 #include <GL/glx.h>
-// #include <X11/extensions/Xrandr.h>
 
 #include <iostream>
 
@@ -34,6 +33,7 @@ class System::Data
 public:
   Display*                                  mDisplay;
   XVisualInfo*                              mVisualInfo;
+  std::function<void()>                     mExposeCallback;
   
   ::Window CreateWindow()
   {
@@ -135,6 +135,7 @@ void System::Poll()
     if(event.type == Expose)
     {
       printf("Expose\n");
+      mData->mExposeCallback();
     }
   }
 }
@@ -145,4 +146,9 @@ void System::Run()
   {
     Poll();
   }
+}
+
+void System::SetExposeCallback(std::function<void()> callback)
+{
+  mData->mExposeCallback = callback;
 }

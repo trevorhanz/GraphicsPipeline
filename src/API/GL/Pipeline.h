@@ -78,6 +78,8 @@ namespace GP
       void Draw() override;
       
     private:
+      int CheckShaderStatus(unsigned int shader, const char* type);
+      
       Pipeline*                     mPipeline;
       
       GP::TargetPtr                 mCurrentTarget;

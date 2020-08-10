@@ -88,8 +88,9 @@ Context::Context(Display* display, XVisualInfo* vi, ::Window window)
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   cout << "OpenGL Version: " << major << "." << minor << endl;
-  
+  LogD("Test");
   cout << "Direct Rendering: " << ((glXIsDirect(mDisplay, mShare)) ? "YES" : "NO") << endl << endl;
+  LogD("Test");
 }
 
 Context::~Context()
@@ -125,7 +126,6 @@ TargetUserDataPtr Context::CreateTarget()
   XFlush(mDisplay);
   XMapRaised(ptr->mDisplay, ptr->mWindow);
   XFlush(mDisplay);
-  sleep(1);
   
   return ptr;
 }

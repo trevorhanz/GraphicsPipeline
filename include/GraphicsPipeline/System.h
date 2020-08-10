@@ -21,6 +21,7 @@
 #define __GP_SYSTEM_H__
 
 #include <string>
+#include <functional>
 
 #include "Context.h"
 #include "Types.h"
@@ -64,6 +65,8 @@ namespace GP
      * Process all events in a loop.
      */
     void Run();
+    
+    void SetExposeCallback(std::function<void()> callback);
     
   private:
     class Data;

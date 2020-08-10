@@ -1,7 +1,27 @@
+set(HEADERS
+    ../include/GraphicsPipeline/Android.h
+    ../include/GraphicsPipeline/Context.h
+    ../include/GraphicsPipeline/Desktop.h
+    ../include/GraphicsPipeline/GP.h
+    ../include/GraphicsPipeline/Logging.h
+    ../include/GraphicsPipeline/MacOS.h
+    ../include/GraphicsPipeline/Operations.h
+    ../include/GraphicsPipeline/Pipeline.h
+    ../include/GraphicsPipeline/System.h
+    ../include/GraphicsPipeline/Types.h
+    ../include/GraphicsPipeline/Web.h
+    ../include/GraphicsPipeline/Window.h
+    ../include/GraphicsPipeline/Windows.h
+    ../include/GraphicsPipeline/X11.h
+    )
 
 set(SRC
   Operations.cpp
-  Types.cpp)
+  Types.cpp
+  ${HEADERS}
+  )
+
+source_group("Header Files\\include" FILES ${HEADERS})
 
 set(LIB "")
 set(INC "")
@@ -51,6 +71,18 @@ else(ANDROID)
       Platforms/Windows/Logging.cpp
       Platforms/Windows/System.cpp
       Platforms/Windows/Window.cpp)
+  elseif(APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    list(APPEND LIB ${COCOA_LIBRARY})
+    list(APPEND SRC
+      Platforms/MacOS/Context.mm
+      Platforms/MacOS/Context.h
+      Platforms/MacOS/Logging.cpp
+      Platforms/MacOS/MacOS.h
+      Platforms/MacOS/View.m
+      Platforms/MacOS/View.h
+      Platforms/MacOS/System.mm
+      Platforms/MacOS/Window.mm)
   elseif(UNIX)
     list(APPEND SRC
       Platforms/X11/Context.cpp
@@ -61,9 +93,10 @@ else(ANDROID)
     find_package(X11 REQUIRED)
     list(APPEND LIB ${X11_LIBRARIES})
   else()
-    
+    message("Configured for unknown OS")
   endif()
   
+  # GLEW not needed on macOS
   if(NOT APPLE)
     find_package(GLEW REQUIRED)
     list(APPEND INC ${GLEW_INCLUDE_DIRS})
