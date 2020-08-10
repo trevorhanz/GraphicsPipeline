@@ -94,3 +94,8 @@ void System::Run()
     Poll();
   }
 }
+
+void System::SetExposeCallback(std::function<void()> callback)
+{
+
+}
