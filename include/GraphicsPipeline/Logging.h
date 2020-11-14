@@ -20,8 +20,8 @@
 #ifndef __GP_LOGGING_H__
 #define __GP_LOGGING_H__
 
-namespace GP
-{
+// namespace GP
+// {
   /*!
    * Generate formatted log output.
    * \param format Printf sytle format string.
@@ -51,6 +51,6 @@ namespace GP
    * \param format Printf sytle format string.
    */
   void LogE(const char* format, ...);
-}
+// }
 
 #endif // __GP_LOGGING_H__

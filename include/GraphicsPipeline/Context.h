@@ -20,42 +20,58 @@
 #ifndef __GP_CONTEXT_H__
 #define __GP_CONTEXT_H__
 
-#include <memory>
+// #include <memory>
 
 #include "Pipeline.h"
 #include "Types.h"
+#include "Target.h"
+#include "Array.h"
+#include "Shader.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _gp_context gp_context;
+
+void gp_context_free(gp_context* context);
+gp_target* gp_context_target_new(gp_context* context);
+gp_array* gp_context_array_new(gp_context* context);
+gp_shader* gp_context_shader_new(gp_context* context);
+
+#ifdef __cplusplus
+} // extern "C"
 
 namespace GP
 {
-  /*!
-   * Central class for providing rendering support.
-   * Must be overridden to provide functionality.
-   */
   class Context
   {
+  private:
+    inline Context(gp_context* context);
   public:
-    /*!
-     * Default contructor.
-     */
-    Context() {}
+    inline ~Context();
     
-    /*!
-     *  Creates a Pipeline tied to this context.
-     *  \return A pointer to the newly create Pipeline
-     */
-    virtual PipelinePtr CreatePipeline() = 0;
+    inline Target* CreateTarget();
     
-    /*!
-     * Binds a target to this context.
-     * Targets can only be bound to a single Context.  Targets must
-     * be bound to a Context before they can be used in a Pipeline.
-     * If the Target hasn't been bound to a context before it is used
-     * in a Pipeline, the Pipeline to bind it to its context.
-     * \param target The Target to be bound
-     */
-    virtual void Bind(TargetPtr target) = 0;
+    inline Array* CreateArray();
+    
+    inline Shader* CreateShader();
+    
+  private:
+    gp_context*           mContext;
+    
+    friend class System;
   };
-  typedef std::shared_ptr<Context> ContextPtr;
-};
+  
+  /*
+   * Implementation
+   */
+  Context::Context(gp_context* context) : mContext(context) {}
+  Context::~Context() {gp_context_free(mContext);}
+  Target* Context::CreateTarget() {return new Target(gp_context_target_new(mContext));}
+  Array* Context::CreateArray() {return new Array(gp_context_array_new(mContext));}
+  Shader* Context::CreateShader() {return new Shader(gp_context_shader_new(mContext));}
+}
+#endif
 
 #endif // __GP_CONTEXT_H__

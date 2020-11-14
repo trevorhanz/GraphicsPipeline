@@ -15,42 +15,55 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_X11_COMMON_H__
-#define __GP_X11_COMMON_H__
+#ifndef __GP_GL_H__
+#define __GP_GL_H__
 
 #include <GraphicsPipeline/Types.h>
-#include <GraphicsPipeline/System.h>
-#include <GraphicsPipeline/Logging.h>
 
-#include <X11/Xlib.h>
-
+#ifndef __APPLE__
 #include <GL/glew.h>
-#include <GL/glx.h>
+#else
+// OpenGL is deprecated since macOS 10.14
+// Apple recommends porting to Metal
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>
+#endif
 
-struct _gp_system
+struct _gp_array
 {
-  Display*                mDisplay;
-  gp_target*              mTarget;
+  GLuint                  mVBO;
 };
 
-struct _gp_context
+struct _gp_shader
 {
-  gp_system*              mParent;
-  Display*                mDisplay;
-  XVisualInfo*            mVisualInfo;
-  Window                  mWindow;
-  Colormap                mColorMap;
-  GLXContext              mShare;
+  GLuint                  mProgram;
+  GLuint                  mAttribute;
 };
 
-struct _gp_target
+typedef struct
 {
-  gp_context*             mParent;
-  gp_pipeline*            mPipeline;
-  Window                  mWindow;
-  GLXContext              mContext;
+  int test;
+} _gp_operation_data;
+
+typedef struct
+{
+  void (*func)(_gp_operation_data* data);
+  _gp_operation_data*     mData;
+} _gp_operation;
+
+typedef struct _gp_operation_list gp_operation_list;
+
+struct _gp_operation_list
+{
+  _gp_operation*          mOperation;
+  gp_operation_list*      mNext;
 };
 
-void _gp_target_draw(gp_target* target);
+struct _gp_pipeline
+{
+  gp_operation_list*      mOperations;
+};
 
-#endif // __GP_X11_COMMON_H__
+void _gp_pipeline_execute(gp_pipeline* pipeline);
+
+#endif // __GP_GL_H__

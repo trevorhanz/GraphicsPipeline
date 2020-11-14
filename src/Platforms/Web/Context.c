@@ -15,52 +15,57 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include "Context.h"
-#include <API/GLES/Pipeline.h>
+#include <API/GLES/GLES.h>
+#include "Web.h"
 
+#include <stdlib.h>
 #include <assert.h>
-#include <emscripten/bind.h>
 
-#include <string>
-
-using namespace GP::Web;
-
-class TargetUserData : public GP::GLES::TargetUserData
+void gp_context_free(gp_context* context)
 {
-public:
-  void MakeCurrent() override {emscripten_webgl_make_context_current(mContext);}
-  void Present() override {}
+  free(context);
+}
+
+gp_target* gp_context_target_new(gp_context* context)
+{
+  gp_target* target = malloc(sizeof(gp_target));
   
-  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mContext;
-};
-
-Target::Target(std::string selector)
-{
   EmscriptenWebGLContextAttributes attrs;
   emscripten_webgl_init_context_attributes(&attrs);
   attrs.majorVersion = 2;
   attrs.minorVersion = 0;
   
-  auto context = emscripten_webgl_create_context(selector.c_str(), &attrs);
+  target->mContext = emscripten_webgl_create_context("#canvas1", &attrs);
   
-  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(context);
+  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(target->mContext);
   assert(res == EMSCRIPTEN_RESULT_SUCCESS);
-  assert(emscripten_webgl_get_current_context() == context);
+  assert(emscripten_webgl_get_current_context() == target->mContext);
   
-  auto userData = std::make_shared<TargetUserData>();
-  userData->mContext = context;
-  mUserData = userData;
+  target->mPipeline = malloc(sizeof(struct _gp_pipeline));
+  target->mPipeline->mOperations = NULL;
+  
+  context->mParent->mTarget = target;
+  
+  return target;
 }
 
-Context::Context()
+gp_array* gp_context_array_new(gp_context* context)
 {
+  gp_array* array = malloc(sizeof(struct _gp_array));
+  
+  glGenBuffers(1, &array->mVBO);
+  
+  return array;
 }
 
-GP::PipelinePtr Context::CreatePipeline()
+gp_shader* gp_context_shader_new(gp_context* context)
 {
-  return std::make_shared<GP::GLES::Pipeline>(this);
+  gp_shader* shader = malloc(sizeof(struct _gp_shader));
+  
+  return shader;
 }
 
-void Context::Bind(GP::TargetPtr target)
+gp_pipeline* gp_target_get_pipeline(gp_target* target)
 {
+  return target->mPipeline;
 }

@@ -15,40 +15,45 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_CONTEXT_X11_H__
-#define __GP_CONTEXT_X11_H__
+#ifndef __GP_TARGET_H__
+#define __GP_TARGET_H__
 
-#include <GraphicsPipeline/GP.h>
-#include <API/GL/Pipeline.h>
+#include "Types.h"
 
-#include <GL/glew.h>
-#include <GL/glx.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
+  gp_pipeline* gp_target_get_pipeline(gp_target* target);
+  
+#ifdef __cplusplus
+}
 
 namespace GP
 {
-  namespace GL
+  class Target
   {
-    class Context : public ContextBase
-    {
-    public:
-      Context(Display* display, XVisualInfo* vi, ::Window window);
-      virtual ~Context();
-      
-      virtual PipelinePtr CreatePipeline();
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      Display*                mDisplay;
-      XVisualInfo*            mVisualInfo;
-      ::Window                mWindow;
-      Colormap                mColorMap;
-      GLXContext              mShare;
-    };
-  }
-};
+  public:
+    inline Target(gp_target* target);
+    inline ~Target();
+    
+    inline Pipeline* GetPipeline();
+    
+  private:
+    gp_target*        mTarget;
+    Pipeline*         mPipeline;
+    
+    friend class Context;
+  };
+  
+  //
+  // Implementation
+  //
+  Target::Target(gp_target* target) : mTarget(target), mPipeline(new Pipeline(gp_target_get_pipeline(target))) {}
+  Target::~Target() {}
+  Pipeline* Target::GetPipeline() {return mPipeline;}
+}
 
+#endif // __cplusplus
 
-#endif // __GP_CONTEXT_X11_H__
+#endif // __GP_TARGET_H__

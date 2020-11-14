@@ -17,39 +17,55 @@
 
 #include <GraphicsPipeline/Logging.h>
 
+#include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <android/log.h>
+// using namespace GP;
 
-using namespace GP;
-
-#define LOG(level)\
+#define LOG(color, prefix)\
+  char* fmt;\
+  if((isatty(fileno(stdout)) != 0))\
+  {\
+    int size = strlen(format)+strlen(prefix)+strlen(color)+10;\
+    fmt = malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s%s\033[0m\n", color, prefix, format);\
+  }\
+  else\
+  {\
+    int size = strlen(format)+strlen(prefix)+2;\
+    fmt = malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s\n", prefix, format);\
+  }\
   va_list args;\
   va_start(args, format);\
-  __android_log_vprint(level, "GP", format, args);\
-  va_end(args);
+  vprintf(fmt, args);\
+  va_end(args);\
+  free(fmt);
 
-void GP::Log(const char* format, ...)
+void Log(const char* format, ...)
 {
-  LOG(ANDROID_LOG_DEFAULT);
+  LOG("", "");
 }
 
-void GP::LogI(const char* format, ...)
+void LogI(const char* format, ...)
 {
-  LOG(ANDROID_LOG_INFO);
+  LOG("\033[36m", "INFO: ");
 }
 
-void GP::LogD(const char* format, ...)
+void LogD(const char* format, ...)
 {
-  LOG(ANDROID_LOG_DEBUG);
+  LOG("\033[34m", "DEBUG: ");
 }
 
-void GP::LogW(const char* format, ...)
+void LogW(const char* format, ...)
 {
-  LOG(ANDROID_LOG_WARN);
+  LOG("\033[33m", "WARNING: ");
 }
 
-void GP::LogE(const char* format, ...)
+void LogE(const char* format, ...)
 {
-  LOG(ANDROID_LOG_ERROR);
+  LOG("\033[31m", "ERROR: ");
 }

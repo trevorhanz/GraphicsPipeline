@@ -15,31 +15,47 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline/Window.h>
-#include <GraphicsPipeline/Web.h>
-#include "Context.h"
-#include "Web.h"
+#ifndef __GP_ARRAY_H__
+#define __GP_ARRAY_H__
 
-using namespace GP;
+#include "Types.h"
 
-Window::Window(UserDataPtr userData)
-  : mUserData(userData)
-{
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  void gp_array_free(gp_array* array);
+  void gp_array_set_data(gp_array* array, float* data, unsigned int count);
+
+#ifdef __cplusplus
 }
 
-Window::~Window()
+namespace GP
 {
+  class Array
+  {
+  private:
+    inline Array(gp_array* array);
+  public:
+    inline ~Array();
+    
+    inline void SetData(float* data, unsigned int count);
+    
+  private:
+    gp_array*           mArray;
+    
+    friend class Context;
+    friend class Pipeline;
+  };
+  
+  //
+  // Implementation
+  //
+  Array::Array(gp_array* array) : mArray(array) {}
+  Array::~Array() {gp_array_free(mArray);}
+  void Array::SetData(float* data, unsigned int count) {gp_array_set_data(mArray, data, count);}
 }
 
-TargetPtr Window::GetTarget()
-{
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  return data->mTarget;
-}
+#endif // __cplusplus
 
-Web::Window::Window(const std::string& id)
-  : GP::Window(std::make_shared<WindowUserData>())
-{
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  data->mTarget = std::make_shared<Web::Target>(id);
-}
+#endif // __GP_ARRAY_H__

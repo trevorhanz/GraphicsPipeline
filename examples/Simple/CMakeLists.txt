@@ -5,5 +5,8 @@ if(EMSCRIPTEN)
   configure_file(index.html ${CMAKE_CURRENT_BINARY_DIR}/index.html COPYONLY)
 endif(EMSCRIPTEN)
 
-add_executable(Simple main.cpp)
+add_executable(Simple main.c)
 target_link_libraries(Simple GraphicsPipeline)
+
+add_executable(Simple++ main.cpp)
+target_link_libraries(Simple++ GraphicsPipeline)

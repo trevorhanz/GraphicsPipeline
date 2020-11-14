@@ -15,50 +15,46 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file Window.h
-
-#ifndef __GP_WINDOW_H__
-#define __GP_WINDOW_H__
+#ifndef __GP_SHADER_H__
+#define __GP_SHADER_H__
 
 #include "Types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
+  void gp_shader_free(gp_shader* shader);
+  void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
+  
+#ifdef __cplusplus
+} // extern "C"
+
 namespace GP
 {
-  /*!
-   * Base class for a top-level window.
-   */
-  class Window
+  class Shader
   {
-  protected:
-    //! Constructor \param windowData Pointer to internal data provided by derived class
-    Window(UserDataPtr windowData);
-    
+  private:
+    inline Shader(gp_shader* shader);
   public:
-    //! Destructor
-    virtual ~Window();
+    inline ~Shader();
     
-    /*!
-     * Get unerlying render target.
-     * \return Target.
-     */
-    TargetPtr GetTarget();
+    inline void Compile(const char* vertex, const char* fragment);
     
-    /*!
-     * Get Window width in pixels.
-     * \return Width in pixels.
-     */
-    unsigned int GetWidth();
+  private:
+    gp_shader*        mShader;
     
-    /*!
-     * Get Window height in pixels.
-     * \return Height in pixels.
-     */
-    unsigned int GetHeight();
-    
-    UserDataPtr           mUserData;
+    friend class Context;
+    friend class Pipeline;
   };
-  //! Shared pointer to Window object.
-  typedef std::shared_ptr<Window> WindowPtr;
+  
+  //
+  // Implementation
+  //
+  Shader::Shader(gp_shader* shader) : mShader(shader) {}
+  Shader::~Shader() {gp_shader_free(mShader);}
+  void Shader::Compile(const char* vertex, const char* fragment) {gp_shader_compile(mShader, vertex, fragment);}
 }
+#endif // __cplusplus
 
-#endif // __GP_WINDOW_H__
+#endif // __GP_SHADER_H__

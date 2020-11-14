@@ -24,32 +24,34 @@
 #include <android/native_window.h>
 
 #include <GraphicsPipeline/System.h>
-#include <API/GLES/Pipeline.h>
+#include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Logging.h>
+#include <API/GLES/GLES.h>
 
-namespace GP
+struct _gp_system
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    ANativeWindow*        mWindow;
-    TargetPtr             mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
-  class TargetUserData : public GLES::TargetUserData
-  {
-  public:
-    bool                  mBound;  // TODO - Replace with bitflag indicating state
-    ANativeWindow*        mWindow;
-    EGLDisplay            mDisplay;
-    EGLSurface            mSurface;
-    EGLContext            mContext;
-    
-    void MakeCurrent() override {eglMakeCurrent(mDisplay, mSurface, mSurface, mContext);}
-    void Present() override {eglSwapBuffers(mDisplay, mSurface);}
-  };
-  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-}
+  EGLDisplay                            mDisplay;
+  gp_target*                            mTarget;
+};
 
+struct _gp_context
+{
+  gp_system*                            mParent;
+  EGLConfig                             mConfig;
+  EGLint                                mFormat;
+  EGLContext                            mShare;
+  EGLSurface                            mShareSurface;
+};
+
+struct _gp_target
+{
+  EGLContext                            mContext;
+  ANativeWindow*                        mWindow;
+  EGLSurface                            mSurface;
+  GLuint                                vbo;
+  GLuint                                shaderProgram;
+  GLint                                 posAttrib;
+  gp_pipeline*                          mPipeline;
+};
 
 #endif // __GP_ANDROID_COMMON_H__

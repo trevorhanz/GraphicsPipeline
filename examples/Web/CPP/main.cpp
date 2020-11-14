@@ -19,6 +19,8 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Web.h>
 
+
+
 using namespace GP;
 
 // Shader sources
@@ -40,36 +42,20 @@ int main(int argv, char* argc[])
 {
   System* system = new System();
   
-  ContextPtr context = system->CreateContext();
+  Context* context = system->CreateContext();
   
-  WindowPtr window = system->CreateWindow("#canvas1", 640, 480);
+  Target* target = context->CreateTarget();
+  Array* array = context->CreateArray();
+  Shader* shader = context->CreateShader();
   
-  ArrayPtr array = std::make_shared<Array>();
-  ShaderPtr shader = std::make_shared<Shader>();
+  array->SetData(vertexData, 6);
   
-  ArrayDataPtr data = std::make_shared<ArrayData>();
-  data->SetData(vertexData, 6);
+  shader->Compile(vertexSource, fragmentSource);
   
-  PipelinePtr loadPipe = context->CreatePipeline();
-  LoadArrayPtr lap = std::make_shared<LoadArray>();
-  lap->SetArray(array);
-  lap->SetData(data);
-  loadPipe->AddOperation(lap);
-  LoadShaderPtr lsp = std::make_shared<LoadShader>();
-  lsp->SetShader(shader);
-  lsp->SetVertexCode(vertexSource);
-  lsp->SetFragmentCode(fragmentSource);
-  loadPipe->AddOperation(lsp);
-  loadPipe->Execute();
+  Pipeline* pipeline = target->GetPipeline();
   
-  PipelinePtr pipeline = context->CreatePipeline();
-  ClearPtr clear = std::make_shared<Clear>();
-  pipeline->AddOperation(clear);
-  DrawPtr draw = std::make_shared<Draw>();
-  draw->SetShader(shader);
-  draw->SetArray(array);
-  pipeline->AddOperation(draw);
+  pipeline->AddDraw(shader, array);
   
-  pipeline->Execute();
+  system->Run();
 }
 

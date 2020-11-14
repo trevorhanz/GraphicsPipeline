@@ -15,35 +15,51 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline/System.h>
-#include <GraphicsPipeline/Android.h>
-#include "Android.h"
+#ifndef __GP_GLES_H__
+#define __GP_GLES_H__
 
-using namespace GP;
+#include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Logging.h>
 
-Window::Window(UserDataPtr userData)
-  : mUserData(userData)
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+
+struct _gp_array
 {
-}
+  GLuint                  mVBO;
+};
 
-Window::~Window()
+struct _gp_shader
 {
-}
+  GLuint                  mProgram;
+  GLuint                  mAttribute;
+};
 
-TargetPtr Window::GetTarget()
+typedef struct
 {
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  return data->mTarget;
-}
+  int test;
+} _gp_operation_data;
 
-Android::Window::Window(ANativeWindow* window)
-  : GP::Window(std::make_shared<WindowUserData>())
+typedef struct
 {
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  data->mWindow = window;
-  data->mTarget = std::make_shared<Target>();
-  auto targetData = std::make_shared<TargetUserData>();
-  targetData->mBound = false;
-  targetData->mWindow = data->mWindow;
-  data->mTarget->mUserData = targetData;
-}
+  void (*func)(_gp_operation_data* data);
+  _gp_operation_data*     mData;
+} _gp_operation;
+
+typedef struct _gp_operation_list gp_operation_list;
+
+struct _gp_operation_list
+{
+  _gp_operation*          mOperation;
+  gp_operation_list*      mNext;
+};
+
+struct _gp_pipeline
+{
+  gp_operation_list*      mOperations;
+};
+
+void _gp_pipeline_execute(gp_pipeline* pipeline);
+
+
+#endif // __GP_GLES_H__

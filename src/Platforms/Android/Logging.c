@@ -17,46 +17,37 @@
 
 #include <GraphicsPipeline/Logging.h>
 
-#include <string>
 #include <stdarg.h>
-#include <unistd.h>
 
-using namespace GP;
+#include <android/log.h>
 
-#define LOG(color, prefix)\
-  std::string fmt = prefix;\
-  fmt += format;\
-  if((isatty(fileno(stdout)) != 0))\
-  {\
-    fmt = color + fmt + "\033[0m";\
-  }\
-  fmt += '\n';\
+#define LOG(level)\
   va_list args;\
   va_start(args, format);\
-  vprintf(fmt.c_str(), args);\
+  __android_log_vprint(level, "GP", format, args);\
   va_end(args);
 
-void GP::Log(const char* format, ...)
+void Log(const char* format, ...)
 {
-  LOG("", "");
+  LOG(ANDROID_LOG_DEFAULT);
 }
 
-void GP::LogI(const char* format, ...)
+void LogI(const char* format, ...)
 {
-  LOG("\033[36m", "INFO: ");
+  LOG(ANDROID_LOG_INFO);
 }
 
-void GP::LogD(const char* format, ...)
+void LogD(const char* format, ...)
 {
-  LOG("\033[34m", "DEBUG: ");
+  LOG(ANDROID_LOG_DEBUG);
 }
 
-void GP::LogW(const char* format, ...)
+void LogW(const char* format, ...)
 {
-  LOG("\033[33m", "WARNING: ");
+  LOG(ANDROID_LOG_WARN);
 }
 
-void GP::LogE(const char* format, ...)
+void LogE(const char* format, ...)
 {
-  LOG("\033[31m", "ERROR: ");
+  LOG(ANDROID_LOG_ERROR);
 }

@@ -5,19 +5,15 @@ set(HEADERS
     ../include/GraphicsPipeline/GP.h
     ../include/GraphicsPipeline/Logging.h
     ../include/GraphicsPipeline/MacOS.h
-    ../include/GraphicsPipeline/Operations.h
     ../include/GraphicsPipeline/Pipeline.h
     ../include/GraphicsPipeline/System.h
     ../include/GraphicsPipeline/Types.h
     ../include/GraphicsPipeline/Web.h
-    ../include/GraphicsPipeline/Window.h
     ../include/GraphicsPipeline/Windows.h
     ../include/GraphicsPipeline/X11.h
     )
 
 set(SRC
-  Operations.cpp
-  Types.cpp
   ${HEADERS}
   )
 
@@ -27,12 +23,14 @@ set(LIB "")
 set(INC "")
 
 if(EMSCRIPTEN)
-  list(APPEND SRC API/GLES/Pipeline.cpp)
   list(APPEND SRC
-    Platforms/Web/System.cpp
-    Platforms/Web/Context.cpp
-    Platforms/Web/Logging.cpp
-    Platforms/Web/Window.cpp)
+    API/GLES/Array.c
+    API/GLES/Pipeline.c
+    API/GLES/Shader.c)
+  list(APPEND SRC
+    Platforms/Web/System.c
+    Platforms/Web/Context.c
+    Platforms/Web/Logging.c)
 elseif(ANDROID)
   find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
     HINTS ${ANDROID_NDK})
@@ -50,18 +48,17 @@ elseif(ANDROID)
               # you want CMake to locate.
               log)
   
-  list(APPEND SRC API/GLES/Pipeline.cpp)
+  list(APPEND SRC API/GLES/Pipeline.c API/GLES/Array.c API/GLES/Shader.c)
   list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
   list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   
   list(APPEND SRC
-    Platforms/Android/Context.cpp
-    Platforms/Android/Logging.cpp
-    Platforms/Android/System.cpp
-    Platforms/Android/Window.cpp)
+    Platforms/Android/Context.c
+    Platforms/Android/Logging.c
+    Platforms/Android/System.c)
 else(ANDROID)
   find_package(OpenGL REQUIRED)
-  list(APPEND SRC API/GL/Pipeline.cpp)
+  list(APPEND SRC API/GL/Pipeline.c API/GL/Array.c API/GL/Shader.c)
   list(APPEND INC ${OPENGL_INCLUDE_DIRS})
   list(APPEND LIB ${OPENGL_LIBRARIES})
   
@@ -85,10 +82,9 @@ else(ANDROID)
       Platforms/MacOS/Window.mm)
   elseif(UNIX)
     list(APPEND SRC
-      Platforms/X11/Context.cpp
-      Platforms/X11/Logging.cpp
-      Platforms/X11/System.cpp
-      Platforms/X11/Window.cpp)
+      Platforms/X11/Context.c
+      Platforms/X11/Logging.c
+      Platforms/X11/System.c)
     
     find_package(X11 REQUIRED)
     list(APPEND LIB ${X11_LIBRARIES})

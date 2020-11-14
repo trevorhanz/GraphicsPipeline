@@ -20,24 +20,5 @@
 #ifndef __GP_X11_H__
 #define __GP_X11_H__
 
-#include "Window.h"
-
-namespace GP
-{
-  namespace X11
-  {
-    /*!
-     * Window with X11 specific features.
-     */
-    class Window : public GP::Window
-    {
-    public:
-      //! Constructor
-      Window();
-    };
-    //! Shared pointer to Window object.
-    typedef std::shared_ptr<Window> WindowPtr;
-  }
-}
 
 #endif // __GP_X11_H__

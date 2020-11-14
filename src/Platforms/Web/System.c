@@ -16,48 +16,35 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/System.h>
-#include <GraphicsPipeline/Window.h>
-#include <GraphicsPipeline/X11.h>
+#include <GraphicsPipeline/Web.h>
+#include <API/GLES/GLES.h>
+#include "Web.h"
 
-#include "X11.h"
+#include <stdlib.h>
 
-#include <GL/glew.h>
-#include <GL/glx.h>
-
-using namespace GP;
-
-GP::Window::Window(UserDataPtr windowData)
-  : mUserData(windowData)
+gp_system* gp_system_new()
 {
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  data->mTarget = std::make_shared<Target>();
+  gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
+  
+  return system;
 }
 
-GP::Window::~Window()
+void gp_system_free(gp_system* system)
 {
+  free(system);
 }
 
-unsigned int GP::Window::GetWidth()
+gp_context* gp_system_context_new(gp_system* system)
 {
-  return 0;
+  gp_context* context = malloc(sizeof(gp_context));
+  context->mParent = system;
+  
+  return context;
 }
 
-unsigned int GP::Window::GetHeight()
+void gp_system_run(gp_system* system)
 {
-  return 0;
+  gp_pipeline* pipeline = gp_target_get_pipeline(system->mTarget);
+  _gp_pipeline_execute(pipeline);
 }
-
-TargetPtr GP::Window::GetTarget()
-{
-  auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-  return data->mTarget;
-}
-
-GP::X11::Window::Window()
-  : GP::Window(std::make_shared<WindowUserData>())
-  {
-    
-  }
-
-
 

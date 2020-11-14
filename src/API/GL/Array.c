@@ -15,36 +15,12 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline/System.h>
-#include "Context.h"
+#include <GraphicsPipeline/Array.h>
+#include "GL.h"
 
-using namespace GP;
-
-System::System()
+void gp_array_set_data(gp_array* array, float* data, unsigned int count)
 {
-}
-
-System::~System()
-{
-}
-
-WindowPtr System::CreateWindow(const std::string& title, int width, int height)
-{
-}
-
-ContextPtr System::CreateContext()
-{
-  return std::make_shared<GLES::Context>();
-}
-
-void System::Poll()
-{
-}
-
-void System::Run()
-{
-}
-
-void System::SetExposeCallback(std::function<void()> callback)
-{
+  glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
+  
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*count, data, GL_STATIC_DRAW);
 }

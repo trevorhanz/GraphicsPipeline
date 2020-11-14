@@ -22,27 +22,8 @@
 
 #include <android/native_window.h>
 
-#include "Window.h"
+#include "Types.h"
 
-namespace GP
-{
-  namespace Android
-  {
-    /*!
-     * Window with Android specific features.
-     */
-    class Window : public GP::Window
-    {
-    public:
-      /*!
-       * Constructor.
-       * \param window a native reference to the Android window.
-       */
-      Window(ANativeWindow* window);
-    };
-    //! Shared pointer to Window object.
-    typedef std::shared_ptr<Window> WindowPtr;
-  };
-};
+gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* window);
 
 #endif // __GP_ANDROID_H__

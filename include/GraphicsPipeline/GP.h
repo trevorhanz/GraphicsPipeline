@@ -20,11 +20,12 @@
 #ifndef __GRAPHICS_PIPELINE_H__
 #define __GRAPHICS_PIPELINE_H__
 
+#include "Array.h"
 #include "Context.h"
 #include "Pipeline.h"
+#include "Shader.h"
 #include "Logging.h"
-#include "Operations.h"
+#include "Target.h"
 #include "Types.h"
-#include "Window.h"
 
 #endif // __GRAPHICS_PIPELINE_H__

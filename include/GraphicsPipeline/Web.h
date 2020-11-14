@@ -20,25 +20,5 @@
 #ifndef __GP_WEB_H__
 #define __GP_WEB_H__
 
-namespace GP
-{
-  namespace Web
-  {
-    /*!
-     * Window with web specific features.
-     */
-    class Window : public GP::Window
-    {
-    public:
-      /*!
-       * Constructor.
-       * \param id HTML id of canvas element.
-       */
-      Window(const std::string& id);
-    };
-    //! Shared pointer to Window object.
-    typedef std::shared_ptr<Window> WindowPtr;
-  }
-}
 
 #endif // __GP_WEB_H__
