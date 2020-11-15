@@ -15,25 +15,33 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#include <GraphicsPipeline/System.h>
+#include <GraphicsPipeline/MacOS.h>
 #include "Context.h"
 #include "MacOS.h"
 
-#include <iostream>
-#include <unistd.h>
+#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
-#include <OpenGL/gl3.h>
-
-#include "View.h"
-
-using namespace GP::GL;
-using namespace std;
-
-Context::Context(void(*callback)())
-  : mCallback(callback)
+gp_system* gp_system_new()
 {
+  gp_system* system = malloc(sizeof(gp_system));
+  
+  return system;
+}
+
+void gp_system_free(gp_system* system)
+{
+  free(system);
+}
+
+gp_context* gp_system_context_new(gp_system* system)
+{
+  gp_context* context = malloc(sizeof(gp_context));
+  
   NSOpenGLPixelFormatAttribute pixelAttribs[ 16 ];
   int pixNum = 0;
-  
+
   pixelAttribs[ pixNum++ ] = NSOpenGLPFAOpenGLProfile;
   pixelAttribs[ pixNum++ ] = NSOpenGLProfileVersion3_2Core;
   pixelAttribs[ pixNum++ ] = NSOpenGLPFADoubleBuffer;
@@ -48,60 +56,27 @@ Context::Context(void(*callback)())
   pixelAttribs[ pixNum++ ] = NSOpenGLPFASamples;
   pixelAttribs[ pixNum++ ] = 4;
   pixelAttribs[ pixNum ] = 0;
-  mPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelAttribs];
-  
-  mShare = [[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:NULL];
-  [mShare makeCurrentContext];
-  
+  context->mPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelAttribs];
+
+  context->mShare = [[NSOpenGLContext alloc] initWithFormat:context->mPixelFormat shareContext:NULL];
+  [context->mShare makeCurrentContext];
+
   // NOTE: GL functions need a context to be bound to get information from
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
-  cout << "OpenGL Version: " << major << "." << minor << endl;
-  LogD("Test");
-  LogD("Test");
-  
+  LogI("OpenGL Version: %d.%d", major, minor);
+
   GLboolean shaderSupport;
   glGetBooleanv(GL_SHADER_COMPILER, &shaderSupport);
-  cout << "ShaderSupport: " << ((shaderSupport)?"TRUE":"FALSE") << endl;
-}
-
-Context::~Context()
-{
+  LogI("ShaderSupport: %s", (shaderSupport)?"TRUE":"FALSE");
   
+  return context;
 }
 
-GP::PipelinePtr Context::CreatePipeline()
+void gp_system_run(gp_system* system)
 {
-  return std::make_shared<Pipeline>(this);
+  [NSApplication sharedApplication];
+  [NSApp run];
 }
-
-TargetUserDataPtr Context::CreateTarget()
-{
-  GP::TargetUserDataPtr ptr = std::make_shared<GP::TargetUserData>();
-  NSUInteger windowStyle = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable;
-  ptr->mWindow = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 640, 480)
-  styleMask:windowStyle backing:NSBackingStoreBuffered defer:NO]
-  autorelease];
-  [ptr->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
-  [ptr->mWindow setTitle:@"GP Window"];
-  [ptr->mWindow makeKeyAndOrderFront:nil];
-  
-  // Create OpenGL view
-  ptr->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, 800, 600 ) pixelFormat:mPixelFormat];
-  NSOpenGLContext* newContext = [ [ NSOpenGLContext alloc ] initWithFormat:mPixelFormat shareContext:mShare ];
-  [ptr->mView setOpenGLContext: newContext];
-  [ptr->mView setCallback:mCallback];
-  [ptr->mWindow setContentView:ptr->mView];
-  [ptr->mView display];
-  
-  ptr->MakeCurrent();
-  
-  return ptr;
-}
-
-void Context::Bind(GP::TargetPtr target)
-{
-}
-
 

@@ -23,33 +23,53 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <GraphicsPipeline/Types.h>
-#include <GraphicsPipeline/Window.h>
 #include <GraphicsPipeline/System.h>
-#include <API/GL/Pipeline.h>
+#include <GraphicsPipeline/Logging.h>
+#include <API/GL/GL.h>
 
 #import <Cocoa/Cocoa.h>
 
 #include "View.h"
 
-namespace GP
+struct _gp_system
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    TargetPtr         mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
-  class TargetUserData : public GL::TargetUserData
-  {
-  public:
-    NSWindow*         mWindow;
-    View*             mView;
-    
-    void MakeCurrent() override {[[mView openGLContext] makeCurrentContext];}
-    void Present() override {[[mView openGLContext] flushBuffer];}
-  };
-  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-}
+  gp_target*              mTarget;
+};
+
+struct _gp_context
+{
+  gp_system*              mParent;
+  NSOpenGLContext*        mShare;
+  NSOpenGLPixelFormat*    mPixelFormat;
+};
+
+struct _gp_target
+{
+  gp_context*             mParent;
+  gp_pipeline*            mPipeline;
+  NSWindow*               mWindow;
+  View*                   mView;
+};
+
+//namespace GP
+//{
+//  class WindowUserData : public UserData
+//  {
+//  public:
+//    TargetPtr         mTarget;
+//  };
+//  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
+//  
+//  class TargetUserData : public GL::TargetUserData
+//  {
+//  public:
+//    NSWindow*         mWindow;
+//    View*             mView;
+//    
+//    void MakeCurrent() override {[[mView openGLContext] makeCurrentContext];}
+//    void Present() override {[[mView openGLContext] flushBuffer];}
+//  };
+//  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
+//}
 
 #endif // __MACOS_COMMON_H__

@@ -19,34 +19,34 @@
 #define __GP_CONTEXT_MACOS_H__
 
 #include <GraphicsPipeline/GP.h>
-#include <API/GL/Pipeline.h>
+#include <API/GL/GL.h>
 
 #include "MacOS.h"
 
-namespace GP
-{
-  namespace GL
-  {
-    class Context : public ContextBase
-    {
-    public:
-      Context(void(*callback)());
-      virtual ~Context();
-      
-      PipelinePtr CreatePipeline() override;
-      
-      TargetUserDataPtr CreateTarget() override;
-      
-      void Bind(GP::TargetPtr target) override;
-      
-    private:
-      NSOpenGLContext*                    mShare;
-      NSOpenGLPixelFormat*                mPixelFormat;
-      
-      void(*mCallback)();
-    };
-  }
-};
+//namespace GP
+//{
+//  namespace GL
+//  {
+//    class Context : public ContextBase
+//    {
+//    public:
+//      Context(void(*callback)());
+//      virtual ~Context();
+//      
+//      PipelinePtr CreatePipeline() override;
+//      
+//      TargetUserDataPtr CreateTarget() override;
+//      
+//      void Bind(GP::TargetPtr target) override;
+//      
+//    private:
+//      NSOpenGLContext*                    mShare;
+//      NSOpenGLPixelFormat*                mPixelFormat;
+//      
+//      void(*mCallback)();
+//    };
+//  }
+//};
 
 
 #endif // __GP_CONTEXT_X11_H__

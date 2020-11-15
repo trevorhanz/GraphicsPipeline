@@ -72,14 +72,12 @@ else(ANDROID)
     find_library(COCOA_LIBRARY Cocoa)
     list(APPEND LIB ${COCOA_LIBRARY})
     list(APPEND SRC
-      Platforms/MacOS/Context.mm
-      Platforms/MacOS/Context.h
-      Platforms/MacOS/Logging.cpp
+      Platforms/MacOS/Context.m
+      Platforms/MacOS/Logging.c
       Platforms/MacOS/MacOS.h
       Platforms/MacOS/View.m
       Platforms/MacOS/View.h
-      Platforms/MacOS/System.mm
-      Platforms/MacOS/Window.mm)
+      Platforms/MacOS/System.m)
   elseif(UNIX)
     list(APPEND SRC
       Platforms/X11/Context.c

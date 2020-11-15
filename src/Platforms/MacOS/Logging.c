@@ -17,46 +17,53 @@
 
 #include <GraphicsPipeline/Logging.h>
 
-#include <string>
+#include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
-
-using namespace GP;
+#include <stdio.h>
+#include <stdlib.h>
 
 #define LOG(color, prefix)\
-  std::string fmt = prefix;\
-  fmt += format;\
+  char* fmt;\
   if((isatty(fileno(stdout)) != 0))\
   {\
-    fmt = color + fmt + "\u001b[0m";\
+    int size = strlen(format)+strlen(prefix)+strlen(color)+10;\
+    fmt = (char*)malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s%s\033[0m\n", color, prefix, format);\
   }\
-  fmt += '\n';\
+  else\
+  {\
+    int size = strlen(format)+strlen(prefix)+2;\
+    fmt = (char*)malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s\n", prefix, format);\
+  }\
   va_list args;\
   va_start(args, format);\
-  vprintf(fmt.c_str(), args);\
-  va_end(args);
+  vprintf(fmt, args);\
+  va_end(args);\
+  free(fmt);
 
-void GP::Log(const char* format, ...)
+void Log(const char* format, ...)
 {
   LOG("", "");
 }
 
-void GP::LogI(const char* format, ...)
+void LogI(const char* format, ...)
 {
-  LOG("\u001b[36m", "INFO: ");
+  LOG("\\u001b[36m", "INFO: ");
 }
 
-void GP::LogD(const char* format, ...)
+void LogD(const char* format, ...)
 {
-  LOG("\u001b[34m", "DEBUG: ");
+  LOG("\\u001b[34m", "DEBUG: ");
 }
 
-void GP::LogW(const char* format, ...)
+void LogW(const char* format, ...)
 {
-  LOG("\u001b[33m", "WARNING: ");
+  LOG("\\u001b[33m", "WARNING: ");
 }
 
-void GP::LogE(const char* format, ...)
+void LogE(const char* format, ...)
 {
-  LOG("\u001b[31m", "ERROR: ");
+  LOG("\\u001b[31m", "ERROR: ");
 }
