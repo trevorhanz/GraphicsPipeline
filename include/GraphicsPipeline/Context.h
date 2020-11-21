@@ -22,6 +22,7 @@
 
 // #include <memory>
 
+#include "Common.h"
 #include "Pipeline.h"
 #include "Types.h"
 #include "Target.h"
@@ -34,10 +35,10 @@ extern "C" {
 
 typedef struct _gp_context gp_context;
 
-void gp_context_free(gp_context* context);
-gp_target* gp_context_target_new(gp_context* context);
-gp_array* gp_context_array_new(gp_context* context);
-gp_shader* gp_context_shader_new(gp_context* context);
+GP_EXPORT void gp_context_free(gp_context* context);
+GP_EXPORT gp_target* gp_context_target_new(gp_context* context);
+GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
+GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -18,14 +18,15 @@
 #ifndef __GP_ARRAY_H__
 #define __GP_ARRAY_H__
 
+#include "Common.h"
 #include "Types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  void gp_array_free(gp_array* array);
-  void gp_array_set_data(gp_array* array, float* data, unsigned int count);
+  GP_EXPORT void gp_array_free(gp_array* array);
+  GP_EXPORT void gp_array_set_data(gp_array* array, float* data, unsigned int count);
 
 #ifdef __cplusplus
 }

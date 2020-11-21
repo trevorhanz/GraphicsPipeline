@@ -18,13 +18,14 @@
 #ifndef __GP_TARGET_H__
 #define __GP_TARGET_H__
 
+#include "Common.h"
 #include "Types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
   
-  gp_pipeline* gp_target_get_pipeline(gp_target* target);
+  GP_EXPORT gp_pipeline* gp_target_get_pipeline(gp_target* target);
   
 #ifdef __cplusplus
 }

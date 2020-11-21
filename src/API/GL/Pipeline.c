@@ -69,7 +69,7 @@ void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* ar
 {
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
-  list->mOperation = malloc(sizeof(_gp_operation));
+  list->mOperation = malloc(sizeof(gp_operation));
   list->mOperation->func = &_gp_operation_draw;
   
   _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));

@@ -20,6 +20,7 @@
 #ifndef __GP_SYSTEM_H__
 #define __GP_SYSTEM_H__
 
+#include "Common.h"
 #include "Context.h"
 #include "Types.h"
 
@@ -27,10 +28,10 @@
 extern "C" {
 #endif
 
-gp_system* gp_system_new();
-void gp_system_free(gp_system* system);
-gp_context* gp_system_context_new(gp_system* system);
-void gp_system_run(gp_system* system);
+GP_EXPORT gp_system* gp_system_new();
+GP_EXPORT void gp_system_free(gp_system* system);
+GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
+GP_EXPORT void gp_system_run(gp_system* system);
 
 #ifdef __cplusplus
 } // extern "C"

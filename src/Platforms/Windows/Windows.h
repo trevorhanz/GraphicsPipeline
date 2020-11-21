@@ -19,29 +19,29 @@
 #define __GP_WINDOWS_COMMON_H__
 
 #include <GraphicsPipeline/Types.h>
-#include <API/GL/Pipeline.h>
+#include <API/GL/GL.h>
 
 #include <windows.h>
 
-namespace GP
+struct _gp_system
 {
-    class WindowUserData : public UserData
-    {
-    public:
-      TargetPtr         mTarget;
-    };
-    typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
+	gp_target*        mTarget;
+};
 
-    class TargetUserData : public GL::TargetUserData
-    {
-    public:
-      HGLRC             mContext;
-      HWND              mWindow;
+struct _gp_context
+{
+	gp_system*        mParent;
+	HGLRC             mShare;
+	HWND              mWindow;
+	unsigned int      mPixelFormat;
+};
 
-      void MakeCurrent() override { wglMakeCurrent(GetDC(mWindow), mContext); }
-      void Present() override { SwapBuffers(GetDC(mWindow)); printf("Swap\n");}
-    };
-    typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-}
+struct _gp_target
+{
+	gp_context*       mParent;
+	HGLRC             mContext;
+	HWND              mWindow;
+	gp_pipeline*      mPipeline;
+};
 
 #endif // __GP_WINDOWS_COMMON_H__

@@ -8,5 +8,5 @@ endif(EMSCRIPTEN)
 add_executable(Simple main.c)
 target_link_libraries(Simple GraphicsPipeline)
 
-add_executable(Simple++ main.cpp)
-target_link_libraries(Simple++ GraphicsPipeline)
+#add_executable(Simple++ main.cpp)
+#target_link_libraries(Simple++ GraphicsPipeline)

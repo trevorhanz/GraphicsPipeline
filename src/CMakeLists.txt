@@ -1,12 +1,16 @@
 set(HEADERS
     ../include/GraphicsPipeline/Android.h
+    ../include/GraphicsPipeline/Array.h
+    ../include/GraphicsPipeline/Common.h
     ../include/GraphicsPipeline/Context.h
     ../include/GraphicsPipeline/Desktop.h
     ../include/GraphicsPipeline/GP.h
     ../include/GraphicsPipeline/Logging.h
     ../include/GraphicsPipeline/MacOS.h
     ../include/GraphicsPipeline/Pipeline.h
+    ../include/GraphicsPipeline/Shader.h
     ../include/GraphicsPipeline/System.h
+    ../include/GraphicsPipeline/Target.h
     ../include/GraphicsPipeline/Types.h
     ../include/GraphicsPipeline/Web.h
     ../include/GraphicsPipeline/Windows.h
@@ -64,10 +68,10 @@ else(ANDROID)
   
   if(WIN32)
     list(APPEND SRC
-      Platforms/Windows/Context.cpp
-      Platforms/Windows/Logging.cpp
-      Platforms/Windows/System.cpp
-      Platforms/Windows/Window.cpp)
+      Platforms/Windows/Context.c
+      Platforms/Windows/Logging.c
+      Platforms/Windows/System.c
+      Platforms/Windows/Windows.h)
   elseif(APPLE)
     find_library(COCOA_LIBRARY Cocoa)
     list(APPEND LIB ${COCOA_LIBRARY})
@@ -99,10 +103,15 @@ else(ANDROID)
 endif(EMSCRIPTEN)
 
 add_library(GraphicsPipeline ${SRC})
-target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include)
+target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include ${CMAKE_CURRENT_BINARY_DIR}/include/)
 target_include_directories(GraphicsPipeline PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(GraphicsPipeline ${LIB})
 set_property(TARGET GraphicsPipeline PROPERTY CXX_STANDARD 11)
+
+if(NOT BUILD_SHARED_LIBS)
+    set(GP_STATIC ON)
+endif(BUILD_SHARED_LIBS)
+configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 
 if(EMSCRIPTEN)
   set_target_properties(GraphicsPipeline PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)

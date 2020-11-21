@@ -18,14 +18,15 @@
 #ifndef __GP_SHADER_H__
 #define __GP_SHADER_H__
 
+#include "Common.h"
 #include "Types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
   
-  void gp_shader_free(gp_shader* shader);
-  void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
+  GP_EXPORT void gp_shader_free(gp_shader* shader);
+  GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
   
 #ifdef __cplusplus
 } // extern "C"

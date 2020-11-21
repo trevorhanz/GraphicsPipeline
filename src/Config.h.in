@@ -1,0 +1,7 @@
+
+#ifndef __GP_CONFIG_H__
+#define __GP_CONFIG_H__
+
+#cmakedefine GP_STATIC
+
+#endif /// __GP_CONFIG_H__

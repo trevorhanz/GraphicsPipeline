@@ -45,17 +45,18 @@ typedef struct
   int test;
 } _gp_operation_data;
 
-typedef struct
+struct _gp_operation
 {
   void (*func)(_gp_operation_data* data);
   _gp_operation_data*     mData;
-} _gp_operation;
+};
 
+typedef struct _gp_operation gp_operation;
 typedef struct _gp_operation_list gp_operation_list;
 
 struct _gp_operation_list
 {
-  _gp_operation*          mOperation;
+  gp_operation*           mOperation;
   gp_operation_list*      mNext;
 };
 

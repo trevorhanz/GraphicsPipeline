@@ -19,6 +19,8 @@
 #include <GraphicsPipeline/Logging.h>
 #include "GL.h"
 
+#include <stdlib.h>
+
 int _check_shader_status(unsigned int shader, const char* type)
 {
   GLint isCompiled = 0;
@@ -29,13 +31,15 @@ int _check_shader_status(unsigned int shader, const char* type)
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
 
     // The maxLength includes the NULL character
-    GLchar errorLog[maxLength];
+    GLchar* errorLog = malloc(sizeof(GLchar)*maxLength);
     glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog);
 
     // Provide the infolog in whatever manor you deem best.
     // Exit with failure.
     glDeleteShader(shader); // Don't leak the shader.
     LogE("%s Error: %s\n", type, errorLog);
+    free(errorLog);
+
     return 0;
   }
   
@@ -73,9 +77,10 @@ void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragme
     glGetProgramiv(shader->mProgram, GL_INFO_LOG_LENGTH, &length);
     if(length > 0)
     {
-      GLchar infoLog[length];
+      GLchar* infoLog = malloc(sizeof(GLchar)*length);
       glGetProgramInfoLog(shader->mProgram, length, &length, infoLog);
       LogE("ShaderError: %s\n", infoLog);
+      free(infoLog);
     }
   }
   

@@ -17,41 +17,43 @@
 
 #include <GraphicsPipeline/Logging.h>
 
-#include <string>
+#include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
-
-using namespace GP;
+#include <stdlib.h>
 
 #define LOG(color, prefix)\
-  std::string fmt = prefix;\
-  fmt += format;\
-  fmt += '\n';\
+  char* fmt;\
+  size_t size = strlen(format)+strlen(prefix)+2;\
+  fmt = malloc(sizeof(char)*size);\
+  snprintf(fmt, size, "%s%s\n", prefix, format);\
   va_list args;\
   va_start(args, format);\
-  vprintf(fmt.c_str(), args);\
-  va_end(args);
+  vprintf(fmt, args);\
+  va_end(args);\
+  free(fmt);
 
-void GP::Log(const char* format, ...)
+void Log(const char* format, ...)
 {
   LOG("", "");
 }
 
-void GP::LogI(const char* format, ...)
+void LogI(const char* format, ...)
 {
   LOG("\033[36m", "INFO: ");
 }
 
-void GP::LogD(const char* format, ...)
+void LogD(const char* format, ...)
 {
   LOG("\033[34m", "DEBUG: ");
 }
 
-void GP::LogW(const char* format, ...)
+void LogW(const char* format, ...)
 {
   LOG("\033[33m", "WARNING: ");
 }
 
-void GP::LogE(const char* format, ...)
+void LogE(const char* format, ...)
 {
   LOG("\033[31m", "ERROR: ");
 }

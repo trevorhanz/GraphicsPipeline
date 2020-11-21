@@ -23,6 +23,7 @@
 // #include <string>
 // #include <memory>
 
+#include "Common.h"
 #include "Types.h"
 #include "Shader.h"
 #include "Array.h"
@@ -31,7 +32,7 @@
 extern "C" {
 #endif
   
-  void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array);
+  GP_EXPORT void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array);
   
 #ifdef __cplusplus
 }

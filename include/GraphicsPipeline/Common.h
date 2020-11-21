@@ -14,46 +14,28 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
-#include <GraphicsPipeline/System.h>
-#include <GraphicsPipeline/Window.h>
-#include <GraphicsPipeline/Windows.h>
 
-#include "Windows.h"
+//! \file Common.h
 
-#include <GL/glew.h>
-#include <windows.h>
+#ifndef __GP_COMMON_H__
+#define __GP_COMMON_H__
 
-using namespace GP;
+#include "Config.h"
 
-GP::Window::Window(UserDataPtr windowData)
-    : mUserData(windowData)
-{
-    auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-    data->mTarget = std::make_shared<Target>();
-}
+#ifdef _WIN64
+	#ifndef GP_STATIC
+		#ifdef GraphicsPipeline_EXPORTS
+			#define GP_EXPORT __declspec(dllexport)
+		#else
+			#define GP_EXPORT __declspec(dllimport)
+		#endif // GraphicsPipeline_EXPORTS
+	#else
+		#define GP_EXPORT
+	#endif // GP_STATIC
+#else
+	#define GP_EXPORT
+#endif // _WIN32
 
-GP::Window::~Window()
-{
-}
 
-unsigned int GP::Window::GetWidth()
-{
-    return 0;
-}
 
-unsigned int GP::Window::GetHeight()
-{
-    return 0;
-}
-
-TargetPtr GP::Window::GetTarget()
-{
-    auto data = std::dynamic_pointer_cast<WindowUserData>(mUserData);
-    return data->mTarget;
-}
-
-GP::Windows::Window::Window()
-    : GP::Window(std::make_shared<WindowUserData>())
-{
-
-}
+#endif // __GP_COMMON_H__

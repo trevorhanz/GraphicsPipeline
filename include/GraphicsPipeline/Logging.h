@@ -20,37 +20,39 @@
 #ifndef __GP_LOGGING_H__
 #define __GP_LOGGING_H__
 
+#include "Common.h"
+
 // namespace GP
 // {
   /*!
    * Generate formatted log output.
    * \param format Printf sytle format string.
    */
-  void Log(const char* format, ...);
+GP_EXPORT void Log(const char* format, ...);
   
   /*!
    * Generate informative formatted log output.
    * \param format Printf sytle format string.
    */
-  void LogI(const char* format, ...);
+GP_EXPORT void LogI(const char* format, ...);
   
   /*!
    * Generate debug formatted log output.
    * \param format Printf sytle format string.
    */
-  void LogD(const char* format, ...);
+GP_EXPORT void LogD(const char* format, ...);
   
   /*!
    * Generate warning formatted log output.
    * \param format Printf sytle format string.
    */
-  void LogW(const char* format, ...);
+GP_EXPORT void LogW(const char* format, ...);
   
   /*!
    * Generate error formatted log output.
    * \param format Printf sytle format string.
    */
-  void LogE(const char* format, ...);
+GP_EXPORT void LogE(const char* format, ...);
 // }
 
 #endif // __GP_LOGGING_H__
