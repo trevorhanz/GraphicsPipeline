@@ -110,7 +110,7 @@ set_property(TARGET GraphicsPipeline PROPERTY CXX_STANDARD 11)
 
 if(NOT BUILD_SHARED_LIBS)
     set(GP_STATIC ON)
-endif(BUILD_SHARED_LIBS)
+endif(NOT BUILD_SHARED_LIBS)
 configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 
 if(EMSCRIPTEN)
