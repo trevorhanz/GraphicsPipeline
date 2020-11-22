@@ -20,6 +20,17 @@ build_ubuntu_18:
     - cmake ../
     - make
 
+build_windows:
+  stage: build
+  image: trevorhanz/windows
+  tags:
+    - docker
+  script:
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/MinGW-W64.cmake ../
+    - make
+
 build_web:
   stage: build
   image: trevorhanz/emscripten:1.39.4
