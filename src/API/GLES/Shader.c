@@ -35,7 +35,7 @@ int _check_shader_status(unsigned int shader, const char* type)
     // Provide the infolog in whatever manor you deem best.
     // Exit with failure.
     glDeleteShader(shader); // Don't leak the shader.
-    LogE("%s Error: %s\n", type, errorLog);
+    gp_log_error("%s Error: %s\n", type, errorLog);
     return 0;
   }
   
@@ -75,7 +75,7 @@ void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragme
     {
       GLchar infoLog[length];
       glGetProgramInfoLog(shader->mProgram, length, &length, infoLog);
-      LogE("ShaderError: %s\n", infoLog);
+      gp_log_error("ShaderError: %s\n", infoLog);
     }
   }
   

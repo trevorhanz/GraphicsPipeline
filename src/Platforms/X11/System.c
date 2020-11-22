@@ -102,8 +102,8 @@ gp_context* gp_system_context_new(gp_system* system)
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
-  LogI("OpenGL Version: %d.%d", major, minor);
-  LogI("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
+  gp_log_info("OpenGL Version: %d.%d", major, minor);
+  gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
   
   return context;
 }

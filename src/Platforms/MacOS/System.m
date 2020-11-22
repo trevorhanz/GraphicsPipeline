@@ -65,11 +65,11 @@ gp_context* gp_system_context_new(gp_system* system)
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
-  LogI("OpenGL Version: %d.%d", major, minor);
+  gp_log_info("OpenGL Version: %d.%d", major, minor);
 
   GLboolean shaderSupport;
   glGetBooleanv(GL_SHADER_COMPILER, &shaderSupport);
-  LogI("ShaderSupport: %s", (shaderSupport)?"TRUE":"FALSE");
+  gp_log_info("ShaderSupport: %s", (shaderSupport)?"TRUE":"FALSE");
   
   return context;
 }

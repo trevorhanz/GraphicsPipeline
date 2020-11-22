@@ -27,12 +27,12 @@
   emscripten_log(level, format, args);\
   va_end(args);
 
-void Log(const char* format, ...)
+void gp_log(const char* format, ...)
 {
   LOG(EM_LOG_CONSOLE);
 }
 
-void LogI(const char* format, ...)
+void gp_log_info(const char* format, ...)
 {
   // EM_LOG_INFO added in 1.39.9
 #ifdef EM_LOG_INFO
@@ -42,7 +42,7 @@ void LogI(const char* format, ...)
 #endif
 }
 
-void LogD(const char* format, ...)
+void gp_log_debug(const char* format, ...)
 {
   // EM_LOG_DEBUG added in 1.39.9
 #ifdef EM_LOG_INFO
@@ -52,12 +52,12 @@ void LogD(const char* format, ...)
 #endif
 }
 
-void LogW(const char* format, ...)
+void gp_log_warn(const char* format, ...)
 {
   LOG(EM_LOG_CONSOLE|EM_LOG_WARN);
 }
 
-void LogE(const char* format, ...)
+void gp_log_error(const char* format, ...)
 {
   LOG(EM_LOG_CONSOLE|EM_LOG_ERROR|EM_LOG_C_STACK);
 }

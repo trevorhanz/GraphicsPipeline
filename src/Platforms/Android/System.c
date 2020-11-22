@@ -26,12 +26,12 @@ gp_system* gp_system_new()
   gp_system* system = malloc(sizeof(gp_system));
   
   if((system->mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY) {
-    LogE("eglGetDisplay() returned error %d", eglGetError());
+    gp_log_error("eglGetDisplay() returned error %d", eglGetError());
     free(system);
     return NULL;
   }
   if(!eglInitialize(system->mDisplay, 0, 0)) {
-    LogE("eglInitialize() returned error %d", eglGetError());
+    gp_log_error("eglInitialize() returned error %d", eglGetError());
     free(system);
     return NULL;
   }
@@ -59,13 +59,13 @@ gp_context* gp_system_context_new(gp_system* system)
   EGLint numConfigs;
   
   if(!eglChooseConfig(system->mDisplay, attribs, &context->mConfig, 1, &numConfigs)) {
-    LogE("eglChooseConfig() returned error %d", eglGetError());
+    gp_log_error("eglChooseConfig() returned error %d", eglGetError());
     free(context);
     return NULL;
   }
 
   if(!eglGetConfigAttrib(system->mDisplay, context->mConfig, EGL_NATIVE_VISUAL_ID, &context->mFormat)) {
-    LogE("eglGetConfigAttrib() returned error %d", eglGetError());
+    gp_log_error("eglGetConfigAttrib() returned error %d", eglGetError());
     free(context);
     return NULL;
   }
@@ -76,7 +76,7 @@ gp_context* gp_system_context_new(gp_system* system)
   };
   
   if(!(context->mShare = eglCreateContext(system->mDisplay, context->mConfig, 0, contextAttribs))) {
-    LogE("eglCreateContext() returned error %d", eglGetError());
+    gp_log_error("eglCreateContext() returned error %d", eglGetError());
     free(context);
     return NULL;
   }
@@ -86,18 +86,18 @@ gp_context* gp_system_context_new(gp_system* system)
   };
   
   if(!(context->mShareSurface = eglCreatePbufferSurface(system->mDisplay, context->mConfig, surfaceAttribs))) {
-    LogE("eglCreatePbufferSurface() returned error %d", eglGetError());
+    gp_log_error("eglCreatePbufferSurface() returned error %d", eglGetError());
     free(context);
     return NULL;
   }
   
   if(!eglMakeCurrent(system->mDisplay, context->mShareSurface, context->mShareSurface, context->mShare)) {
-      LogE("eglMakeCurrent() returned error %d", eglGetError());
+      gp_log_error("eglMakeCurrent() returned error %d", eglGetError());
       free(context);
       return NULL;
     }
   
-  LogE("GL Version: %s", glGetString(GL_VERSION));
+  gp_log_error("GL Version: %s", glGetString(GL_VERSION));
   
   return context;
 }

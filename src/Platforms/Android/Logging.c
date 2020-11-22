@@ -27,27 +27,27 @@
   __android_log_vprint(level, "GP", format, args);\
   va_end(args);
 
-void Log(const char* format, ...)
+void gp_log(const char* format, ...)
 {
   LOG(ANDROID_LOG_DEFAULT);
 }
 
-void LogI(const char* format, ...)
+void gp_log_info(const char* format, ...)
 {
   LOG(ANDROID_LOG_INFO);
 }
 
-void LogD(const char* format, ...)
+void gp_log_debug(const char* format, ...)
 {
   LOG(ANDROID_LOG_DEBUG);
 }
 
-void LogW(const char* format, ...)
+void gp_log_warn(const char* format, ...)
 {
   LOG(ANDROID_LOG_WARN);
 }
 
-void LogE(const char* format, ...)
+void gp_log_error(const char* format, ...)
 {
   LOG(ANDROID_LOG_ERROR);
 }

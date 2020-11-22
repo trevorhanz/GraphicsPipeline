@@ -58,7 +58,7 @@ gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* win
   ANativeWindow_setBuffersGeometry(window, 0, 0, context->mFormat);
 
   if (!(target->mSurface = eglCreateWindowSurface(context->mParent->mDisplay, context->mConfig, window, 0))) {
-    LogE("eglCreateWindowSurface() returned error %d", eglGetError());
+    gp_log_error("eglCreateWindowSurface() returned error %d", eglGetError());
     free(target);
     return NULL;
   }
@@ -69,13 +69,13 @@ gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* win
   };
   
   if (!(target->mContext = eglCreateContext(context->mParent->mDisplay, context->mConfig, context->mShare, contextAttribs))) {
-    LogE("eglCreateContext() returned error %d", eglGetError());
+    gp_log_error("eglCreateContext() returned error %d", eglGetError());
     free(target);
     return NULL;
   }
   
   if (!eglMakeCurrent(context->mParent->mDisplay, target->mSurface, target->mSurface, target->mContext)) {
-    LogE("eglMakeCurrent() returned error %d", eglGetError());
+    gp_log_error("eglMakeCurrent() returned error %d", eglGetError());
     free(target);
     return NULL;
   }

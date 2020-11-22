@@ -34,7 +34,7 @@
 {\
   GLenum err;\
   while((err = glGetError()) != GL_NO_ERROR) {\
-    LogE("GL ERROR (%d) at: %s:%d", err, __FILE__, __LINE__);\
+    gp_log_error("GL ERROR (%d) at: %s:%d", err, __FILE__, __LINE__);\
   }\
 }
 

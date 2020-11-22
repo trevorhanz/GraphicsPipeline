@@ -45,27 +45,27 @@
   va_end(args);\
   free(fmt);
 
-void Log(const char* format, ...)
+void gp_log(const char* format, ...)
 {
   LOG("", "");
 }
 
-void LogI(const char* format, ...)
+void gp_log_info(const char* format, ...)
 {
   LOG("\033[36m", "INFO: ");
 }
 
-void LogD(const char* format, ...)
+void gp_log_debug(const char* format, ...)
 {
   LOG("\033[34m", "DEBUG: ");
 }
 
-void LogW(const char* format, ...)
+void gp_log_warn(const char* format, ...)
 {
   LOG("\033[33m", "WARNING: ");
 }
 
-void LogE(const char* format, ...)
+void gp_log_error(const char* format, ...)
 {
   LOG("\033[31m", "ERROR: ");
 }
