@@ -31,6 +31,21 @@ build_windows:
     - cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/MinGW-W64.cmake ../
     - make
 
+build_osx:
+  stage: build
+  image: liushuyu/osxcross
+  tags:
+    - docker
+  script:
+    - mkdir build
+    - cd build
+    - export OSXCROSS_HOST=x86_64-apple-darwin18
+    - export OSXCROSS_TARGET=o64
+    - export OSXCROSS_TARGET_DIR=/opt/osxcross/
+    - export OSXCROSS_SDK=/opt/osxcross/SDK/MacOSX10.14.sdk/
+    - cmake -DCMAKE_TOOLCHAIN_FILE=/opt/osxcross/toolchain.cmake ../
+    - make
+
 build_web:
   stage: build
   image: trevorhanz/emscripten:1.39.4
