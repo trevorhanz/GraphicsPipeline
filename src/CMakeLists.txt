@@ -27,6 +27,8 @@ set(LIB "")
 set(INC "")
 
 if(EMSCRIPTEN)
+  set(GP_WEB ON)
+  
   list(APPEND SRC
     API/GLES/Array.c
     API/GLES/Pipeline.c
@@ -36,6 +38,9 @@ if(EMSCRIPTEN)
     Platforms/Web/Context.c
     Platforms/Web/Logging.c)
 elseif(ANDROID)
+  set(GP_MOBILE ON)
+  set(GP_ANDROID ON)
+  
   find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
     HINTS ${ANDROID_NDK})
   find_library(GLES2_LIBRARY libGLESv2.so
@@ -61,18 +66,24 @@ elseif(ANDROID)
     Platforms/Android/Logging.c
     Platforms/Android/System.c)
 else(ANDROID)
+  set(GP_DESKTOP ON)
+  
   find_package(OpenGL REQUIRED)
   list(APPEND SRC API/GL/Pipeline.c API/GL/Array.c API/GL/Shader.c)
   list(APPEND INC ${OPENGL_INCLUDE_DIRS})
   list(APPEND LIB ${OPENGL_LIBRARIES})
   
   if(WIN32)
+    set(GP_WINDOWS ON)
+    
     list(APPEND SRC
       Platforms/Windows/Context.c
       Platforms/Windows/Logging.c
       Platforms/Windows/System.c
       Platforms/Windows/Windows.h)
   elseif(APPLE)
+    set(GP_MACOS ON)
+    
     find_library(COCOA_LIBRARY Cocoa)
     list(APPEND LIB ${COCOA_LIBRARY})
     list(APPEND SRC
@@ -83,6 +94,8 @@ else(ANDROID)
       Platforms/MacOS/View.h
       Platforms/MacOS/System.m)
   elseif(UNIX)
+    set(GP_LINUX ON)
+    
     list(APPEND SRC
       Platforms/X11/Context.c
       Platforms/X11/Logging.c

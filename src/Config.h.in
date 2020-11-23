@@ -4,4 +4,14 @@
 
 #cmakedefine GP_STATIC
 
+#cmakedefine GP_DESKTOP
+#cmakedefine GP_WINDOWS
+#cmakedefine GP_LINUX
+#cmakedefine GP_MACOS
+
+#cmakedefine GP_MOBILE
+#cmakedefine GP_ANDROID
+
+#cmakedefine GP_WEB
+
 #endif /// __GP_CONFIG_H__
