@@ -20,22 +20,5 @@
 #ifndef __GP_MACOS_H__
 #define __GP_MACOS_H__
 
-//namespace GP
-//{
-//  namespace MacOS
-//  {
-//    /*!
-//     * Window with MacOS specific features.
-//     */
-//    class Window : public GP::Window
-//    {
-//    public:
-//      //! Constructor
-//      Window();
-//    };
-//    //! Shared pointer to Window object.
-//    typedef std::shared_ptr<Window> WindowPtr;
-//  }
-//}
 
 #endif // __GP_MACOS_H__
