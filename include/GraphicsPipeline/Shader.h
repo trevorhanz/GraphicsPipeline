@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Shader.h
+
 #ifndef __GP_SHADER_H__
 #define __GP_SHADER_H__
 
@@ -25,7 +27,18 @@
 extern "C" {
 #endif
   
+/*!
+ * Free gp_shader object.
+ * \param shader Shader object to be freed.
+ */
   GP_EXPORT void gp_shader_free(gp_shader* shader);
+
+/*!
+ * Compile a gp_shader object with a vertext and fragment source code.
+ * \param shader Shader object to be compiled.
+ * \param vertex Vertex shader source code.
+ * \param fragment Fragment shader source code.
+ */
   GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
   
 #ifdef __cplusplus
@@ -33,13 +46,23 @@ extern "C" {
 
 namespace GP
 {
+  /*!
+   * Wrapper class for gp_shader.
+   */
   class Shader
   {
   private:
+    //! Constructor
     inline Shader(gp_shader* shader);
   public:
+    //! Destructor
     inline ~Shader();
     
+    /*!
+     * Compile this shader program with vertex and fragment source code.
+     * \param vertex Vertex shader source code.
+     * \param fragment Fragment shader source code.
+     */
     inline void Compile(const char* vertex, const char* fragment);
     
   private:

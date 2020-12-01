@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Array.h
+
 #ifndef __GP_ARRAY_H__
 #define __GP_ARRAY_H__
 
@@ -25,7 +27,18 @@
 extern "C" {
 #endif
 
+/*!
+ * Free array object.
+ * \param array Pointer to array to be freed.
+ */
   GP_EXPORT void gp_array_free(gp_array* array);
+  
+/*!
+ * Upload data to an array object.
+ * \param array Pointer to array object.
+ * \param data Pointer to data to be uploaded.
+ * \param count Number of element in data array.
+ */
   GP_EXPORT void gp_array_set_data(gp_array* array, float* data, unsigned int count);
 
 #ifdef __cplusplus
@@ -33,17 +46,27 @@ extern "C" {
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_array.
+   */
   class Array
   {
   private:
+    //! Constructor
     inline Array(gp_array* array);
   public:
+    //! Destructor
     inline ~Array();
     
+    /*!
+     * Uploads data to %Array object.
+     * \param data %Array of data to be uploaded.
+     * \param count Number of elements in data array;
+     */
     inline void SetData(float* data, unsigned int count);
     
   private:
-    gp_array*           mArray;
+    gp_array*           mArray;     //!< Internal array object
     
     friend class Context;
     friend class Pipeline;

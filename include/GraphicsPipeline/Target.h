@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+//! \file Target.h
+
 #ifndef __GP_TARGET_H__
 #define __GP_TARGET_H__
 
@@ -25,6 +27,11 @@
 extern "C" {
 #endif
   
+/*!
+ * Get the gp_pipeline tied to a gp_target.
+ * \param target Pointer to target object.
+ * \return Pointer to pipeline object.
+ */
   GP_EXPORT gp_pipeline* gp_target_get_pipeline(gp_target* target);
   
 #ifdef __cplusplus
@@ -32,12 +39,22 @@ extern "C" {
 
 namespace GP
 {
+  /*!
+   * Wrapper class for gp_target.
+   */
   class Target
   {
   public:
+    //! Constructor
     inline Target(gp_target* target);
+    
+    //! Destructor
     inline ~Target();
     
+    /*!
+     * Retrieve GP::Pipeline object.
+     * \return Pointer to GP::Pipeline.
+     */
     inline Pipeline* GetPipeline();
     
   private:

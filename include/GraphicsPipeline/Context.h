@@ -20,8 +20,6 @@
 #ifndef __GP_CONTEXT_H__
 #define __GP_CONTEXT_H__
 
-// #include <memory>
-
 #include "Common.h"
 #include "Pipeline.h"
 #include "Types.h"
@@ -33,11 +31,31 @@
 extern "C" {
 #endif
 
-typedef struct _gp_context gp_context;
-
+/*!
+ * Free gp_context object
+ * \param context Context object to be freed.
+ */
 GP_EXPORT void gp_context_free(gp_context* context);
+
+/*!
+ * Create a new gp_target object tied to a context.
+ * \param context Context object used to create target.
+ * \return Newly created target.
+ */
 GP_EXPORT gp_target* gp_context_target_new(gp_context* context);
+
+/*!
+ * Create a new gp_array object tied to a context.
+ * \param context Context object used to create array.
+ * \return Newly created array.
+ */
 GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
+
+/*!
+ * Create a new gp_shader object tied to a context.
+ * \param context Context object used to create shader.
+ * \return Newly created shader.
+ */
 GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
 
 #ifdef __cplusplus
@@ -45,17 +63,34 @@ GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_context
+   */
   class Context
   {
   private:
+    //! Constructor
     inline Context(gp_context* context);
   public:
+    //! Destructor
     inline ~Context();
     
+    /*!
+     * Create a Target object tied to this Context.
+     * \return Newly created Target object.
+     */
     inline Target* CreateTarget();
     
+    /*!
+     * Create an Array object tied to this Context.
+     * \return Newly created Array object.
+     */
     inline Array* CreateArray();
     
+    /*!
+     * Create a Shader object tied to this Context.
+     * \return Newly created Shader object.
+     */
     inline Shader* CreateShader();
     
   private:

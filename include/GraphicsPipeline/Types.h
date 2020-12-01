@@ -24,13 +24,13 @@
 extern "C" {
 #endif
 
-typedef struct _gp_system gp_system;
-typedef struct _gp_context gp_context;
-typedef struct _gp_target gp_target;
-typedef struct _gp_array gp_array;
-typedef struct _gp_shader gp_shader;
-typedef struct _gp_pipeline gp_pipeline;
-typedef struct _gp_operation gp_operation;
+typedef struct _gp_system gp_system;        //!< System object.
+typedef struct _gp_context gp_context;      //!< Rendering context.
+typedef struct _gp_target gp_target;        //!< Destination for rendering.
+typedef struct _gp_array gp_array;          //!< Storage for data array.
+typedef struct _gp_shader gp_shader;        //!< Shader program object.
+typedef struct _gp_pipeline gp_pipeline;    //!< Organization of rendering operations.
+typedef struct _gp_operation gp_operation;  //!< A single rendering operations.
 
 #ifdef __cplusplus
 }

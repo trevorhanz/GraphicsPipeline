@@ -20,9 +20,6 @@
 #ifndef __GP_PIPELINE_H__
 #define __GP_PIPELINE_H__
 
-// #include <string>
-// #include <memory>
-
 #include "Common.h"
 #include "Types.h"
 #include "Shader.h"
@@ -32,6 +29,12 @@
 extern "C" {
 #endif
   
+  /*!
+   * Add a draw operation to the end of the pipeline.
+   * \param pipeline Pipeline to add operation to.
+   * \param shader Shader object used in draw operation.
+   * \param array Array object used in draw operation.
+   */
   GP_EXPORT void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array);
   
 #ifdef __cplusplus
@@ -39,12 +42,22 @@ extern "C" {
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_pipeline 
+   */
   class Pipeline
   {
   public:
+    //! Constructor
     inline Pipeline(gp_pipeline* pipeline);
+    //! Destructor
     inline ~Pipeline();
     
+    /*!
+     * Add draw operation to the end of this pipeline object.
+     * \param shader Shader object to be used in operation.
+     * \param array Array object to be used in operation.
+     */
     inline void AddDraw(Shader* shader, Array* array);
     
   private:

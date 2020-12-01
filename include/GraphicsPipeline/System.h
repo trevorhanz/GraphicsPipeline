@@ -28,9 +28,30 @@
 extern "C" {
 #endif
 
+/*!
+ * Create a new system object.
+ * \return Pointer to new system object.
+ */
 GP_EXPORT gp_system* gp_system_new();
+
+/*!
+ * Free system object.
+ * \param system Pointer to system object to be freed.
+ */
 GP_EXPORT void gp_system_free(gp_system* system);
+
+/*!
+ * Create a new context object tied to an existing system object.
+ * \param system Pointer to existing system object.
+ * \return Pointer to new context object.
+ */
 GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
+
+/*!
+ * Runs the main event loop for a system obect.
+ * The function will take control of the current thread.
+ * \param system Pointer to system object to be run.
+ */
 GP_EXPORT void gp_system_run(gp_system* system);
 
 #ifdef __cplusplus
@@ -38,14 +59,27 @@ GP_EXPORT void gp_system_run(gp_system* system);
 
 namespace GP
 {
+  /*!
+   * Wrapper class for gp_system.
+   */
   class System
   {
   public:
+    //! Constructor
     inline System();
+    
+    //! Destructor
     inline ~System();
     
+    /*!
+     * Creates a new GP::Context for this system.
+     * \return Pointer to newly created GP::Context.
+     */
     inline Context* CreateContext();
     
+    /*!
+     * Start the main loop.
+     */
     inline void Run();
     
   private:
