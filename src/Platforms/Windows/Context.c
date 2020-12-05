@@ -16,11 +16,13 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/Context.h>
+#include "API/GL/GL.h"
 #include "Windows.h"
 
 #include <windows.h>
 #include <winuser.h>
-#include <GL/wglew.h>
+#include <GL/glext.h>
+#include <GL/wglext.h>
 
 void gp_context_free(gp_context* context)
 {
@@ -133,7 +135,7 @@ gp_array* gp_context_array_new(gp_context* context)
 {
   gp_array* array = malloc(sizeof(struct _gp_array));
 
-  glGenBuffers(1, &array->mVBO);
+  _gp_generate_array(array);
 
   return array;
 }

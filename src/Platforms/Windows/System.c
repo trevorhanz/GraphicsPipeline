@@ -17,10 +17,14 @@
 
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Windows.h>
-//#include "Context.h"
+#include <GraphicsPipeline/Logging.h>
+#include "API/GL/GL.h"
 #include "Windows.h"
 
-#include <GL/wglew.h>
+#include <GL/glext.h>
+#include <GL/wglext.h>
+
+#include <stdio.h>
 
 static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle For This Window
                                     UINT    uMsg,                   // Message For This Window
@@ -67,7 +71,8 @@ gp_system* gp_system_new()
   if(!RegisterClass(&wc))                               // Attempt To Register The Window Class
   {
     MessageBox(NULL, "Failed To Register The Window Class.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(system);
+    return NULL;
   }
 
   return system;
@@ -97,7 +102,8 @@ gp_context* gp_system_context_new(gp_system* system)
       NULL)))                                           // Pass a pointer to this window
   {
     MessageBox(NULL, "Window Creation Error.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
   
   HDC hDC = GetDC(hWnd);
@@ -128,25 +134,29 @@ gp_context* gp_system_context_new(gp_system* system)
   if (!(PixelFormat = ChoosePixelFormat(hDC, &pfd)))    // Did Windows Find A Matching Pixel Format?
   {
     MessageBox(NULL, "Can't Find A Suitable PixelFormat.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
   
   if (!SetPixelFormat(hDC, PixelFormat, &pfd))          // Are We Able To Set The Pixel Format?
   {
     MessageBox(NULL, "Can't Set The PixelFormat.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
   
   HGLRC hRC;
   if (!(hRC = wglCreateContext(hDC)))                   // Are We Able To Get A Rendering Context?
   {
     MessageBox(NULL, "Can't Create A GL Rendering Context.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
   if (!wglMakeCurrent(hDC, hRC))                        // Try To Activate The Rendering Context
   {
     MessageBox(NULL, "Can't Activate The GL Rendering Context.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
   
   PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
@@ -253,13 +263,15 @@ gp_context* gp_system_context_new(gp_system* system)
           NULL)))                                                       // Pass a pointer to this window
       {
         MessageBox(NULL, "Window Creation Error.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-        return;
+        free(context);
+        return NULL;
       }
   
       if (context->mPixelFormat > 0)
         if (!SetPixelFormat(GetDC(hWnd), context->mPixelFormat, &pfd))  // Are We Able To Set The Pixel Format?
         {
           MessageBox(NULL, "Can't Set The PixelFormat.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+          free(context);
           return NULL;
         }
       context->mWindow = hWnd;
@@ -269,22 +281,23 @@ gp_context* gp_system_context_new(gp_system* system)
     if (!(context->mShare = wglCreateContext(hDC)))                     // Are We Able To Get A Rendering Context?
     {
       MessageBox(NULL, "Can't Create A GL Rendering Context.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+      free(context);
       return NULL;
     }
   
     if (!wglMakeCurrent(hDC, context->mShare))                          // Try To Activate The Rendering Context
     {
       MessageBox(NULL, "Can't Activate The GL Rendering Context.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+      free(context);
       return NULL;
     }
   }
   else
   {
     MessageBox(NULL, "Can't Find Pixel Format.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
-    return;
+    free(context);
+    return NULL;
   }
-  
-  glewInit();
   
   OSVERSIONINFOEX version;
   version.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -295,7 +308,7 @@ gp_context* gp_system_context_new(gp_system* system)
   
   // Try to identify the Windows version
   char OS[64];
-  OS[0] = '/0';
+  OS[0] = '\0';
   if (version.dwMajorVersion == 10)
   {
     if (version.wProductType == VER_NT_WORKSTATION) strcpy(OS, "Windows 10");
@@ -347,7 +360,9 @@ gp_context* gp_system_context_new(gp_system* system)
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
-
+  
+  _gp_api_init();
+  
   return context;
 }
 

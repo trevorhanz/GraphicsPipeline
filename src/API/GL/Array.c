@@ -28,3 +28,8 @@ void gp_array_set_data(gp_array* array, float* data, unsigned int count)
   
   glBufferData(GL_ARRAY_BUFFER, sizeof(float)*count, data, GL_STATIC_DRAW);
 }
+
+void _gp_generate_array(gp_array* array)
+{
+  glGenBuffers(1, &array->mVBO);
+}

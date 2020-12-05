@@ -73,6 +73,8 @@ void _gp_pipeline_execute(gp_pipeline* pipeline);
 
 void _gp_api_init();
 
+void _gp_generate_array(gp_array* array);
+
 #ifdef __cplusplus
 }
 #endif
