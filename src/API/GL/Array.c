@@ -16,6 +16,10 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/Array.h>
+
+#ifndef __APPLE__
+#include <GL/glew.h>
+#endif
 #include "GL.h"
 
 void gp_array_set_data(gp_array* array, float* data, unsigned int count)

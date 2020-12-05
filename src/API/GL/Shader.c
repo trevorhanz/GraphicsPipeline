@@ -17,6 +17,10 @@
 
 #include <GraphicsPipeline/Shader.h>
 #include <GraphicsPipeline/Logging.h>
+
+#ifndef __APPLE__
+#include <GL/glew.h>
+#endif
 #include "GL.h"
 
 #include <stdlib.h>

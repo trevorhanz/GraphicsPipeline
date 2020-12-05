@@ -21,7 +21,7 @@
 #include <GraphicsPipeline/Types.h>
 
 #ifndef __APPLE__
-#include <GL/glew.h>
+#include <GL/gl.h>
 #else
 // OpenGL is deprecated since macOS 10.14
 // Apple recommends porting to Metal
@@ -65,6 +65,16 @@ struct _gp_pipeline
   gp_operation_list*      mOperations;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void _gp_pipeline_execute(gp_pipeline* pipeline);
+
+void _gp_api_init();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __GP_GL_H__

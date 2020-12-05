@@ -17,6 +17,10 @@
 
 #include <GraphicsPipeline/Pipeline.h>
 #include <GraphicsPipeline/Logging.h>
+
+#ifndef __APPLE__
+#include <GL/glew.h>
+#endif
 #include "GL.h"
 
 #ifndef __APPLE__
@@ -49,7 +53,9 @@ typedef struct
 void _gp_operation_draw(_gp_operation_data* data)
 {
   _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
-
+  
+  CHECK_GL_ERROR();
+  
   glBindVertexArray(d->mVAO);
   
   glUseProgram(d->mShader->mProgram);
@@ -91,4 +97,17 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
     
     list = list->mNext;
   }
+}
+
+void _gp_api_init()
+{
+#ifndef __APPLE__
+  // NOTE: GLEW must be initialize with an active OpenGL context
+  GLenum err = glewInit();
+  if(GLEW_OK != err)
+  {
+    gp_log_error("GLEW: %s", glewGetErrorString(err));
+  }
+  gp_log_info("GLEW Version: %s", glewGetString(GLEW_VERSION));
+#endif // __APPLE__
 }
