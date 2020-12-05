@@ -165,7 +165,7 @@ if(EMSCRIPTEN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
   add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
-  target_link_libraries(GraphicsPipeline-main GraphicsPipeline)
+  target_link_libraries(GraphicsPipeline-main Native)
 endif(EMSCRIPTEN)
 
 #
