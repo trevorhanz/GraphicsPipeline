@@ -34,15 +34,16 @@
 
 #include <stdlib.h>
 
-void GLAPIENTRY DebugCallbackFunction(GLenum source,
-                                      GLenum type,
-                                      GLuint id,
-                                      GLenum severity,
-                                      GLsizei length,
-                                      const GLchar* message,
-                                      const void* userParam)
+// Apple doesn't seem to have support for debug callbacks
+#ifndef __APPLE__
+void DebugCallbackFunction(GLenum source,
+                           GLenum type,
+                           GLuint id,
+                           GLenum severity,
+                           GLsizei length,
+                           const GLchar* message,
+                           const void* userParam)
 {
-
   switch(type)
   {
   case GL_DEBUG_TYPE_ERROR:
@@ -59,6 +60,7 @@ void GLAPIENTRY DebugCallbackFunction(GLenum source,
     break;
   }
 }
+#endif
 
 #define CHECK_GL_ERROR() \
 {\
@@ -138,10 +140,13 @@ void _gp_api_init()
 #endif // __APPLE__
   
 #if GP_DEBUG
+  // Apple doesn't seem to have support for debug callbacks
+#ifndef __APPLE__
   if(glDebugMessageCallback)
   {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallbackFunction, 0);
   }
+#endif // __APPLE__
 #endif // GP_DEBUG
 }
