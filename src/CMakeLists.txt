@@ -154,6 +154,12 @@ target_link_libraries(Native ${LIB} Interface)
 set_property(TARGET Native PROPERTY OUTPUT_NAME GPNative)
 set_property(TARGET Native PROPERTY CXX_STANDARD 11)
 
+string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type )
+if(build_type STREQUAL "DEBUG")
+  target_compile_definitions(Native PRIVATE GP_DEBUG)
+  target_compile_definitions(GP_Qt5 PRIVATE GP_DEBUG)
+endif()
+
 if(NOT BUILD_SHARED_LIBS)
     set(GP_STATIC ON)
 endif(NOT BUILD_SHARED_LIBS)

@@ -18,6 +18,7 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/X11.h>
 #include "X11.h"
+#include "API/GL/GL.h"
 
 #include <GL/glew.h>
 #include <GL/glx.h>
@@ -95,15 +96,14 @@ gp_context* gp_system_context_new(gp_system* system)
   // NOTE: Context needs window first time it is made current.
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
-  // NOTE: GLEW must be initialize with an active OpenGL context
-  glewInit();
-  
   // NOTE: GL functions need a context to be bound to get information from
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
   gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
+  
+  _gp_api_init();
   
   return context;
 }

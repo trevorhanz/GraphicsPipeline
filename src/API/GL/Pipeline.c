@@ -34,6 +34,32 @@
 
 #include <stdlib.h>
 
+void GLAPIENTRY DebugCallbackFunction(GLenum source,
+                                      GLenum type,
+                                      GLuint id,
+                                      GLenum severity,
+                                      GLsizei length,
+                                      const GLchar* message,
+                                      const void* userParam)
+{
+
+  switch(type)
+  {
+  case GL_DEBUG_TYPE_ERROR:
+    gp_log_error(message);
+    break;
+  case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+  case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+  case GL_DEBUG_TYPE_PORTABILITY:
+    gp_log_warn(message);
+    break;
+  case GL_DEBUG_TYPE_PERFORMANCE:
+  case GL_DEBUG_TYPE_OTHER:
+    gp_log_debug(message);
+    break;
+  }
+}
+
 #define CHECK_GL_ERROR() \
 {\
   GLenum err;\
@@ -110,4 +136,12 @@ void _gp_api_init()
   }
   gp_log_info("GLEW Version: %s", glewGetString(GLEW_VERSION));
 #endif // __APPLE__
+  
+#if GP_DEBUG
+  if(glDebugMessageCallback)
+  {
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(DebugCallbackFunction, 0);
+  }
+#endif // GP_DEBUG
 }
