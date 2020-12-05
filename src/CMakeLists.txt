@@ -113,6 +113,31 @@ else(ANDROID)
     list(APPEND INC ${GLEW_INCLUDE_DIRS})
     list(APPEND LIB ${GLEW_LIBRARIES})
   endif(NOT APPLE)
+  
+  if(GP_BUILD_QT5)
+    find_package(Qt5 COMPONENTS Widgets REQUIRED)
+    set(CMAKE_AUTOMOC ON)
+    
+    set(Qt5_SRC
+      API/GL/Pipeline.c
+      API/GL/Array.c
+      API/GL/Shader.c
+      Platforms/Qt5/Context.cpp
+      Platforms/Qt5/Logging.c
+      Platforms/Qt5/System.cpp
+      Platforms/Qt5/Target.cpp)
+    
+    add_library(GP_Qt5 ${Qt5_SRC})
+    target_include_directories(GP_Qt5 PRIVATE ${INC} API/GL/)
+    target_include_directories(GP_Qt5 PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+    target_link_libraries(GP_Qt5 Qt5::Widgets ${LIB} Interface)
+    set_property(TARGET GP_Qt5 PROPERTY OUTPUT_NAME GPQt5)
+    set_property(TARGET GP_Qt5 PROPERTY CXX_STANDARD 11)
+    add_library(GP::Qt5 ALIAS GP_Qt5)
+    
+  endif(GP_BUILD_QT5)
 endif(EMSCRIPTEN)
 
 add_library(Interface INTERFACE)

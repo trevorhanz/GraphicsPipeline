@@ -10,5 +10,7 @@ if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif(POLICY CMP0074)
 
+option(GP_BUILD_QT5 "Build Qt5 support." OFF)
+
 add_subdirectory(src)
 add_subdirectory(examples)
