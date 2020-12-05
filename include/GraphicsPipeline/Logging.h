@@ -22,34 +22,42 @@
 
 #include "Common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!
   * Generate formatted log output.
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log(const char* format, ...);
-  
+
 /*!
   * Generate informative formatted log output.
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log_info(const char* format, ...);
-  
+
 /*!
   * Generate debug formatted log output.
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log_debug(const char* format, ...);
-  
+
 /*!
   * Generate warning formatted log output.
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log_warn(const char* format, ...);
-  
+
 /*!
   * Generate error formatted log output.
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log_error(const char* format, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __GP_LOGGING_H__

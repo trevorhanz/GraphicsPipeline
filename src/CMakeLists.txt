@@ -115,11 +115,19 @@ else(ANDROID)
   endif(NOT APPLE)
 endif(EMSCRIPTEN)
 
-add_library(GraphicsPipeline ${SRC})
-target_include_directories(GraphicsPipeline PUBLIC ${INC} ../include ${CMAKE_CURRENT_BINARY_DIR}/include/)
-target_include_directories(GraphicsPipeline PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(GraphicsPipeline ${LIB})
-set_property(TARGET GraphicsPipeline PROPERTY CXX_STANDARD 11)
+add_library(Interface INTERFACE)
+target_include_directories(Interface INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+
+add_library(Native ${SRC})
+target_include_directories(Native PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Native PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+target_link_libraries(Native ${LIB} Interface)
+set_property(TARGET Native PROPERTY OUTPUT_NAME GPNative)
+set_property(TARGET Native PROPERTY CXX_STANDARD 11)
 
 if(NOT BUILD_SHARED_LIBS)
     set(GP_STATIC ON)
@@ -127,10 +135,37 @@ endif(NOT BUILD_SHARED_LIBS)
 configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 
 if(EMSCRIPTEN)
-  set_target_properties(GraphicsPipeline PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
+  set_target_properties(Native PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
   
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
   add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
   target_link_libraries(GraphicsPipeline-main GraphicsPipeline)
 endif(EMSCRIPTEN)
+
+#
+# Install
+#
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(../cmake/GraphicsPipelineConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
+
+write_basic_package_version_file(
+    "GraphicsPipelineVersion.cmake"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
+install(DIRECTORY ../include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)
+install(TARGETS Interface Native
+        EXPORT GP
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
+install(EXPORT GP NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)

@@ -6,7 +6,7 @@ if(EMSCRIPTEN)
 endif(EMSCRIPTEN)
 
 add_executable(Simple main.c)
-target_link_libraries(Simple GraphicsPipeline)
+target_link_libraries(Simple Native)
 
 add_executable(Simple++ main.cpp)
-target_link_libraries(Simple++ GraphicsPipeline)
+target_link_libraries(Simple++ Native)
