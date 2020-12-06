@@ -24,19 +24,15 @@ using namespace GP;
 
 // Shader sources
 const char* vertexSource =
-    "#version 400\n"
-    "layout(location = 0) in vec4 position;       \n"
+    "attribute vec4 position;       \n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
-    "#version 400\n"
-    "precision mediump float;\n"
-    "out vec4 fragColor;\n"
     "void main()                                  \n"
     "{                                            \n"
-    "  fragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
+    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 

@@ -55,6 +55,9 @@ extern "C" gp_context* gp_qt_context_new()
   functions->glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
   
+  const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+  gp_log_info("GLSL Version: %s", glslVersion);
+  
   _gp_api_init();
   
   return context;

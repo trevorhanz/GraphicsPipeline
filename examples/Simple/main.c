@@ -43,7 +43,6 @@ const char* vertexSource =
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
-    "precision mediump float;\n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"

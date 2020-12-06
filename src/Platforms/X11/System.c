@@ -101,6 +101,10 @@ gp_context* gp_system_context_new(gp_system* system)
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
+  
+  const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+  gp_log_info("GLSL Version: %s", glslVersion);
+  
   gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
   
   _gp_api_init();
