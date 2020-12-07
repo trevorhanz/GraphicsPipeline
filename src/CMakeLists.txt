@@ -1,4 +1,8 @@
-set(HEADERS
+
+#
+# Public source
+#
+set(PUBLIC_HEADERS
     ../include/GraphicsPipeline/Android.h
     ../include/GraphicsPipeline/Array.h
     ../include/GraphicsPipeline/Common.h
@@ -8,6 +12,7 @@ set(HEADERS
     ../include/GraphicsPipeline/Logging.h
     ../include/GraphicsPipeline/MacOS.h
     ../include/GraphicsPipeline/Pipeline.h
+    ../include/GraphicsPipeline/Qt5.h
     ../include/GraphicsPipeline/Shader.h
     ../include/GraphicsPipeline/System.h
     ../include/GraphicsPipeline/Target.h
@@ -18,10 +23,43 @@ set(HEADERS
     )
 
 set(SRC
-  ${HEADERS}
+  ${PUBLIC_HEADERS}
   )
 
-source_group("Header Files\\include" FILES ${HEADERS})
+#
+# API source
+#
+set(GL_HEADERS
+  API/GL/GL.h
+  )
+
+set(GL_SRC
+  ${GL_HEADERS}
+  API/GL/Pipeline.c
+  API/GL/Array.c
+  API/GL/Shader.c
+  )
+
+set(GLES_HEADERS
+  API/GLES/GLES.h
+  )
+
+set(GLES_SRC
+  ${GLES_HEADERS}
+  API/GLES/Pipeline.c
+  API/GLES/Array.c
+  API/GLES/Shader.c
+  )
+
+#
+# Source Groups
+#
+source_group("Header Files\\Public" FILES ${PUBLIC_HEADERS})
+source_group("Header Files\\API" FILES ${GL_HEADERS} ${GLES_HEADERS})
+source_group("Header Files\\Platform" REGULAR_EXPRESSION "Platforms.+\.h")
+
+source_group("Source Files\\API" REGULAR_EXPRESSION "API")
+source_group("Source Files\\Platform" REGULAR_EXPRESSION "Platforms")
 
 set(LIB "")
 set(INC "")
@@ -29,10 +67,7 @@ set(INC "")
 if(EMSCRIPTEN)
   set(GP_WEB ON)
   
-  list(APPEND SRC
-    API/GLES/Array.c
-    API/GLES/Pipeline.c
-    API/GLES/Shader.c)
+  list(APPEND SRC ${GLES_HEADERS})
   list(APPEND SRC
     Platforms/Web/System.c
     Platforms/Web/Context.c
@@ -57,7 +92,7 @@ elseif(ANDROID)
               # you want CMake to locate.
               log)
   
-  list(APPEND SRC API/GLES/Pipeline.c API/GLES/Array.c API/GLES/Shader.c)
+  list(APPEND SRC ${GLES_SRC})
   list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
   list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   
@@ -69,7 +104,7 @@ else(ANDROID)
   set(GP_DESKTOP ON)
   
   find_package(OpenGL REQUIRED)
-  list(APPEND SRC API/GL/Pipeline.c API/GL/Array.c API/GL/Shader.c)
+  list(APPEND SRC ${GL_SRC})
   list(APPEND INC ${OPENGL_INCLUDE_DIRS})
   list(APPEND LIB ${OPENGL_LIBRARIES})
   
@@ -119,9 +154,7 @@ else(ANDROID)
     set(CMAKE_AUTOMOC ON)
     
     set(Qt5_SRC
-      API/GL/Pipeline.c
-      API/GL/Array.c
-      API/GL/Shader.c
+      ${GL_SRC}
       Platforms/Qt5/Context.cpp
       Platforms/Qt5/Logging.c
       Platforms/Qt5/System.cpp
