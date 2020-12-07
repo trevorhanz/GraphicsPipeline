@@ -67,7 +67,7 @@ set(INC "")
 if(EMSCRIPTEN)
   set(GP_WEB ON)
   
-  list(APPEND SRC ${GLES_HEADERS})
+  list(APPEND SRC ${GLES_SRC})
   list(APPEND SRC
     Platforms/Web/System.c
     Platforms/Web/Context.c
