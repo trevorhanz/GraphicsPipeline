@@ -15,14 +15,15 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#include <windows.h>
+#include <winuser.h>
+
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
 #include <GraphicsPipeline/Context.h>
 #include "API/GL/GL.h"
 #include "Windows.h"
-
-#include <windows.h>
-#include <winuser.h>
-#include <GL/glext.h>
-#include <GL/wglext.h>
 
 void gp_context_free(gp_context* context)
 {

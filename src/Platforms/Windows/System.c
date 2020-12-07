@@ -15,15 +15,16 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Windows.h>
 #include <GraphicsPipeline/Logging.h>
 #include "API/GL/GL.h"
 #include "Windows.h"
 
-#include <GL/glext.h>
-#include <GL/wglext.h>
-
+#include <stdlib.h>
 #include <stdio.h>
 
 static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle For This Window
