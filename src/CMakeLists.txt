@@ -190,7 +190,10 @@ set_property(TARGET Native PROPERTY CXX_STANDARD 11)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type )
 if(build_type STREQUAL "DEBUG")
   target_compile_definitions(Native PRIVATE GP_DEBUG)
-  target_compile_definitions(GP_Qt5 PRIVATE GP_DEBUG)
+  
+  if(GP_BUILD_QT5)
+    target_compile_definitions(GP_Qt5 PRIVATE GP_DEBUG)
+  endif(GP_BUILD_QT5)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
