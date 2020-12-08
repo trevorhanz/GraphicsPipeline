@@ -22,8 +22,16 @@
 
 #include "System.h"
 
-#ifdef __linux__
+#ifdef GP_WINDOWS
+#include "Windows.h"
+#endif
+
+#ifdef GP_LINUX
 #include "X11.h"
+#endif
+
+#ifdef GP_MACOS
+#include "MacOS.h"
 #endif
 
 #endif // __GP_DESKTOP_H__

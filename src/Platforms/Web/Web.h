@@ -19,16 +19,32 @@
 #define __GP_WEB_COMMON_H__
 
 #include <GraphicsPipeline/System.h>
-#include "Context.h"
+// #include "Context.h"
 
-namespace GP
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
+struct _gp_system
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    TargetPtr         mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-}
+  gp_target*                            mTarget;
+};
+
+struct _gp_context
+{
+  gp_system*                            mParent;
+  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mShare;
+};
+
+struct _gp_target
+{
+  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mContext;
+  GLuint                                vbo;
+  GLuint                                shaderProgram;
+  GLint                                 posAttrib;
+  gp_pipeline*                          mPipeline;
+};
 
 #endif // __GP_WEB_COMMON_H__

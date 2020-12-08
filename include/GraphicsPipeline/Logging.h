@@ -20,37 +20,44 @@
 #ifndef __GP_LOGGING_H__
 #define __GP_LOGGING_H__
 
-namespace GP
-{
-  /*!
-   * Generate formatted log output.
-   * \param format Printf sytle format string.
-   */
-  void Log(const char* format, ...);
-  
-  /*!
-   * Generate informative formatted log output.
-   * \param format Printf sytle format string.
-   */
-  void LogI(const char* format, ...);
-  
-  /*!
-   * Generate debug formatted log output.
-   * \param format Printf sytle format string.
-   */
-  void LogD(const char* format, ...);
-  
-  /*!
-   * Generate warning formatted log output.
-   * \param format Printf sytle format string.
-   */
-  void LogW(const char* format, ...);
-  
-  /*!
-   * Generate error formatted log output.
-   * \param format Printf sytle format string.
-   */
-  void LogE(const char* format, ...);
+#include "Common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+  * Generate formatted log output.
+  * \param format Printf sytle format string.
+  */
+GP_EXPORT void gp_log(const char* format, ...);
+
+/*!
+  * Generate informative formatted log output.
+  * \param format Printf sytle format string.
+  */
+GP_EXPORT void gp_log_info(const char* format, ...);
+
+/*!
+  * Generate debug formatted log output.
+  * \param format Printf sytle format string.
+  */
+GP_EXPORT void gp_log_debug(const char* format, ...);
+
+/*!
+  * Generate warning formatted log output.
+  * \param format Printf sytle format string.
+  */
+GP_EXPORT void gp_log_warn(const char* format, ...);
+
+/*!
+  * Generate error formatted log output.
+  * \param format Printf sytle format string.
+  */
+GP_EXPORT void gp_log_error(const char* format, ...);
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif // __GP_LOGGING_H__

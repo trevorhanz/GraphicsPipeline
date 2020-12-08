@@ -24,11 +24,16 @@
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 
+#include "API/GL/GL.h"
+#include "MacOS.h"
+
 @implementation View
 
 - (id) initWithFrame:(NSRect)frame
 {
   self = [super initWithFrame:frame];
+  
+  return self;
 }
 
 - (void) reshape
@@ -40,7 +45,14 @@
 {
   [super drawRect:rect];
   
-  mCallback();
+  [[self openGLContext] makeCurrentContext];
+  
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  
+  _gp_pipeline_execute(mTarget->mPipeline);
+  
+  [[self openGLContext] flushBuffer];
 }
 
 - (void) update
@@ -48,9 +60,9 @@
   [super update];
 }
 
-- (void) setCallback:(void (*)())callback
+- (void) setTarget:(gp_target*)target
 {
-  mCallback = callback;
+  mTarget = target;
 }
 
 @end

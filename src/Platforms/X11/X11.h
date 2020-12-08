@@ -19,35 +19,38 @@
 #define __GP_X11_COMMON_H__
 
 #include <GraphicsPipeline/Types.h>
-#include <GraphicsPipeline/Window.h>
 #include <GraphicsPipeline/System.h>
-#include <API/GL/Pipeline.h>
+#include <GraphicsPipeline/Logging.h>
 
 #include <X11/Xlib.h>
 
 #include <GL/glew.h>
 #include <GL/glx.h>
 
-namespace GP
+struct _gp_system
 {
-  class WindowUserData : public UserData
-  {
-  public:
-    TargetPtr         mTarget;
-  };
-  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-  
-  class TargetUserData : public GL::TargetUserData
-  {
-  public:
-    Display*          mDisplay;
-    ::Window          mWindow;
-    GLXContext        mContext;
-    
-    void MakeCurrent() override {glXMakeCurrent(mDisplay, mWindow, mContext);}
-    void Present() override {glXSwapBuffers(mDisplay, mWindow); printf("Swap\n");}
-  };
-  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-}
+  Display*                mDisplay;
+  gp_target*              mTarget;
+};
+
+struct _gp_context
+{
+  gp_system*              mParent;
+  Display*                mDisplay;
+  XVisualInfo*            mVisualInfo;
+  Window                  mWindow;
+  Colormap                mColorMap;
+  GLXContext              mShare;
+};
+
+struct _gp_target
+{
+  gp_context*             mParent;
+  gp_pipeline*            mPipeline;
+  Window                  mWindow;
+  GLXContext              mContext;
+};
+
+void _gp_target_draw(gp_target* target);
 
 #endif // __GP_X11_COMMON_H__

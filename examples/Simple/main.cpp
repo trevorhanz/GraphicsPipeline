@@ -18,23 +18,21 @@
 #include <GraphicsPipeline/GP.h>
 #include <GraphicsPipeline/Desktop.h>
 
+#include <stdlib.h>
+
 using namespace GP;
 
 // Shader sources
 const char* vertexSource =
-    "#version 400\n"
-    "layout(location = 0) in vec4 position;       \n"
+    "attribute vec4 position;       \n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
-    "#version 400\n"
-    "precision mediump float;\n"
-    "out vec4 fragColor;\n"
     "void main()                                  \n"
     "{                                            \n"
-    "  fragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
+    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
@@ -42,42 +40,18 @@ int main(int argc, char* argv[])
 {
   System* system = new System();
   
-  ContextPtr context = system->CreateContext();
+  Context* context = system->CreateContext();
   
-  WindowPtr window = system->CreateWindow("#canvas1", 640, 480);
+  Target* target = context->CreateTarget();
+  Array* array = context->CreateArray();
+  Shader* shader = context->CreateShader();
   
-  ArrayPtr array = std::make_shared<Array>();
-  ShaderPtr shader = std::make_shared<Shader>();
+  array->SetData(vertexData, 6);
   
-  ArrayDataPtr data = std::make_shared<ArrayData>();
-  data->SetData(vertexData, 6);
+  shader->Compile(vertexSource, fragmentSource);
   
-  PipelinePtr loadPipe = context->CreatePipeline();
-  LoadArrayPtr lap = std::make_shared<LoadArray>();
-  lap->SetArray(array);
-  lap->SetData(data);
-  loadPipe->AddOperation(lap);
-  LoadShaderPtr lsp = std::make_shared<LoadShader>();
-  lsp->SetShader(shader);
-  lsp->SetVertexCode(vertexSource);
-  lsp->SetFragmentCode(fragmentSource);
-  loadPipe->AddOperation(lsp);
-  loadPipe->Execute();
-  
-  PipelinePtr pipeline = context->CreatePipeline();
-  TargetFocusPtr focus = std::make_shared<TargetFocus>();
-  focus->SetTarget(window->GetTarget());
-  pipeline->AddOperation(focus);
-  ClearPtr clear = std::make_shared<Clear>();
-  pipeline->AddOperation(clear);
-  DrawPtr draw = std::make_shared<Draw>();
-  draw->SetShader(shader);
-  draw->SetArray(array);
-  pipeline->AddOperation(draw);
-  
-  pipeline->Execute();
-  
-  system->SetExposeCallback([pipeline](){pipeline->Execute();});
+  Pipeline* pipeline = target->GetPipeline();
+  pipeline->AddDraw(shader, array);
   
   system->Run();
   

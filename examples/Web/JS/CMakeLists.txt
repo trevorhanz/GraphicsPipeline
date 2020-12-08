@@ -4,7 +4,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_
 configure_file(index.html ${CMAKE_CURRENT_BINARY_DIR}/index.html COPYONLY)
 
 add_custom_target(WebExample ALL SOURCES index.html)
-add_dependencies(WebExample GraphicsPipeline)
+add_dependencies(WebExample Native)
 
 add_custom_command(
         TARGET WebExample POST_BUILD

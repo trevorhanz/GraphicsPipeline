@@ -23,16 +23,18 @@
 #define GL_SILENCE_DEPRECATION
 #import <Cocoa/Cocoa.h>
 
+#include <GraphicsPipeline/Types.h>
+
 @interface View : NSOpenGLView
 {
-  void(*mCallback)();
+  gp_target*          mTarget;
 }
 
 - (id) initWithFrame:(NSRect)frame;
 - (void) reshape;
 - (void) drawRect:(NSRect)rect;
 - (void) update;
-- (void) setCallback:(void(*)())callback;
+- (void) setTarget:(gp_target*)target;
 @end
 
 #endif // __VIEW_H__

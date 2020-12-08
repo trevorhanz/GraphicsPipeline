@@ -20,42 +20,94 @@
 #ifndef __GP_CONTEXT_H__
 #define __GP_CONTEXT_H__
 
-#include <memory>
-
+#include "Common.h"
 #include "Pipeline.h"
 #include "Types.h"
+#include "Target.h"
+#include "Array.h"
+#include "Shader.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+ * Free gp_context object
+ * \param context Context object to be freed.
+ */
+GP_EXPORT void gp_context_free(gp_context* context);
+
+/*!
+ * Create a new gp_target object tied to a context.
+ * \param context Context object used to create target.
+ * \return Newly created target.
+ */
+GP_EXPORT gp_target* gp_context_target_new(gp_context* context);
+
+/*!
+ * Create a new gp_array object tied to a context.
+ * \param context Context object used to create array.
+ * \return Newly created array.
+ */
+GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
+
+/*!
+ * Create a new gp_shader object tied to a context.
+ * \param context Context object used to create shader.
+ * \return Newly created shader.
+ */
+GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
+
+#ifdef __cplusplus
+} // extern "C"
 
 namespace GP
 {
   /*!
-   * Central class for providing rendering support.
-   * Must be overridden to provide functionality.
+   * \brief Wrapper class for ::gp_context
    */
   class Context
   {
+  private:
+    //! Constructor
+    inline Context(gp_context* context);
   public:
-    /*!
-     * Default contructor.
-     */
-    Context() {}
+    //! Destructor
+    inline ~Context();
     
     /*!
-     *  Creates a Pipeline tied to this context.
-     *  \return A pointer to the newly create Pipeline
+     * Create a Target object tied to this Context.
+     * \return Newly created Target object.
      */
-    virtual PipelinePtr CreatePipeline() = 0;
+    inline Target* CreateTarget();
     
     /*!
-     * Binds a target to this context.
-     * Targets can only be bound to a single Context.  Targets must
-     * be bound to a Context before they can be used in a Pipeline.
-     * If the Target hasn't been bound to a context before it is used
-     * in a Pipeline, the Pipeline to bind it to its context.
-     * \param target The Target to be bound
+     * Create an Array object tied to this Context.
+     * \return Newly created Array object.
      */
-    virtual void Bind(TargetPtr target) = 0;
+    inline Array* CreateArray();
+    
+    /*!
+     * Create a Shader object tied to this Context.
+     * \return Newly created Shader object.
+     */
+    inline Shader* CreateShader();
+    
+  private:
+    gp_context*           mContext;
+    
+    friend class System;
   };
-  typedef std::shared_ptr<Context> ContextPtr;
-};
+  
+  /*
+   * Implementation
+   */
+  Context::Context(gp_context* context) : mContext(context) {}
+  Context::~Context() {gp_context_free(mContext);}
+  Target* Context::CreateTarget() {return new Target(gp_context_target_new(mContext));}
+  Array* Context::CreateArray() {return new Array(gp_context_array_new(mContext));}
+  Shader* Context::CreateShader() {return new Shader(gp_context_shader_new(mContext));}
+}
+#endif
 
 #endif // __GP_CONTEXT_H__

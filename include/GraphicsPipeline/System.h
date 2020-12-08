@@ -20,59 +20,80 @@
 #ifndef __GP_SYSTEM_H__
 #define __GP_SYSTEM_H__
 
-#include <string>
-#include <functional>
-
+#include "Common.h"
 #include "Context.h"
 #include "Types.h"
-#include "Window.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+ * Create a new system object.
+ * \return Pointer to new system object.
+ */
+GP_EXPORT gp_system* gp_system_new();
+
+/*!
+ * Free system object.
+ * \param system Pointer to system object to be freed.
+ */
+GP_EXPORT void gp_system_free(gp_system* system);
+
+/*!
+ * Create a new context object tied to an existing system object.
+ * \param system Pointer to existing system object.
+ * \return Pointer to new context object.
+ */
+GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
+
+/*!
+ * Runs the main event loop for a system obect.
+ * The function will take control of the current thread.
+ * \param system Pointer to system object to be run.
+ */
+GP_EXPORT void gp_system_run(gp_system* system);
+
+#ifdef __cplusplus
+} // extern "C"
 
 namespace GP
 {
   /*!
-   * Top-Level system object.
-   * Abstraction for OS specific window system and event loop.
+   * Wrapper class for gp_system.
    */
   class System
   {
   public:
     //! Constructor
-    System();
+    inline System();
+    
     //! Destructor
-    ~System();
+    inline ~System();
     
     /*!
-     * Create a new Window object for this system.
-     * \param title Window title.
-     * \param width Window width in pixels.
-     * \param height Window height in pixels.
-     * \return Pointer to Window object.
+     * Creates a new GP::Context for this system.
+     * \return Pointer to newly created GP::Context.
      */
-    WindowPtr CreateWindow(const std::string& title, int width, int height);
+    inline Context* CreateContext();
     
     /*!
-     * Creates a new Context bound to this System.
-     * \return Pointer to new Context.
+     * Start the main loop.
      */
-    ContextPtr CreateContext();
-    
-    /*!
-     * Process pending events.
-     */
-    void Poll();
-    
-    /*!
-     * Process all events in a loop.
-     */
-    void Run();
-    
-    void SetExposeCallback(std::function<void()> callback);
+    inline void Run();
     
   private:
-    class Data;
-    Data*           mData;
+    gp_system*            mSystem;
   };
-};
-
+  
+  //
+  // Implementation
+  //
+  System::System() {mSystem = gp_system_new();}
+  System::~System() {gp_system_free(mSystem);}
+  Context* System::CreateContext() {return new Context(gp_system_context_new(mSystem));}
+  void System::Run() {gp_system_run(mSystem);}
+}
+#endif // __cplusplus
 
 #endif // __GP_SYSTEM_H__
