@@ -50,3 +50,36 @@ extern "C" void gp_system_run(gp_system* system)
 {
   auto ret = system->mApp->exec();
 }
+
+extern "C" gp_timer* gp_system_timer_new(gp_system* system)
+{
+  gp_timer* timer = new gp_timer();
+  timer->mTimer = new QTimer();
+  timer->mTimerCallback = new TimerCallback(timer);
+  
+  QObject::connect(timer->mTimer, SIGNAL(timeout(void)), timer->mTimerCallback, SLOT(Callback(void)));
+  
+  return timer;
+}
+
+extern "C" gp_io* gp_system_io_read_new(gp_system* system, int fd)
+{
+  gp_io* io = new gp_io();
+  io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Read);
+  io->mIOCallback = new IOCallback(io);
+  
+  QObject::connect(io->mSocketNotifier, SIGNAL(timeout(void)), io->mIOCallback, SLOT(Callback(void)));
+  
+  return io;
+}
+
+extern "C" gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  gp_io* io = new gp_io();
+  io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Write);
+  io->mIOCallback = new IOCallback(io);
+  
+  QObject::connect(io->mSocketNotifier, SIGNAL(timeout(void)), io->mIOCallback, SLOT(Callback(void)));
+  
+  return io;
+}

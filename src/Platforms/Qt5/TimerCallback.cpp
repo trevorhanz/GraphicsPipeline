@@ -15,49 +15,16 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_QT_COMMON_H__
-#define __GP_QT_COMMON_H__
-
-#include <GraphicsPipeline/GP.h>
-
-#include <QApplication>
-#include <QOpenGLContext>
-#include <QOffscreenSurface>
-#include <QTimer>
-#include <QSocketNotifier>
-
-#include "Target.h"
 #include "TimerCallback.h"
-#include "IOCallback.h"
 
-struct _gp_system
+TimerCallback::TimerCallback(gp_timer* timer)
+  : QObject(NULL),
+  mTimer(timer),
+  mCallback(NULL)
 {
-  QApplication*           mApp;
-};
+}
 
-struct _gp_context
+void TimerCallback::Callback()
 {
-  QOpenGLContext*         mShare;
-  QOffscreenSurface*      mSurface;
-};
-
-struct _gp_target
-{
-  Target*                 mTarget;
-};
-
-struct _gp_timer
-{
-  QTimer*                 mTimer;
-  TimerCallback*          mTimerCallback;
-  void*                   mUserData;
-};
-
-struct _gp_io
-{
-  QSocketNotifier*        mSocketNotifier;
-  IOCallback*             mIOCallback;
-  void*                   mUserData;
-};
-
-#endif // __GP_QT_COMMON_H__
+  mCallback(mTimer);
+}

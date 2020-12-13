@@ -157,9 +157,12 @@ else(ANDROID)
     set(Qt5_SRC
       ${GL_SRC}
       Platforms/Qt5/Context.cpp
+      Platforms/Qt5/Event.cpp
+      Platforms/Qt5/IOCallback.cpp
       Platforms/Qt5/Logging.c
       Platforms/Qt5/System.cpp
-      Platforms/Qt5/Target.cpp)
+      Platforms/Qt5/Target.cpp
+      Platforms/Qt5/TimerCallback.cpp)
     
     add_library(GP_Qt5 ${Qt5_SRC})
     target_include_directories(GP_Qt5 PRIVATE ${INC} API/GL/)
