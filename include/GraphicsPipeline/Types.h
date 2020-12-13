@@ -31,6 +31,20 @@ typedef struct _gp_array gp_array;          //!< Storage for data array.
 typedef struct _gp_shader gp_shader;        //!< Shader program object.
 typedef struct _gp_pipeline gp_pipeline;    //!< Organization of rendering operations.
 typedef struct _gp_operation gp_operation;  //!< A single rendering operations.
+typedef struct _gp_timer gp_timer;          //!< Event timer object.
+typedef struct _gp_io gp_io;                //!< Event io object.
+
+/*!
+ * Callback function to be used by gp_timer objects.
+ * \param timer Pointer to gp_timer object that timed out.
+ */
+typedef void(*gp_timer_callback)(gp_timer* timer);
+
+/*!
+ * Callback function to be used by gp_io objects.
+ * \param io Pointer to gp_io object with fd that is ready.
+ */
+typedef void(*gp_io_callback)(gp_io* io);
 
 #ifdef __cplusplus
 }

@@ -54,6 +54,103 @@ GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
  */
 GP_EXPORT void gp_system_run(gp_system* system);
 
+/*!
+ * Create a new gp_timer object tied to the event loop
+ * of the gp_system object.
+ * \param system Pointer to system object to be used.
+ * \return Pointer to Newly created gp_target object.
+ */
+GP_EXPORT gp_timer* gp_system_timer_new(gp_system* system);
+
+/*!
+ * Free a gp_timer object.
+ * \param timer Pointer to timer object to be freed.
+ */
+GP_EXPORT void gp_timer_free(gp_timer* timer);
+
+/*!
+ * Set the callback to be used when the gp_timer timesout.
+ * \param timer Pointer to timer object.
+ * \param callback Callback function to be called at timeout.
+ */
+GP_EXPORT void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback);
+
+/*!
+ * Set user defined data to be associated with a gp_timer object.
+ * \param timer Pointer to timer object.
+ * \param userdata Pointer to user defined data.
+ */
+GP_EXPORT void gp_timer_set_userdata(gp_timer* timer, void* userdata);
+
+/*!
+ * Get user defined data to be associated with a gp_timer object.
+ * \param timer Pointer to timer object.
+ * \return Pointer to user defined data.
+ */
+GP_EXPORT void* gp_timer_get_userdata(gp_timer* timer);
+
+/*!
+ * Start the timer count down.
+ * Note: Timer count downs only progress while the system main loop
+ * is running.
+ * \param timer Pointer to timer object.
+ * \param timeout Time till timeout in seconds.
+ */
+GP_EXPORT void gp_timer_arm(gp_timer* timer, double timeout);
+
+/*!
+ * Stops the timer count down and prevents the callback
+ * from being called.
+ * \param timer Pointer to timer object.
+ */
+GP_EXPORT void gp_timer_disarm(gp_timer* timer);
+
+/*!
+ * Create a new gp_io object tied to the event loop
+ * of the gp_system object for listening to read events.
+ * \param system Pointer to system object to be used.
+ * \param fd File descriptor to watch.
+ * \return Pointer to Newly created gp_io object.
+ */
+GP_EXPORT gp_io* gp_system_io_read_new(gp_system* system, int fd);
+
+/*!
+ * Create a new gp_io object tied to the event loop
+ * of the gp_system object for listening to write events.
+ * \param system Pointer to system object to be used.
+ * \param fd File descriptor to watch.
+ * \return Pointer to Newly created gp_io object.
+ */
+GP_EXPORT gp_io* gp_system_io_write_new(gp_system* system, int fd);
+
+/*!
+ * Free a gp_io object.
+ * \param io Pointer to io object to be freed.
+ */
+GP_EXPORT void gp_io_free(gp_io* io);
+
+/*!
+ * Set the callback to be used for gp_io events.
+ * \param io Pointer to io object.
+ * \param callback Callback function to be called for events.
+ * \param userdata Pointer to be passed to callback function.
+ */
+GP_EXPORT void gp_io_set_callback(gp_io* io, gp_io_callback callback);
+
+/*!
+ * Set user defined data to be associated with a gp_timer object.
+ * \param io Pointer to io object.
+ * \param userdata Pointer to user defined data.
+ */
+GP_EXPORT void gp_io_set_userdata(gp_io* io, void* userdata);
+
+/*!
+ * Get user defined data to be associated with a gp_timer object.
+ * \param io Pointer to io object.
+ * \return Pointer to user defined data.
+ */
+GP_EXPORT void* gp_io_get_userdata(gp_io* io);
+
 #ifdef __cplusplus
 } // extern "C"
 

@@ -26,16 +26,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <sys/select.h>
+
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
   system->mDisplay = XOpenDisplay(0);
+  system->mEvent = _gp_event_new();
   
   return system;
 }
 
 void gp_system_free(gp_system* system)
 {
+  _gp_event_free(system->mEvent);
+  
   free(system);
 }
 
@@ -112,20 +117,47 @@ gp_context* gp_system_context_new(gp_system* system)
   return context;
 }
 
-void gp_system_run(gp_system* system)
+void _gp_system_process_events(gp_io* io)
 {
-  while(1)
+  gp_system* system = (gp_system*)gp_io_get_userdata(io);
+  
+  XEvent event;
+  
+  while(XPending(system->mDisplay))
   {
-    XEvent event;
+    XNextEvent(system->mDisplay, &event);
     
-    while(XPending(system->mDisplay))
+    if(event.type == Expose)
     {
-      XNextEvent(system->mDisplay, &event);
-      
-      if(event.type == Expose)
-      {
-        _gp_target_draw(system->mTarget);
-      }
+      _gp_target_draw(system->mTarget);
     }
   }
 }
+
+void gp_system_run(gp_system* system)
+{
+  int fd = XConnectionNumber(system->mDisplay);
+  
+  gp_io* io = gp_system_io_read_new(system, fd);
+  gp_io_set_callback(io, _gp_system_process_events);
+  gp_io_set_userdata(io, (void*)system);
+  
+  _gp_event_run(system->mEvent);
+}
+
+gp_timer* gp_system_timer_new(gp_system* system)
+{
+  return _gp_event_timer_new(system->mEvent);
+}
+
+gp_io* gp_system_io_read_new(gp_system* system, int fd)
+{
+  return _gp_event_io_read_new(system->mEvent, fd);
+}
+
+gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  return _gp_event_io_write_new(system->mEvent, fd);
+}
+
+

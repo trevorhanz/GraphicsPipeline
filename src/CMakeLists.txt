@@ -133,6 +133,7 @@ else(ANDROID)
     
     list(APPEND SRC
       Platforms/X11/Context.c
+      Platforms/X11/Event.c
       Platforms/X11/Logging.c
       Platforms/X11/System.c)
     

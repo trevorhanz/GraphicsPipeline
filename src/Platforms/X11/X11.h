@@ -27,10 +27,15 @@
 #include <GL/glew.h>
 #include <GL/glx.h>
 
+typedef struct __gp_event _gp_event;
+
 struct _gp_system
 {
   Display*                mDisplay;
   gp_target*              mTarget;
+  
+  _gp_event*              mEvent;
+  gp_io*                  mIO;        // X11 connection listener
 };
 
 struct _gp_context
@@ -52,5 +57,17 @@ struct _gp_target
 };
 
 void _gp_target_draw(gp_target* target);
+
+_gp_event* _gp_event_new();
+
+void _gp_event_free(_gp_event* event);
+
+void _gp_event_run(_gp_event* event);
+
+gp_timer* _gp_event_timer_new(_gp_event* event);
+
+gp_io* _gp_event_io_read_new(_gp_event* event, int fd);
+
+gp_io* _gp_event_io_write_new(_gp_event* event, int fd);
 
 #endif // __GP_X11_COMMON_H__

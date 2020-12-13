@@ -1,5 +1,6 @@
 
 add_subdirectory(Simple)
+add_subdirectory(Timer)
 
 if(EMSCRIPTEN)
   add_subdirectory(Web)
