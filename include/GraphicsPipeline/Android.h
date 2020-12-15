@@ -25,11 +25,18 @@
 #include "Types.h"
 
 /*!
+ * \defgroup Android
+ * \{
+ */
+
+/*!
  * Creates a new target object from an Android ANativeWindow.
  * \param context Pointer to context for which the target will be tied.
  * \param window ANativeWindow for which the target will be created.
  * \return Pointer to new target object.
  */
 gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* window);
+
+//! \} // Android
 
 #endif // __GP_ANDROID_H__

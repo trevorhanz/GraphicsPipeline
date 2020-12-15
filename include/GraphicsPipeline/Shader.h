@@ -26,7 +26,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
+
+/*!
+ * \defgroup Shader
+ * \{
+ */
+
 /*!
  * Free gp_shader object.
  * \param shader Shader object to be freed.
@@ -40,14 +45,16 @@ extern "C" {
  * \param fragment Fragment shader source code.
  */
   GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
-  
+
+//! \} // Shader
+
 #ifdef __cplusplus
 } // extern "C"
 
 namespace GP
 {
   /*!
-   * Wrapper class for gp_shader.
+   * \brief Wrapper class for ::gp_shader.
    */
   class Shader
   {

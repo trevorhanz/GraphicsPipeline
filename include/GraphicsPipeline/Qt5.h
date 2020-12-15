@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /*!
+ * \defgroup Qt5
+ * \{
+ */
+
+/*!
  * Create a new system object from cli arguments.
  * \param argc Pointer to number of arguments
  * \param argv Array of c strings containing arguments
@@ -39,6 +44,8 @@ gp_system* gp_qt_system_new(int* argc, char** argv);
  * \return Newly created gp_context.
  */
 gp_context* gp_qt_context_new();
+
+//! \} // Qt5
 
 #ifdef __cplusplus
 }

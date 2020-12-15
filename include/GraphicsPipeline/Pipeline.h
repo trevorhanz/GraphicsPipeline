@@ -28,7 +28,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
+
+/*!
+ * \defgroup Pipeline
+ * \{
+ */
+
   /*!
    * Add a draw operation to the end of the pipeline.
    * \param pipeline Pipeline to add operation to.
@@ -36,7 +41,9 @@ extern "C" {
    * \param array Array object used in draw operation.
    */
   GP_EXPORT void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array);
-  
+
+//! \} // Pipeline
+
 #ifdef __cplusplus
 }
 
