@@ -26,21 +26,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
+
+/*!
+ * \defgroup Target
+ * \{
+ */
+
 /*!
  * Get the gp_pipeline tied to a gp_target.
  * \param target Pointer to target object.
  * \return Pointer to pipeline object.
  */
   GP_EXPORT gp_pipeline* gp_target_get_pipeline(gp_target* target);
-  
+
+//! \} // Target
+
 #ifdef __cplusplus
 }
 
 namespace GP
 {
   /*!
-   * Wrapper class for gp_target.
+   * \brief Wrapper class for ::gp_target.
    */
   class Target
   {

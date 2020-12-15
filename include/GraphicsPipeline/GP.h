@@ -22,6 +22,7 @@
 
 #include "Array.h"
 #include "Context.h"
+#include "System.h"
 #include "Pipeline.h"
 #include "Shader.h"
 #include "Logging.h"

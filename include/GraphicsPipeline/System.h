@@ -29,6 +29,11 @@ extern "C" {
 #endif
 
 /*!
+ * \defgroup System
+ * \{
+ */
+
+/*!
  * Create a new system object.
  * \return Pointer to new system object.
  */
@@ -151,13 +156,15 @@ GP_EXPORT void gp_io_set_userdata(gp_io* io, void* userdata);
  */
 GP_EXPORT void* gp_io_get_userdata(gp_io* io);
 
+//! \} // System
+
 #ifdef __cplusplus
 } // extern "C"
 
 namespace GP
 {
   /*!
-   * Wrapper class for gp_system.
+   * \brief Wrapper class for ::gp_system.
    */
   class System
   {

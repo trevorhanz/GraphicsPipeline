@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /*!
+ * \defgroup Logging
+ * \{
+ */
+
+/*!
   * Generate formatted log output.
   * \param format Printf sytle format string.
   */
@@ -55,6 +60,8 @@ GP_EXPORT void gp_log_warn(const char* format, ...);
   * \param format Printf sytle format string.
   */
 GP_EXPORT void gp_log_error(const char* format, ...);
+
+//! \} // Logging
 
 #ifdef __cplusplus
 }

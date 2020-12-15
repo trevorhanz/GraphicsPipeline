@@ -32,6 +32,11 @@ extern "C" {
 #endif
 
 /*!
+ * \defgroup Context
+ * \{
+ */
+
+/*!
  * Free gp_context object
  * \param context Context object to be freed.
  */
@@ -57,6 +62,8 @@ GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
  * \return Newly created shader.
  */
 GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
+
+//! \} // Context
 
 #ifdef __cplusplus
 } // extern "C"

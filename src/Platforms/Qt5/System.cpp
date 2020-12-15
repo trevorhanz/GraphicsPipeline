@@ -41,7 +41,7 @@ extern "C" void gp_system_free(gp_system* system)
   delete system;
 }
 
-extern "C" gp_context* gp_system_context_new()
+extern "C" gp_context* gp_system_context_new(gp_system* system)
 {
   return gp_qt_context_new();
 }

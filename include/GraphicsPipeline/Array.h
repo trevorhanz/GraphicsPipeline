@@ -28,6 +28,11 @@ extern "C" {
 #endif
 
 /*!
+ * \defgroup Array
+ * \{
+ */
+
+/*!
  * Free array object.
  * \param array Pointer to array to be freed.
  */
@@ -40,6 +45,8 @@ extern "C" {
  * \param count Number of element in data array.
  */
   GP_EXPORT void gp_array_set_data(gp_array* array, float* data, unsigned int count);
+
+//! \} // Array
 
 #ifdef __cplusplus
 }

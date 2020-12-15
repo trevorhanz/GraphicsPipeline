@@ -180,13 +180,13 @@ endif(EMSCRIPTEN)
 add_library(Interface INTERFACE)
 target_include_directories(Interface INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+  $<INSTALL_INTERFACE:include>)
 
 add_library(Native ${SRC})
 target_include_directories(Native PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(Native PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+  $<INSTALL_INTERFACE:include>)
 target_link_libraries(Native ${LIB} Interface)
 set_property(TARGET Native PROPERTY OUTPUT_NAME GPNative)
 set_property(TARGET Native PROPERTY CXX_STANDARD 11)
