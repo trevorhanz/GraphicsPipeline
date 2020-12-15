@@ -20,6 +20,7 @@
 extern "C" void gp_timer_free(gp_timer* timer)
 {
   delete timer->mTimer;
+  delete timer->mTimerCallback;
   delete timer;
 }
 
@@ -50,18 +51,24 @@ extern "C" void gp_timer_disarm(gp_timer* timer)
 
 extern "C" void gp_io_free(gp_io* io)
 {
+    delete io->mSocketNotifier;
+    delete io->mIOCallback;
+    delete io;
 }
 
 extern "C" void gp_io_set_callback(gp_io* io, gp_io_callback callback)
 {
+    io->mIOCallback->mCallback = callback;
 }
 
 extern "C" void gp_io_set_userdata(gp_io* io, void* userdata)
 {
+    io->mUserData = userdata;
 }
 
 extern "C" void* gp_io_get_userdata(gp_io* io)
 {
+    return io->mUserData;
 }
 
 

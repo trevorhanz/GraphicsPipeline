@@ -56,6 +56,7 @@ extern "C" gp_timer* gp_system_timer_new(gp_system* system)
   gp_timer* timer = new gp_timer();
   timer->mTimer = new QTimer();
   timer->mTimerCallback = new TimerCallback(timer);
+  timer->mUserData = NULL;
   
   QObject::connect(timer->mTimer, SIGNAL(timeout(void)), timer->mTimerCallback, SLOT(Callback(void)));
   
@@ -67,8 +68,9 @@ extern "C" gp_io* gp_system_io_read_new(gp_system* system, int fd)
   gp_io* io = new gp_io();
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Read);
   io->mIOCallback = new IOCallback(io);
+  io->mUserData = NULL;
   
-  QObject::connect(io->mSocketNotifier, SIGNAL(timeout(void)), io->mIOCallback, SLOT(Callback(void)));
+  QObject::connect(io->mSocketNotifier, SIGNAL(activated(int)), io->mIOCallback, SLOT(Callback(void)));
   
   return io;
 }
@@ -78,6 +80,7 @@ extern "C" gp_io* gp_system_io_write_new(gp_system* system, int fd)
   gp_io* io = new gp_io();
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Write);
   io->mIOCallback = new IOCallback(io);
+  io->mUserData = NULL;
   
   QObject::connect(io->mSocketNotifier, SIGNAL(timeout(void)), io->mIOCallback, SLOT(Callback(void)));
   
