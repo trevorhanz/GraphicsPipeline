@@ -19,7 +19,7 @@
 #define __GP_WEB_COMMON_H__
 
 #include <GraphicsPipeline/System.h>
-// #include "Context.h"
+#include <GraphicsPipeline/Logging.h>
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -45,6 +45,17 @@ struct _gp_target
   GLuint                                shaderProgram;
   GLint                                 posAttrib;
   gp_pipeline*                          mPipeline;
+};
+
+struct _gp_timer
+{
+  int                                   mTimerID;
+  gp_timer_callback                     mCallback;
+  void*                                 mUserData;
+};
+
+struct _gp_io
+{
 };
 
 #endif // __GP_WEB_COMMON_H__

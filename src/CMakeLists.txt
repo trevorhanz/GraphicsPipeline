@@ -71,6 +71,7 @@ if(EMSCRIPTEN)
   list(APPEND SRC
     Platforms/Web/System.c
     Platforms/Web/Context.c
+    Platforms/Web/Event.c
     Platforms/Web/Logging.c)
 elseif(ANDROID)
   set(GP_MOBILE ON)

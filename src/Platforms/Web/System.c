@@ -44,7 +44,33 @@ gp_context* gp_system_context_new(gp_system* system)
 
 void gp_system_run(gp_system* system)
 {
-  gp_pipeline* pipeline = gp_target_get_pipeline(system->mTarget);
-  _gp_pipeline_execute(pipeline);
+  if(system->mTarget)
+  {
+    gp_pipeline* pipeline = gp_target_get_pipeline(system->mTarget);
+    _gp_pipeline_execute(pipeline);
+  }
 }
 
+gp_timer* gp_system_timer_new(gp_system* system)
+{
+  gp_timer* timer = malloc(sizeof(gp_timer));
+  timer->mTimerID = -1;
+  timer->mCallback = NULL;
+  timer->mUserData = NULL;
+  
+  return timer;
+}
+
+gp_io* gp_system_io_read_new(gp_system* system, int fd)
+{
+  gp_log_warn("IO watchers not implemented");
+  
+  return NULL;
+}
+
+gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  gp_log_warn("IO watchers not implemented");
+  
+  return NULL;
+}
