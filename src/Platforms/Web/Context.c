@@ -46,6 +46,12 @@ gp_target* gp_context_target_new(gp_context* context)
   
   context->mParent->mTarget = target;
   
+  const GLubyte* glVersion = glGetString(GL_VERSION);
+  gp_log_info("GL Version: %s", glVersion);
+  
+  const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+  gp_log_info("GLSL Version: %s", glslVersion);
+  
   return target;
 }
 
