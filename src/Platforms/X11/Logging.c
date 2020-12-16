@@ -23,8 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// using namespace GP;
-
 #define LOG(color, prefix)\
   char* fmt;\
   if((isatty(fileno(stdout)) != 0))\
