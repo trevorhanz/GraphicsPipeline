@@ -20,11 +20,14 @@
 #include <emscripten.h>
 
 #include <stdarg.h>
+#include <stdio.h>
 
 #define LOG(level)\
+  char buffer[256];\
   va_list args;\
   va_start(args, format);\
-  emscripten_log(level, format, args);\
+  vsnprintf(buffer, 256, format, args);\
+  emscripten_log(level, buffer);\
   va_end(args);
 
 void gp_log(const char* format, ...)
