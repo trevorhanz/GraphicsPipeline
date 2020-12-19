@@ -179,7 +179,7 @@ else(ANDROID)
   endif(GP_BUILD_QT5)
 endif(EMSCRIPTEN)
 
-add_library(Interface INTERFACE ${PUBLIC_HEADERS})
+add_library(Interface INTERFACE)
 target_include_directories(Interface INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
   $<INSTALL_INTERFACE:include>)
