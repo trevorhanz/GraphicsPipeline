@@ -22,7 +22,7 @@ build_ubuntu_18:
 
 build_centos_7:
   stage: build
-  image: registry.gitlab.com/trevorhanz/graphicspipeline/centos7
+  image: $REGISTRY_ROOT/centos7
   tags:
     - docker
   script:
@@ -33,7 +33,7 @@ build_centos_7:
 
 build_centos_8:
   stage: build
-  image: registry.gitlab.com/trevorhanz/graphicspipeline/centos8
+  image: $REGISTRY_ROOT/centos8
   tags:
     - docker
   script:
