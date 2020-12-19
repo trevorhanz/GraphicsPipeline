@@ -402,20 +402,26 @@ void gp_system_run(gp_system* system)
   MSG msg;                                                  // Windows Message Structure
   while(1)
   {
-    while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))         // Is There A Message Waiting?
+    if (WaitMessage())
     {
-      TranslateMessage(&msg);                               // Translate The Message
-      DispatchMessage(&msg);                                // Dispatch The Message
+      while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))         // Is There A Message Waiting?
+      {
+        TranslateMessage(&msg);                               // Translate The Message
+        DispatchMessage(&msg);                                // Dispatch The Message
 
-      gp_target* target = system->mTarget;
-      wglMakeCurrent(GetDC(target->mWindow), target->mContext);
+        if (system->mTarget)
+        {
+          gp_target* target = system->mTarget;
+          wglMakeCurrent(GetDC(target->mWindow), target->mContext);
 
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+          glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+          glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-      _gp_pipeline_execute(target->mPipeline);
+          _gp_pipeline_execute(target->mPipeline);
 
-      SwapBuffers(GetDC(target->mWindow));
+          SwapBuffers(GetDC(target->mWindow));
+        }
+      }
     }
   }
 }
