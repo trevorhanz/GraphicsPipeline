@@ -115,6 +115,7 @@ else(ANDROID)
     list(APPEND SRC
       Platforms/Windows/Context.c
       Platforms/Windows/Logging.c
+      Platforms/Windows/Event.c
       Platforms/Windows/System.c
       Platforms/Windows/Windows.h)
   elseif(APPLE)
@@ -178,7 +179,7 @@ else(ANDROID)
   endif(GP_BUILD_QT5)
 endif(EMSCRIPTEN)
 
-add_library(Interface INTERFACE)
+add_library(Interface INTERFACE ${PUBLIC_HEADERS})
 target_include_directories(Interface INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
   $<INSTALL_INTERFACE:include>)

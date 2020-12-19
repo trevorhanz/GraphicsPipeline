@@ -15,6 +15,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#pragma comment(lib, "wsock32.lib")
+
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
@@ -23,9 +25,12 @@
 #include <GraphicsPipeline/Logging.h>
 #include "API/GL/GL.h"
 #include "Windows.h"
+#include <winsock2.h>
 
 #include <stdlib.h>
 #include <stdio.h>
+
+#define WM_SOCKET WM_USER + 1
 
 static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle For This Window
                                     UINT    uMsg,                   // Message For This Window
@@ -48,6 +53,9 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
   case WM_DESTROY:
     return 0;
 
+  case WM_SOCKET:
+    return 0;
+
   default:
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
   }
@@ -56,6 +64,7 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
 gp_system* gp_system_new()
 {
   gp_system* system = malloc(sizeof(gp_system));
+  system->mTarget = 0;
 
   WNDCLASS wc;                                          // Windows Class Structure
   wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;        // Redraw On Size, And Own DC For Window.
@@ -70,6 +79,27 @@ gp_system* gp_system_new()
   wc.lpszClassName = "GraphicsPipeline";                // Set The Class Name
 
   if(!RegisterClass(&wc))                               // Attempt To Register The Window Class
+  {
+    MessageBox(NULL, "Failed To Register The Window Class.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+    free(system);
+    return NULL;
+  }
+
+  system->mInternalWindow = CreateWindowEx(
+    0,                              // Optional window styles.
+    "GraphicsPipeline",             // Window class
+    "",                             // Window text
+    WS_OVERLAPPEDWINDOW,            // Window style
+
+    // Size and position
+    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+
+    NULL,                           // Parent window    
+    NULL,                           // Menu
+    GetModuleHandle(NULL),          // Instance handle
+    NULL                            // Additional application data
+  );
+  if (!system->mInternalWindow)
   {
     MessageBox(NULL, "Failed To Register The Window Class.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
     free(system);
@@ -390,3 +420,30 @@ void gp_system_run(gp_system* system)
   }
 }
 
+gp_timer* gp_system_timer_new(gp_system* system)
+{
+  gp_timer* timer = malloc(sizeof(gp_timer));
+  timer->mSystem = system;
+  timer->mCallback = NULL;
+  timer->mUserData = NULL;
+
+  return timer;
+}
+
+gp_io* gp_system_io_read_new(gp_system* system, int fd)
+{
+  gp_io* io = malloc(sizeof(gp_io));
+
+  WSAAsyncSelect(fd, system->mInternalWindow, WM_SOCKET, FD_READ);
+
+  return io;
+}
+
+gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  gp_io* io = malloc(sizeof(gp_io));
+  
+  WSAAsyncSelect(fd, system->mInternalWindow, WM_SOCKET, FD_WRITE);
+
+  return io;
+}

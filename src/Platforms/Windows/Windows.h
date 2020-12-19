@@ -25,23 +25,38 @@
 
 struct _gp_system
 {
-	gp_target*        mTarget;
+  gp_target*            mTarget;
+  HWND                  mInternalWindow;
 };
 
 struct _gp_context
 {
-	gp_system*        mParent;
-	HGLRC             mShare;
-	HWND              mWindow;
-	unsigned int      mPixelFormat;
+  gp_system*            mParent;
+  HGLRC                 mShare;
+  HWND                  mWindow;
+  unsigned int          mPixelFormat;
 };
 
 struct _gp_target
 {
-	gp_context*       mParent;
-	HGLRC             mContext;
-	HWND              mWindow;
-	gp_pipeline*      mPipeline;
+  gp_context*           mParent;
+  HGLRC                 mContext;
+  HWND                  mWindow;
+  gp_pipeline*          mPipeline;
+};
+
+struct _gp_timer
+{
+  gp_system*            mSystem;
+  gp_timer_callback     mCallback;
+  void*                 mUserData;
+};
+
+struct _gp_io
+{
+  gp_system*            mSystem;
+  gp_io_callback        mCallback;
+  void*                 mUserData;
 };
 
 #endif // __GP_WINDOWS_COMMON_H__

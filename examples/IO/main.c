@@ -19,7 +19,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef GP_WINDOWS
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 void IOCallback(gp_io* io)
 {
