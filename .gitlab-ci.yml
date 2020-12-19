@@ -20,6 +20,28 @@ build_ubuntu_18:
     - cmake ../
     - make
 
+build_centos_7:
+  stage: build
+  image: registry.gitlab.com/trevorhanz/graphicspipeline/centos7
+  tags:
+    - docker
+  script:
+    - mkdir build
+    - cd build
+    - cmake3 ../
+    - make
+
+build_centos_8:
+  stage: build
+  image: registry.gitlab.com/trevorhanz/graphicspipeline/centos8
+  tags:
+    - docker
+  script:
+    - mkdir build
+    - cd build
+    - cmake ../
+    - make
+
 build_windows:
   stage: build
   image: trevorhanz/windows
