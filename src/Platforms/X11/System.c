@@ -23,24 +23,37 @@
 #include <GL/glew.h>
 #include <GL/glx.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
-  system->mDisplay = XOpenDisplay(0);
+  
+  char* display = getenv("DISPLAY");
+  system->mDisplay = XOpenDisplay(display);
+  if(!system->mDisplay)
+  {
+    gp_log_error("Unable to connect to X11 server (%s).", (display)?display:":0");
+    free(system);
+    return NULL;
+  }
   
   return system;
 }
 
 void gp_system_free(gp_system* system)
 {
+  assert(system != NULL);
+  
   free(system);
 }
 
 gp_context* gp_system_context_new(gp_system* system)
 {
+  assert(system != NULL);
+  
   gp_context* context = (gp_context*)malloc(sizeof(struct _gp_context));
   context->mParent = system;
   context->mDisplay = system->mDisplay;
@@ -114,6 +127,8 @@ gp_context* gp_system_context_new(gp_system* system)
 
 void gp_system_run(gp_system* system)
 {
+  assert(system != NULL);
+  
   while(1)
   {
     XEvent event;
