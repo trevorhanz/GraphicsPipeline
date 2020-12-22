@@ -186,12 +186,12 @@ void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
   timer->mCallback = callback;
 }
 
-void gp_timer_set_userdatak(gp_timer* timer, void* userdata)
+void gp_timer_set_userdata(gp_timer* timer, void* userdata)
 {
   timer->mUserData = userdata;
 }
 
-void* gp_timer_get_userdatak(gp_timer* timer)
+void* gp_timer_get_userdata(gp_timer* timer)
 {
   return timer->mUserData;
 }
