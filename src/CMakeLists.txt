@@ -98,7 +98,9 @@ elseif(ANDROID)
   list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   
   list(APPEND SRC
+    Platforms/Android/Android.h
     Platforms/Android/Context.c
+    Platforms/Android/Event.c
     Platforms/Android/Logging.c
     Platforms/Android/System.c)
 else(ANDROID)

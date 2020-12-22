@@ -54,4 +54,12 @@ struct _gp_target
   gp_pipeline*                          mPipeline;
 };
 
+struct _gp_timer
+{
+};
+
+struct _gp_io
+{
+};
+
 #endif // __GP_ANDROID_COMMON_H__

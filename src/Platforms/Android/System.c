@@ -105,3 +105,18 @@ gp_context* gp_system_context_new(gp_system* system)
 void gp_system_run(gp_system* system)
 {
 }
+
+gp_timer* gp_system_timer_new(gp_system* system)
+{
+  return NULL;
+}
+
+gp_io* gp_system_io_read_new(gp_system* system, int fd)
+{
+  return NULL;
+}
+
+gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  return NULL;
+}
