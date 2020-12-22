@@ -6,6 +6,12 @@ cmake_minimum_required(VERSION 3.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Perfer GLVND by default when available
+if(POLICY CMP0072)
+  cmake_policy(SET CMP0072 NEW)
+endif(POLICY CMP0072)
+
+# Uses <PackageName>_ROOT variables
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif(POLICY CMP0074)

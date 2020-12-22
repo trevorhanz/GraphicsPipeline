@@ -196,7 +196,7 @@ target_include_directories(Native PUBLIC
   $<INSTALL_INTERFACE:include>)
 target_link_libraries(Native ${LIB} Interface)
 set_property(TARGET Native PROPERTY OUTPUT_NAME GPNative)
-set_property(TARGET Native PROPERTY CXX_STANDARD 11)
+set_property(TARGET Native PROPERTY C_STANDARD 99)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type )
 if(build_type STREQUAL "DEBUG")
