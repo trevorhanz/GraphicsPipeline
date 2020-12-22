@@ -125,10 +125,13 @@ else(ANDROID)
     list(APPEND LIB ${COCOA_LIBRARY})
     list(APPEND SRC
       Platforms/MacOS/Context.m
+      Platforms/MacOS/Event.m
       Platforms/MacOS/Logging.c
       Platforms/MacOS/MacOS.h
       Platforms/MacOS/View.m
       Platforms/MacOS/View.h
+      Platforms/MacOS/Timer.m
+      Platforms/MacOS/Timer.h
       Platforms/MacOS/System.m)
   elseif(UNIX)
     set(GP_LINUX ON)

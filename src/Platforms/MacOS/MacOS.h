@@ -30,6 +30,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "View.h"
+#include "Timer.h"
 
 struct _gp_system
 {
@@ -51,25 +52,16 @@ struct _gp_target
   View*                   mView;
 };
 
-//namespace GP
-//{
-//  class WindowUserData : public UserData
-//  {
-//  public:
-//    TargetPtr         mTarget;
-//  };
-//  typedef std::shared_ptr<WindowUserData> WindowUserDataPtr;
-//  
-//  class TargetUserData : public GL::TargetUserData
-//  {
-//  public:
-//    NSWindow*         mWindow;
-//    View*             mView;
-//    
-//    void MakeCurrent() override {[[mView openGLContext] makeCurrentContext];}
-//    void Present() override {[[mView openGLContext] flushBuffer];}
-//  };
-//  typedef std::shared_ptr<TargetUserData> TargetUserDataPtr;
-//}
+struct _gp_timer
+{
+  Timer*                  mTimer;
+};
+
+struct _gp_io
+{
+  NSFileHandle*           mHandle;
+  gp_io_callback          mCallback;
+  void*                   mUserData;
+};
 
 #endif // __MACOS_COMMON_H__

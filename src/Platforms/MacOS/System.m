@@ -80,3 +80,32 @@ void gp_system_run(gp_system* system)
   [NSApp run];
 }
 
+gp_timer* gp_system_timer_new(gp_system* system)
+{
+  gp_timer* timer = malloc(sizeof(gp_timer));
+  timer->mTimer = [[Timer alloc] init:timer];
+  
+  return timer;
+}
+
+gp_io* gp_system_io_read_new(gp_system*  system, int fd)
+{
+  gp_io* io = malloc(sizeof(gp_io));
+  io->mHandle = [[NSFileHandle alloc] initWithFileDescriptor:fd];
+  io->mHandle.readabilityHandler = ^(NSFileHandle* fh){
+    io->mCallback(io);
+  };
+  
+  return io;
+}
+
+gp_io* gp_system_io_write_new(gp_system* system, int fd)
+{
+  gp_io* io = malloc(sizeof(gp_io));
+  io->mHandle = [[NSFileHandle alloc] initWithFileDescriptor:fd];
+  io->mHandle.writeabilityHandler = ^(NSFileHandle* fh){
+    io->mCallback(io);
+  };
+  
+  return io;
+}
