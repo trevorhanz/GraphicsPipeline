@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #ifdef GP_WINDOWS
-#include <windows.h>
+#include <io.h>
 #else
 #include <unistd.h>
 #endif

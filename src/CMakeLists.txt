@@ -120,6 +120,7 @@ else(ANDROID)
       Platforms/Windows/Event.c
       Platforms/Windows/System.c
       Platforms/Windows/Windows.h)
+    list(APPEND LIB wsock32)
   elseif(APPLE)
     set(GP_MACOS ON)
     

@@ -55,12 +55,12 @@ void _gp_timer_callback(HWND hwnd, UINT msg, UINT_PTR timerId, DWORD dwTime)
 
 void gp_timer_arm(gp_timer* timer, double timeout)
 {
-  SetTimer(timer->mSystem->mInternalWindow, timer, timeout * 1000, &_gp_timer_callback);
+  SetTimer(timer->mSystem->mInternalWindow, (UINT_PTR)timer, timeout * 1000, &_gp_timer_callback);
 }
 
 void gp_timer_disarm(gp_timer* timer)
 {
-  KillTimer(timer->mSystem->mInternalWindow, timer);
+  KillTimer(timer->mSystem->mInternalWindow, (UINT_PTR)timer);
 }
 
 void gp_io_free(gp_io* io)
