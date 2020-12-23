@@ -7,13 +7,13 @@ endif(EMSCRIPTEN)
 add_executable(Timer main.c)
 target_link_libraries(Timer Native)
 
-# add_executable(Timer++ main.cpp)
-# target_link_libraries(Simple++ Native)
+add_executable(Timer++ main.cpp)
+target_link_libraries(Timer++ Native)
 
 if(GP_BUILD_QT5)
   add_executable(Timer_qt5 main.c)
   target_link_libraries(Timer_qt5 GP::Qt5)
 
-#   add_executable(Simple++_qt5 main.cpp)
-#   target_link_libraries(Simple++_qt5 GP_Qt5)
+  add_executable(Timer++_qt5 main.cpp)
+  target_link_libraries(Timer++_qt5 GP_Qt5)
 endif(GP_BUILD_QT5)

@@ -7,8 +7,14 @@ endif(EMSCRIPTEN)
 add_executable(IO main.c)
 target_link_libraries(IO Native)
 
+add_executable(IO++ main.cpp)
+target_link_libraries(IO++ Native)
+
 if(GP_BUILD_QT5)
   add_executable(IO_qt5 main.c)
   target_link_libraries(IO_qt5 GP::Qt5)
+  
+  add_executable(IO++_qt5 main.cpp)
+  target_link_libraries(IO++_qt5 GP::Qt5)
 endif(GP_BUILD_QT5)
 

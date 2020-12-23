@@ -163,6 +163,9 @@ GP_EXPORT void* gp_io_get_userdata(gp_io* io);
 
 namespace GP
 {
+  class Timer;
+  class IO;
+  
   /*!
    * \brief Wrapper class for ::gp_system.
    */
@@ -182,6 +185,28 @@ namespace GP
     inline Context* CreateContext();
     
     /*!
+     * Creates a new GP::Timer for this system.
+     * \return Pointer to newly created GP::Timer.
+     */
+    inline Timer* CreateTimer();
+    
+    /*!
+     * Creates a new GP::IO for this system that listens
+     * for a file descriptor to become readable.
+     * \param fd File descriptor for which to listen.
+     * \return Pointer to newly created GP::IO.
+     */
+    inline IO* CreateReadIO(int fd);
+    
+    /*!
+     * Creates a new GP::IO for this system that listens
+     * for a file descriptor to become writable.
+     * \param fd File descriptor for which to listen.
+     * \return Pointer to newly created GP::IO.
+     */
+    inline IO* CreateWriteIO(int fd);
+    
+    /*!
      * Start the main loop.
      */
     inline void Run();
@@ -190,13 +215,115 @@ namespace GP
     gp_system*            mSystem;
   };
   
+  /*!
+   * \brief Wrapper class for ::gp_timer.
+   */
+  class Timer
+  {
+  private:
+    //! Constructor
+    inline Timer(gp_timer* timer);
+    
+  public:
+    //! Destructor
+    inline ~Timer();
+    
+    /*!
+     * Sets callback function to be called at timeout.
+     * \param callback Callback function to be called.
+     */
+    inline void SetCallback(gp_timer_callback callback);
+    
+    /*!
+     * Set user defined pointer to data.
+     * \param userdata Point to user defined data.
+     */
+    inline void SetUserData(void* userdata);
+    
+    /*!
+     * Retrieve user defined data pointer.
+     * \return Pointer to user defined data.
+     */
+    inline void* GetUserData();
+    
+    /*!
+     * Start timer count down.
+     * \param seconds Time till timeout in seconds.
+     */
+    inline void Arm(double seconds);
+    
+    /*!
+     * Cancel the current count down.
+     */
+    inline void Disarm();
+    
+  private:
+    gp_timer*             mTimer;
+    
+    friend class System;
+  };
+  
+  /*!
+   * \brief Wapper class for ::gp_io.
+   */
+  class IO
+  {
+  private:
+    //! Constructor
+    inline IO(gp_io* io);
+    
+  public:
+    //! Destructor
+    inline ~IO();
+    
+    /*!
+     * Sets callback function to be called at timeout.
+     * \param callback Callback function to be called.
+     */
+    inline void SetCallback(gp_io_callback callback);
+    
+    /*!
+     * Set user defined pointer to data.
+     * \param userdata Point to user defined data.
+     */
+    inline void SetUserData(void* userdata);
+    
+    /*!
+     * Retrieve user defined data pointer.
+     * \return Pointer to user defined data.
+     */
+    inline void* GetUserData();
+    
+  private:
+    gp_io*                mIO;
+    
+    friend class System;
+  };
+  
   //
   // Implementation
   //
   System::System() {mSystem = gp_system_new();}
   System::~System() {gp_system_free(mSystem);}
   Context* System::CreateContext() {return new Context(gp_system_context_new(mSystem));}
+  Timer* System::CreateTimer() {return new Timer(gp_system_timer_new(mSystem));}
+  IO* System::CreateReadIO(int fd) {return new IO(gp_system_io_read_new(mSystem, fd));}
+  IO* System::CreateWriteIO(int fd) {return new IO(gp_system_io_write_new(mSystem, fd));}
   void System::Run() {gp_system_run(mSystem);}
+  
+  Timer::Timer(gp_timer* timer) : mTimer(timer) {}
+  Timer::~Timer() {gp_timer_free(mTimer);}
+  void Timer::SetCallback(gp_timer_callback callback) {gp_timer_set_callback(mTimer, callback);}
+  void Timer::SetUserData(void* userdata) {gp_timer_set_userdata(mTimer, userdata);}
+  void* Timer::GetUserData() {return gp_timer_get_userdata(mTimer);}
+  void Timer::Arm(double seconds) {gp_timer_arm(mTimer, seconds);}
+  void Timer::Disarm() {gp_timer_disarm(mTimer);}
+  
+  IO::IO(gp_io* io) : mIO(io) {}
+  IO::~IO() {gp_io_free(mIO);}
+  void IO::SetCallback(gp_io_callback callback) {gp_io_set_callback(mIO, callback);}
+  void IO::SetUserData(void* userdata) {gp_io_set_userdata(mIO, userdata);}
+  void* IO::GetUserData() {return gp_io_get_userdata(mIO);}
 }
 #endif // __cplusplus
 
