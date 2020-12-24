@@ -15,7 +15,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <API/GLES/GLES.h>
+#include <API/GL/GL.h>
 #include "Web.h"
 
 #include <stdlib.h>

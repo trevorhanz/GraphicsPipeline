@@ -26,7 +26,7 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Types.h>
 #include <GraphicsPipeline/Logging.h>
-#include <API/GLES/GLES.h>
+#include <API/GL/GL.h>
 
 struct _gp_system
 {

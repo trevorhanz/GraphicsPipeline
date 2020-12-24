@@ -17,7 +17,7 @@
 
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Web.h>
-#include <API/GLES/GLES.h>
+#include <API/GL/GL.h>
 #include "Web.h"
 
 #include <stdlib.h>

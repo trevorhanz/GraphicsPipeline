@@ -19,6 +19,7 @@
 #define __GP_GL_H__
 
 #include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Common.h>
 
 #ifdef GP_GL
 #ifndef __APPLE__

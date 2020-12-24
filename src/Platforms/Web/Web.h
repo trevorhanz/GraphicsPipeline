@@ -21,8 +21,7 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Logging.h>
 
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include <API/GL/GL.h>
 
 #include <emscripten.h>
 #include <emscripten/html5.h>
