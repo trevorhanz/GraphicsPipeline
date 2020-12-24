@@ -20,4 +20,10 @@
 
 #cmakedefine GP_WEB
 
+//
+// API Info
+//
+#cmakedefine GP_GL
+#cmakedefine GP_GLES
+
 #endif /// __GP_CONFIG_H__

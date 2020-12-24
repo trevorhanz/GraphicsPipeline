@@ -18,24 +18,28 @@
 #include <GraphicsPipeline/Pipeline.h>
 #include <GraphicsPipeline/Logging.h>
 
+#ifdef GP_GL
 #ifndef __APPLE__
 #include <GL/glew.h>
-#endif
+#endif // __APPLE__
 #include "GL.h"
 
 #ifndef __APPLE__
 #include <GL/glew.h>
-#else
+#else // __APPLE__
 // OpenGL is deprecated since macOS 10.14
 // Apple recommends porting to Metal
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
+#endif // __APPLE__
+#else // GP_GL
+#include "GL.h"
 #endif
 
 #include <stdlib.h>
 
 // Apple doesn't seem to have support for debug callbacks
-#ifndef __APPLE__
+#if !defined(__APPLE__) && defined(GP_GL)
 void DebugCallbackFunction(GLenum source,
                            GLenum type,
                            GLuint id,
@@ -73,7 +77,9 @@ void DebugCallbackFunction(GLenum source,
 typedef struct
 {
   _gp_operation_data      mData;
+#ifdef GP_GL
   GLuint                  mVAO;
+#endif
   gp_shader*              mShader;
   gp_array*               mArray;
 } _gp_operation_draw_data;
@@ -84,7 +90,9 @@ void _gp_operation_draw(_gp_operation_data* data)
   
   CHECK_GL_ERROR();
   
+#ifdef GP_GL
   glBindVertexArray(d->mVAO);
+#endif
   
   glUseProgram(d->mShader->mProgram);
   
@@ -109,7 +117,9 @@ void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* ar
   _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));
   data->mShader = shader;
   data->mArray = array;
+#ifdef GP_GL
   glGenVertexArrays(1, &data->mVAO);
+#endif
   list->mOperation->mData = (_gp_operation_data*)data;
   
   list->mNext = pipeline->mOperations;
@@ -129,6 +139,7 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
 
 void _gp_api_init()
 {
+#ifdef GP_GL
 #ifndef __APPLE__
   // NOTE: GLEW must be initialize with an active OpenGL context
   GLenum err = glewInit();
@@ -149,4 +160,5 @@ void _gp_api_init()
   }
 #endif // __APPLE__
 #endif // GP_DEBUG
+#endif // GP_GL
 }

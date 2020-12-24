@@ -20,14 +20,19 @@
 
 #include <GraphicsPipeline/Types.h>
 
+#ifdef GP_GL
 #ifndef __APPLE__
 #include <GL/gl.h>
-#else
+#else // __APPLE__
 // OpenGL is deprecated since macOS 10.14
 // Apple recommends porting to Metal
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
-#endif
+#endif // __APPLE__
+#else // GP_GL
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#endif // GP_GL
 
 struct _gp_array
 {
@@ -51,7 +56,6 @@ struct _gp_operation
   _gp_operation_data*     mData;
 };
 
-typedef struct _gp_operation gp_operation;
 typedef struct _gp_operation_list gp_operation_list;
 
 struct _gp_operation_list
