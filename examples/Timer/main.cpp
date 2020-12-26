@@ -18,23 +18,16 @@
 #include <GraphicsPipeline/GP.h>
 #include <GraphicsPipeline/Desktop.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
 
 using namespace GP;
-
-void TimerCallback(gp_timer* timer)
-{
-  printf("Timeout\n");
-  gp_timer_arm(timer, 1.0);
-}
 
 int main(int argc, char* argv[])
 {
   System* system = new System();
   
   Timer* timer = system->CreateTimer();
-  timer->SetCallback(TimerCallback);
+  timer->SetCallback([](Timer* timer){std::cout << "Timeout" << std::endl; timer->Arm(1.0);});
   timer->Arm(1.0);
   
   system->Run();

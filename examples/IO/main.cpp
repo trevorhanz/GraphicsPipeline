@@ -17,30 +17,21 @@
 
 #include <GraphicsPipeline/GP.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#ifdef GP_WINDOWS
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
+#include <iostream>
 
 using namespace GP;
-
-void IOCallback(gp_io* io)
-{
-  char buffer[256];
-  read(0, buffer, 256);
-  printf("IO: %s\n", buffer);
-}
 
 int main(int argc, char* argv[])
 {
   System* system = new System();
   
   IO* io = system->CreateReadIO(0); // STDIN;
-  io->SetCallback(IOCallback);
+  io->SetCallback([](IO*)
+  {
+    std::string in;
+    std::cin >> in;
+    std::cout << "IO: " << in << std::endl;
+  });
   
   system->Run();
   

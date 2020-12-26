@@ -25,6 +25,8 @@
 #include "Types.h"
 
 #ifdef __cplusplus
+#include <functional>
+
 extern "C" {
 #endif
 
@@ -232,19 +234,7 @@ namespace GP
      * Sets callback function to be called at timeout.
      * \param callback Callback function to be called.
      */
-    inline void SetCallback(gp_timer_callback callback);
-    
-    /*!
-     * Set user defined pointer to data.
-     * \param userdata Point to user defined data.
-     */
-    inline void SetUserData(void* userdata);
-    
-    /*!
-     * Retrieve user defined data pointer.
-     * \return Pointer to user defined data.
-     */
-    inline void* GetUserData();
+    inline void SetCallback(std::function<void(Timer*)> callback);
     
     /*!
      * Start timer count down.
@@ -258,7 +248,10 @@ namespace GP
     inline void Disarm();
     
   private:
-    gp_timer*             mTimer;
+    inline static void HandleTimeout(gp_timer* timer);
+    
+    gp_timer*                           mTimer;
+    std::function<void(Timer*)>         mCallback;
     
     friend class System;
   };
@@ -280,22 +273,13 @@ namespace GP
      * Sets callback function to be called at timeout.
      * \param callback Callback function to be called.
      */
-    inline void SetCallback(gp_io_callback callback);
-    
-    /*!
-     * Set user defined pointer to data.
-     * \param userdata Point to user defined data.
-     */
-    inline void SetUserData(void* userdata);
-    
-    /*!
-     * Retrieve user defined data pointer.
-     * \return Pointer to user defined data.
-     */
-    inline void* GetUserData();
+    inline void SetCallback(std::function<void(IO*)> callback);
     
   private:
-    gp_io*                mIO;
+    inline static void HandleUpdate(gp_io* io);
+    
+    gp_io*                              mIO;
+    std::function<void(IO*)>            mCallback;
     
     friend class System;
   };
@@ -313,17 +297,33 @@ namespace GP
   
   Timer::Timer(gp_timer* timer) : mTimer(timer) {}
   Timer::~Timer() {gp_timer_free(mTimer);}
-  void Timer::SetCallback(gp_timer_callback callback) {gp_timer_set_callback(mTimer, callback);}
-  void Timer::SetUserData(void* userdata) {gp_timer_set_userdata(mTimer, userdata);}
-  void* Timer::GetUserData() {return gp_timer_get_userdata(mTimer);}
+  void Timer::SetCallback(std::function<void(Timer*)> callback)
+  {
+    gp_timer_set_callback(mTimer, HandleTimeout);
+    gp_timer_set_userdata(mTimer, (void*)this);
+    mCallback = callback;
+  }
+  void Timer::HandleTimeout(gp_timer* timer)
+  {
+    Timer* THIS = (Timer*)gp_timer_get_userdata(timer);
+    THIS->mCallback(THIS);
+  }
   void Timer::Arm(double seconds) {gp_timer_arm(mTimer, seconds);}
   void Timer::Disarm() {gp_timer_disarm(mTimer);}
   
   IO::IO(gp_io* io) : mIO(io) {}
   IO::~IO() {gp_io_free(mIO);}
-  void IO::SetCallback(gp_io_callback callback) {gp_io_set_callback(mIO, callback);}
-  void IO::SetUserData(void* userdata) {gp_io_set_userdata(mIO, userdata);}
-  void* IO::GetUserData() {return gp_io_get_userdata(mIO);}
+  void IO::SetCallback(std::function<void(IO*)> callback)
+  {
+    gp_io_set_callback(mIO, HandleUpdate);
+    gp_io_set_userdata(mIO, (void*)this);
+    mCallback = callback;
+  }
+  void IO::HandleUpdate(gp_io* io)
+  {
+    IO* THIS = (IO*)gp_io_get_userdata(io);
+    THIS->mCallback(THIS);
+  }
 }
 #endif // __cplusplus
 
