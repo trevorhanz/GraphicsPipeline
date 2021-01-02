@@ -117,7 +117,8 @@ static_analysis:
   tags:
     - docker
   script:
-    cppcheck ./
+    cppcheck --error-exitcode=1 ./
+  allow_failure: true
 
 pages:
   stage: deploy
