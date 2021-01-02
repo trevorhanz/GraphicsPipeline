@@ -76,8 +76,6 @@ gp_context* gp_system_context_new(gp_system* system)
     GLX_DEPTH_SIZE      , 24,
     GLX_STENCIL_SIZE    , 8,
     GLX_DOUBLEBUFFER    , True,
-    GLX_SAMPLE_BUFFERS  , 1,
-    GLX_SAMPLES         , 4,
     None
   };
   int fbcount;
@@ -87,7 +85,8 @@ gp_context* gp_system_context_new(gp_system* system)
 //     cerr << "Failed to retrieve a framebuffer config" << endl;
 //     return;
   }
-  int samp_buf, samples, best_fbc;
+  int samp_buf, samples, best_samples;
+  best_samples = -1;
   for(int i=0; i<fbcount; i++)
   {
     XVisualInfo *vi;
@@ -96,9 +95,9 @@ gp_context* gp_system_context_new(gp_system* system)
     {
       glXGetFBConfigAttrib(context->mDisplay, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
       glXGetFBConfigAttrib(context->mDisplay, fbc[i], GLX_SAMPLES       , &samples  );
-      if(samp_buf > 0 && samples > 4)
+      if(samples > best_samples)
       {
-        best_fbc = i;
+        best_samples = samples;
         context->mVisualInfo = vi;
         break;
       }
