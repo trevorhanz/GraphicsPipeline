@@ -38,7 +38,7 @@ build_ubuntu_20:
   script:
     - mkdir build
     - cd build
-    - cmake ../
+    - cmake -DGP_BUILD_TEST=ON ../
     - make
 
 build_centos_7:
