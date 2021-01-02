@@ -113,14 +113,14 @@ void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* ar
   
   list->mOperation = malloc(sizeof(gp_operation));
   list->mOperation->func = &_gp_operation_draw;
+  list->mOperation->mData = malloc(sizeof(_gp_operation_draw_data));
   
-  _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)list->mOperation->mData;
   data->mShader = shader;
   data->mArray = array;
 #ifdef GP_GL
   glGenVertexArrays(1, &data->mVAO);
 #endif
-  list->mOperation->mData = (_gp_operation_data*)data;
   
   list->mNext = pipeline->mOperations;
   pipeline->mOperations = list;
