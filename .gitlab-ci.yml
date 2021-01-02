@@ -119,8 +119,8 @@ unit_test:
   tags:
     - docker
   script:
-    - ./build/tests/TestC --gtest_output=xml:ReportC.xml
-    - ./build/tests/TestCPP --gtest_output=xml:ReportCPP.xml
+    - xvfb-run ./build/tests/TestC --gtest_output=xml:ReportC.xml
+    - xvfb-run ./build/tests/TestCPP --gtest_output=xml:ReportCPP.xml
   dependencies:
     - build_ubuntu_20
   artifacts:

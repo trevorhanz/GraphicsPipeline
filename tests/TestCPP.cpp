@@ -24,10 +24,10 @@ using namespace GP;
 TEST(CPP, Init)
 {
   System* system = new System();
-  EXPECT_NE(0, (uintptr_t)system);
+  ASSERT_NE(0, (uintptr_t)system);
   
   Context* context = system->CreateContext();
-  EXPECT_NE(0, (uintptr_t)context);
+  ASSERT_NE(0, (uintptr_t)context);
   
   delete context;
   

@@ -22,10 +22,10 @@
 TEST(C, Init)
 {
   gp_system* system = gp_system_new();
-  EXPECT_NE(0, (uintptr_t)system);
+  ASSERT_NE(0, (uintptr_t)system);
   
   gp_context* context = gp_system_context_new(system);
-  EXPECT_NE(0, (uintptr_t)context);
+  ASSERT_NE(0, (uintptr_t)context);
   
   gp_context_free(context);
   
