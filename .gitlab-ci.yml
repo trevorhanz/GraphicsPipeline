@@ -1,13 +1,22 @@
 stages:
   - build
   - analyze
+  - test
   - deploy
 
-build_ubuntu_16:
+.default_build:
   stage: build
-  image: $REGISTRY_ROOT/ubuntu:16
+  image: $REGISTRY_ROOT/ubuntu:20
   tags:
     - docker
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 day
+  
+build_ubuntu_16:
+  extends: .default_build
+  image: $REGISTRY_ROOT/ubuntu:16
   script:
     - mkdir build
     - cd build
@@ -15,10 +24,8 @@ build_ubuntu_16:
     - make
 
 build_ubuntu_18:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/ubuntu:18
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -26,10 +33,8 @@ build_ubuntu_18:
     - make
 
 build_ubuntu_20:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/ubuntu:20
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -37,10 +42,8 @@ build_ubuntu_20:
     - make
 
 build_centos_7:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/centos:7
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -48,10 +51,8 @@ build_centos_7:
     - make
 
 build_centos_8:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/centos:8
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -59,10 +60,8 @@ build_centos_8:
     - make
 
 build_windows:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/windows:mingw
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -70,10 +69,8 @@ build_windows:
     - make
 
 build_osx:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/macos
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -85,10 +82,8 @@ build_osx:
     - make
 
 build_web:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/emscripten
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -96,10 +91,8 @@ build_web:
     - make
 
 build_android:
-  stage: build
+  extends: .default_build
   image: $REGISTRY_ROOT/android
-  tags:
-    - docker
   script:
     - mkdir build
     - cd build
@@ -119,6 +112,22 @@ static_analysis:
   script:
     cppcheck --error-exitcode=1 ./
   allow_failure: true
+
+unit_test:
+  stage: test
+  image: $REGISTRY_ROOT/ubuntu:20
+  tags:
+    - docker
+  script:
+    - ./build/tests/TestC --gtest_output=xml:ReportC.xml
+    - ./build/tests/TestCPP --gtest_output=xml:ReportCPP.xml
+  dependencies:
+    - build_ubuntu_20
+  artifacts:
+    reports:
+      junit:
+        - ReportC.xml
+        - ReportCPP.xml
 
 pages:
   stage: deploy
