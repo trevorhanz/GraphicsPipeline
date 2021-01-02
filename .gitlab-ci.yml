@@ -1,3 +1,8 @@
+stages:
+  - build
+  - analyze
+  - deploy
+
 build_ubuntu_16:
   stage: build
   image: $REGISTRY_ROOT/ubuntu:16
@@ -106,7 +111,16 @@ build_android:
        ../
     - make
 
+static_analysis:
+  stage: analyze
+  image: $REGISTRY_ROOT/ubuntu:20
+  tags:
+    - docker
+  script:
+    cppcheck ./
+
 pages:
+  stage: deploy
   image: $REGISTRY_ROOT/emscripten
   tags:
     - docker
