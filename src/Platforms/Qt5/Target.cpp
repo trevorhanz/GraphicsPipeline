@@ -53,7 +53,7 @@ gp_pipeline* Target::GetPipeline()
   return mPipeline;
 }
 
-void Target::exposeEvent(QExposeEvent* event)
+void Target::Draw()
 {
   mContext->makeCurrent(this);
   
@@ -65,5 +65,12 @@ void Target::exposeEvent(QExposeEvent* event)
   _gp_pipeline_execute(mPipeline);
   
   mContext->swapBuffers(this);
+}
+
+void Target::exposeEvent(QExposeEvent* event)
+{
+  gp_log_debug("expose");
+  
+  Draw();
 }
 

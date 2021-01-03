@@ -103,3 +103,8 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 {
   return target->mTarget->GetPipeline();
 }
+
+void gp_target_redraw(gp_target* target)
+{
+  target->mTarget->Draw();
+}

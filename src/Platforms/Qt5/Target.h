@@ -31,6 +31,8 @@ public:
   QWidget* GetWidget();
   gp_pipeline* GetPipeline();
   
+  void Draw();
+  
 protected:
   void exposeEvent(QExposeEvent* event) override;
   
