@@ -140,7 +140,7 @@ void _gp_system_process_events(gp_io* io)
     
     if(event.type == Expose)
     {
-      _gp_target_draw(system->mTarget);
+      gp_target_redraw(system->mTarget);
     }
   }
 }

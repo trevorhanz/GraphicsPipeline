@@ -54,6 +54,9 @@ struct _gp_target
   gp_pipeline*            mPipeline;
   Window                  mWindow;
   GLXContext              mContext;
+  uint8_t                 mDirty;
+  int                     mPipe[2];
+  gp_io*                  mWake;
 };
 
 void _gp_target_draw(gp_target* target);
@@ -64,10 +67,14 @@ void _gp_event_free(_gp_event* event);
 
 void _gp_event_run(_gp_event* event);
 
+void _gp_event_wake(_gp_event* event);
+
 gp_timer* _gp_event_timer_new(_gp_event* event);
 
 gp_io* _gp_event_io_read_new(_gp_event* event, int fd);
 
 gp_io* _gp_event_io_write_new(_gp_event* event, int fd);
+
+void _gp_event_pipe_new(_gp_event* event, int* fds);
 
 #endif // __GP_X11_COMMON_H__

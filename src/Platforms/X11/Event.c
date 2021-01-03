@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <fcntl.h>
 
 #ifndef min
 #define min(X,Y) ((X) < (Y) ? (X) : (Y))
@@ -47,6 +48,7 @@ struct __gp_event
   int                     mReadFDMax;
   int                     mWriteFDMax;
   unsigned int            mRunning;
+  int                     mPipe[2];
   
   _gp_event_link*         mIORead;
   _gp_event_link*         mIOWrite;
@@ -99,6 +101,9 @@ _gp_event* _gp_event_new()
   event->mIOWrite = NULL;
   event->mTimer = NULL;
   
+  _gp_event_pipe_new(event, &event->mPipe[0]);
+  _gp_event_fd_set(event->mPipe[0], &event->mReadFDs, &event->mReadFDMax);
+  
   return event;
 }
 
@@ -122,6 +127,16 @@ void _gp_event_run(_gp_event* event)
     
     if(select(max(event->mReadFDMax, event->mWriteFDMax)+1, &readfds, &writefds, NULL, &tv))
     {
+      if(FD_ISSET(event->mPipe[0], &readfds))
+      {
+        for(;;)
+        {
+          char ch;
+          if(read(event->mPipe[0], &ch, 1) == -1)
+            break;
+        }
+      }
+      
       _gp_event_link* link = event->mIORead;
       while(link != NULL)
       {
@@ -157,6 +172,14 @@ void _gp_event_run(_gp_event* event)
         link = link->mNext;
       }
     }
+  }
+}
+
+void _gp_event_wake(_gp_event* event)
+{
+  if(write(event->mPipe[1], "x", 1) == -1)
+  {
+    gp_log_error("Unable to wake event pipe.");
   }
 }
 
@@ -268,4 +291,28 @@ void gp_io_set_userdata(gp_io* io, void* userdata)
 void* gp_io_get_userdata(gp_io* io)
 {
   return io->mUserData;
+}
+
+void _gp_event_pipe_new(_gp_event* event, int* fds)
+{
+  if(pipe(fds) == -1)
+  {
+    gp_log_error("Unable to create event pipe.");
+    return;
+  }
+  int flags = fcntl(fds[0], F_GETFL);
+  flags |= O_NONBLOCK;
+  if(fcntl(fds[0], F_SETFL, flags) == -1)
+  {
+    gp_log_error("Unable to create non-blocking event pipe.");
+    return;
+  }
+  
+  flags = fcntl(fds[1], F_GETFL);
+  flags |= O_NONBLOCK;
+  if(fcntl(fds[1], F_SETFL, flags) == -1)
+  {
+    gp_log_error("Unable to create non-blocking event pipe.");
+    return;
+  }
 }

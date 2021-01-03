@@ -22,6 +22,23 @@
 
 #include "../../API/GL/GL.h"
 
+void _gp_target_wake_callback(gp_io* io)
+{
+  gp_target* target = (gp_target*)gp_io_get_userdata(io);
+  for(;;)
+  {
+    char ch;
+    if(read(target->mPipe[0], &ch, 1) == -1)
+      break;
+  }
+  
+  if(target->mDirty)
+  {
+    _gp_target_draw(target);
+    target->mDirty = 0;
+  }
+}
+
 void gp_context_free(gp_context* context)
 {
   XFreeColormap(context->mDisplay, context->mColorMap);
@@ -34,7 +51,13 @@ gp_target* gp_context_target_new(gp_context* context)
   target->mParent = context;
   target->mPipeline = malloc(sizeof(struct _gp_pipeline));
   target->mPipeline->mOperations = NULL;
+  target->mDirty = 1;
   context->mParent->mTarget = target;
+  _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
+  
+  target->mWake = gp_system_io_read_new(context->mParent, target->mPipe[0]);
+  gp_io_set_callback(target->mWake, _gp_target_wake_callback);
+  gp_io_set_userdata(target->mWake, target);
   
   XSetWindowAttributes attr;
   attr.colormap = context->mColorMap;
@@ -78,6 +101,13 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
   return target->mPipeline;
 }
 
+void gp_target_redraw(gp_target* target)
+{
+  write(target->mPipe[1], "x", 1);
+  
+  target->mDirty = 1;
+}
+
 void _gp_target_draw(gp_target* target)
 {
   glXMakeCurrent(target->mParent->mDisplay, target->mWindow, target->mContext);
@@ -88,6 +118,8 @@ void _gp_target_draw(gp_target* target)
   _gp_pipeline_execute(target->mPipeline);
   
   glXSwapBuffers(target->mParent->mDisplay, target->mWindow);
+  
+  target->mDirty = 0;
 }
 
 

@@ -37,7 +37,13 @@ extern "C" {
  * \param target Pointer to target object.
  * \return Pointer to pipeline object.
  */
-  GP_EXPORT gp_pipeline* gp_target_get_pipeline(gp_target* target);
+GP_EXPORT gp_pipeline* gp_target_get_pipeline(gp_target* target);
+
+/*!
+ * Schedule the target to be redrawn.
+ * \param target Pointer to target object.
+ */
+GP_EXPORT void gp_target_redraw(gp_target* target);
 
 //! \} // Target
 
@@ -64,6 +70,11 @@ namespace GP
      */
     inline Pipeline* GetPipeline();
     
+    /*!
+     * Schedules the target to be redrawn.
+     */
+    inline void Redraw();
+    
   private:
     gp_target*        mTarget;
     Pipeline*         mPipeline;
@@ -77,6 +88,7 @@ namespace GP
   Target::Target(gp_target* target) : mTarget(target), mPipeline(new Pipeline(gp_target_get_pipeline(target))) {}
   Target::~Target() {}
   Pipeline* Target::GetPipeline() {return mPipeline;}
+  void Target::Redraw() {gp_target_redraw(mTarget);}
 }
 
 #endif // __cplusplus
