@@ -225,7 +225,7 @@ void gp_timer_arm(gp_timer* timer, double timeout)
   it.it_interval.tv_sec = 0;
   it.it_interval.tv_nsec = 0;
   it.it_value.tv_sec = timeout;
-  it.it_value.tv_nsec = (timeout-((int)timeout))*100000000;
+  it.it_value.tv_nsec = (timeout-((int)timeout))*1000000000;
   
   timerfd_settime(timer->mFD, 0, &it, NULL);
 }

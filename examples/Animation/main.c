@@ -34,7 +34,7 @@ const char* fragmentSource =
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
-#define TIMEOUT .1
+#define TIMEOUT .01
 
 typedef struct
 {
