@@ -75,3 +75,15 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 {
   return target->mPipeline;
 }
+
+void _gp_target_redraw_callback(void* data)
+{
+  gp_target* target = (gp_target*)data;
+  
+  _gp_pipeline_execute(target->mPipeline);
+}
+
+void gp_target_redraw(gp_target* target)
+{
+  emscripten_async_call(_gp_target_redraw_callback, target, -1);
+}
