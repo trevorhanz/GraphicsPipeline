@@ -50,6 +50,10 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
   return target->mPipeline;
 }
 
+void gp_target_redraw(gp_target* target)
+{
+}
+
 gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* window)
 {
   gp_target* target = malloc(sizeof(gp_target));
