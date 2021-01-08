@@ -30,8 +30,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define WM_SOCKET WM_USER + 1
-
 static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle For This Window
                                     UINT    uMsg,                   // Message For This Window
                                     WPARAM  wParam,                 // Additional Message Information
@@ -51,6 +49,20 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
     return 0;
 
   case WM_DESTROY:
+    return 0;
+
+  case WM_REDRAW:
+    {
+      gp_target* target = wParam;
+      wglMakeCurrent(GetDC(target->mWindow), target->mContext);
+
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+      _gp_pipeline_execute(target->mPipeline);
+
+      SwapBuffers(GetDC(target->mWindow));
+    }
     return 0;
 
   case WM_SOCKET:
@@ -408,19 +420,6 @@ void gp_system_run(gp_system* system)
       {
         TranslateMessage(&msg);                               // Translate The Message
         DispatchMessage(&msg);                                // Dispatch The Message
-
-        if (system->mTarget)
-        {
-          gp_target* target = system->mTarget;
-          wglMakeCurrent(GetDC(target->mWindow), target->mContext);
-
-          glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-          glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-          _gp_pipeline_execute(target->mPipeline);
-
-          SwapBuffers(GetDC(target->mWindow));
-        }
       }
     }
   }

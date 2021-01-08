@@ -153,5 +153,9 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
   return target->mPipeline;
 }
 
+void gp_target_redraw(gp_target* target)
+{
+  SendMessage(target->mWindow, WM_REDRAW, target, 0);
+}
 
 
