@@ -98,6 +98,18 @@ gp_operation* gp_operation_clear_new()
   return operation;
 }
 
+typedef struct _gp_array_list gp_array_list;
+
+struct _gp_array_list
+{
+  gp_array_list*          mNext;
+  GLuint                  mVBO;
+  int                     mIndex;
+  int                     mComponents;
+  int                     mStride;
+  uintptr_t               mOffset;
+};
+
 typedef struct
 {
   _gp_operation_data      mData;
@@ -106,7 +118,7 @@ typedef struct
   uint8_t                 mDirty;
 #endif
   gp_shader*              mShader;
-  gp_array*               mArray;
+  gp_array_list*          mArrays;
 } _gp_operation_draw_data;
 
 void _gp_operation_draw(_gp_operation_data* data)
@@ -123,14 +135,19 @@ void _gp_operation_draw(_gp_operation_data* data)
   
   glUseProgram(d->mShader->mProgram);
   
-  glBindBuffer(GL_ARRAY_BUFFER, d->mArray->mVBO);
-  
-  CHECK_GL_ERROR();
-  
-  // Specify the layout of the vertex data
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  
+  gp_array_list* array = d->mArrays;
+  while(array != NULL)
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
+    
+    CHECK_GL_ERROR();
+    
+    // Specify the layout of the vertex data
+    glEnableVertexAttribArray(array->mIndex);
+    glVertexAttribPointer(array->mIndex, array->mComponents, GL_FLOAT, GL_FALSE, array->mStride, (void*)array->mOffset);
+    
+    array = array->mNext;
+  }
 #ifdef GP_GL
   d->mDirty = 0;
   }
@@ -145,7 +162,7 @@ gp_operation* gp_operation_draw_new()
   operation->func = _gp_operation_draw;
   
   _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));
-  data->mArray = NULL;
+  data->mArrays = NULL;
   data->mShader = NULL;
   #ifdef GP_GL
     glGenVertexArrays(1, &data->mVAO);
@@ -160,12 +177,22 @@ void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
 {
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   data->mShader = shader;
+  data->mDirty = 1;
 }
 
-void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index)
+void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset)
 {
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  data->mArray = array;
+  
+  gp_array_list* a = malloc(sizeof(gp_array_list));
+  a->mNext = data->mArrays;
+  a->mVBO = array->mVBO;
+  a->mIndex = index;
+  a->mComponents = components;
+  a->mStride = stride;
+  a->mOffset = offset;
+  data->mArrays = a;
+  data->mDirty = 1;
 }
 
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)

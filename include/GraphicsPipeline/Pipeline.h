@@ -59,8 +59,11 @@ GP_EXPORT void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* 
  * \param operation Draw operation to add the array object to.
  * \param array New array object to be added.
  * \param index Layout index used to attach the array object.
+ * \param components Number of components for each element.
+ * \param stride Byte offset between consecutive elements.
+ * \param offset Byte offset of first element.
  */
-GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index);
+GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset);
 
 /*!
   * Add an operation to the end of the pipeline.
@@ -120,8 +123,11 @@ namespace GP
      * Array will be attached to shader program by layout index value.
      * \param array New array object to be added.
      * \param index Layout index used to attach the array object.
+     * \param components Number of components for each element.
+     * \param stride Byte offset between consecutive elements.
+     * \param offset Byte offset of first element.
      */
-    inline void AddArrayByIndex(Array* array, int index);
+    inline void AddArrayByIndex(Array* array, int index, int components, int stride = 0, int offset = 0);
   };
   
   /*!
@@ -156,9 +162,9 @@ namespace GP
   {
     gp_operation_draw_set_shader(mOperation, shader->mShader);
   }
-  void DrawOperation::AddArrayByIndex(Array* array, int index)
+  void DrawOperation::AddArrayByIndex(Array* array, int index, int components, int stride, int offset)
   {
-    gp_operation_draw_add_array_by_index(mOperation, array->mArray, index);
+    gp_operation_draw_add_array_by_index(mOperation, array->mArray, index, components, stride, offset);
   }
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
