@@ -41,8 +41,7 @@ gp_target* gp_context_target_new(gp_context* context)
   assert(res == EMSCRIPTEN_RESULT_SUCCESS);
   assert(emscripten_webgl_get_current_context() == target->mContext);
   
-  target->mPipeline = malloc(sizeof(struct _gp_pipeline));
-  target->mPipeline->mOperations = NULL;
+  target->mPipeline = _gp_pipeline_new();
   
   context->mParent->mTarget = target;
   

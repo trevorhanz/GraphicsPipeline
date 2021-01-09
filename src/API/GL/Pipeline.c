@@ -173,8 +173,25 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
   list->mOperation = operation;
-  list->mNext = pipeline->mOperations;
-  pipeline->mOperations = list;
+  list->mNext = NULL;
+  if(pipeline->mOperationsEnd != NULL)
+  {
+    pipeline->mOperationsEnd->mNext = list;
+  }
+  else
+  {
+    pipeline->mOperations = list;
+    pipeline->mOperationsEnd = list;
+  }
+}
+
+gp_pipeline* _gp_pipeline_new()
+{
+  gp_pipeline* pipeline = malloc(sizeof(gp_pipeline));
+  pipeline->mOperations = NULL;
+  pipeline->mOperationsEnd = NULL;
+  
+  return pipeline;
 }
 
 void _gp_pipeline_execute(gp_pipeline* pipeline)

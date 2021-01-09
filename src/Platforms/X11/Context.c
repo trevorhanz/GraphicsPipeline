@@ -49,8 +49,7 @@ gp_target* gp_context_target_new(gp_context* context)
 {
   gp_target* target = malloc(sizeof(struct _gp_target));
   target->mParent = context;
-  target->mPipeline = malloc(sizeof(struct _gp_pipeline));
-  target->mPipeline->mOperations = NULL;
+  target->mPipeline = _gp_pipeline_new();
   target->mDirty = 1;
   context->mParent->mTarget = target;
   _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);

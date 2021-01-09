@@ -21,12 +21,10 @@
 
 Target::Target(QOpenGLContext* share)
   : mContext(new QOpenGLContext(this)),
-  mPipeline(new gp_pipeline)
+  mPipeline(_gp_pipeline_new())
 {
   setSurfaceType(QWindow::OpenGLSurface);
   setFormat(share->format());
-  
-  mPipeline->mOperations = NULL;
   
   mContext->setFormat(share->format());
   mContext->setShareContext(share);

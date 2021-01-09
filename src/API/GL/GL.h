@@ -68,11 +68,14 @@ struct _gp_operation_list
 struct _gp_pipeline
 {
   gp_operation_list*      mOperations;
+  gp_operation_list*      mOperationsEnd;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+gp_pipeline* _gp_pipeline_new();
 
 void _gp_pipeline_execute(gp_pipeline* pipeline);
 

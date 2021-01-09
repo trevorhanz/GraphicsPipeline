@@ -32,8 +32,7 @@ gp_target* gp_context_target_new(gp_context* context)
 {
   gp_target* target = malloc(sizeof(gp_target));
   target->mParent = context;
-  target->mPipeline = malloc(sizeof(struct _gp_pipeline));
-  target->mPipeline->mOperations = NULL;
+  target->mPipeline = _gp_pipeline_new();
   
   NSUInteger windowStyle = NSWindowStyleMaskTitled |
                            NSWindowStyleMaskClosable |
