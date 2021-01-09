@@ -77,6 +77,7 @@ namespace GP
     
     friend class Context;
     friend class Pipeline;
+    friend class DrawOperation;
   };
   
   //

@@ -34,13 +34,34 @@ extern "C" {
  * \{
  */
 
-  /*!
-   * Add a draw operation to the end of the pipeline.
-   * \param pipeline Pipeline to add operation to.
-   * \param shader Shader object used in draw operation.
-   * \param array Array object used in draw operation.
-   */
-  GP_EXPORT void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array);
+/*!
+ * Creates a new draw operation.
+ * \return Pointer to new operation.
+ */
+GP_EXPORT gp_operation* gp_operation_draw_new();
+
+/*!
+ * Sets the shader program to be used for this draw operation.
+ * \param operation Draw operation to set the shader to.
+ * \param shader New shader program to be used.
+ */
+GP_EXPORT void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader);
+
+/*!
+ * Add an array object to be used in this draw operation.
+ * Array will be attached to shader program by layout index value.
+ * \param operation Draw operation to add the array object to.
+ * \param array New array object to be added.
+ * \param index Layout index used to attach the array object.
+ */
+GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index);
+
+/*!
+  * Add an operation to the end of the pipeline.
+  * \param pipeline Pipeline to add operation to.
+  * \param operation Operation to be added.
+  */
+GP_EXPORT void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation);
 
 //! \} // Pipeline
 
@@ -49,6 +70,44 @@ extern "C" {
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_operation
+   */
+  class Operation
+  {
+  protected:
+    //! Constructor
+    inline Operation(gp_operation* operation);
+    
+    gp_operation*         mOperation;
+    
+    friend class Pipeline;
+  };
+  
+  /*!
+   * \brief Extended class for accessing draw operation functions.
+   */
+  class DrawOperation : public Operation
+  {
+  public:
+    //! Constructor
+    inline DrawOperation();
+    
+    /*!
+     * Sets the shader program to be used for this draw operation.
+     * \param shader Shader object to be used.
+     */
+    inline void SetShader(Shader* shader);
+    
+    /*!
+     * Add an array object to be used in this draw operation.
+     * Array will be attached to shader program by layout index value.
+     * \param array New array object to be added.
+     * \param index Layout index used to attach the array object.
+     */
+    inline void AddArrayByIndex(Array* array, int index);
+  };
+  
   /*!
    * \brief Wrapper class for ::gp_pipeline 
    */
@@ -65,7 +124,7 @@ namespace GP
      * \param shader Shader object to be used in operation.
      * \param array Array object to be used in operation.
      */
-    inline void AddDraw(Shader* shader, Array* array);
+    inline void AddOperation(Operation* operation);
     
   private:
     gp_pipeline*          mPipeline;
@@ -74,11 +133,22 @@ namespace GP
   //
   // Implementation
   //
+  Operation::Operation(gp_operation* operation) : mOperation(operation) {}
+  DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
+  void DrawOperation::SetShader(Shader* shader)
+  {
+    gp_operation_draw_set_shader(mOperation, shader->mShader);
+  }
+  void DrawOperation::AddArrayByIndex(Array* array, int index)
+  {
+    gp_operation_draw_add_array_by_index(mOperation, array->mArray, index);
+  }
+  
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}
-  void Pipeline::AddDraw(Shader* shader, Array* array)
+  void Pipeline::AddOperation(Operation* operation)
   {
-    gp_pipeline_add_draw(mPipeline, shader->mShader, array->mArray);
+    gp_pipeline_add_operation(mPipeline, operation->mOperation);
   }
 }
 #endif // __cplusplus

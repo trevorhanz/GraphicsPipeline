@@ -79,6 +79,7 @@ typedef struct
   _gp_operation_data      mData;
 #ifdef GP_GL
   GLuint                  mVAO;
+  uint8_t                 mDirty;
 #endif
   gp_shader*              mShader;
   gp_array*               mArray;
@@ -92,6 +93,8 @@ void _gp_operation_draw(_gp_operation_data* data)
   
 #ifdef GP_GL
   glBindVertexArray(d->mVAO);
+  if(d->mDirty == 1)
+  {
 #endif
   
   glUseProgram(d->mShader->mProgram);
@@ -104,24 +107,48 @@ void _gp_operation_draw(_gp_operation_data* data)
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
   
+#ifdef GP_GL
+  d->mDirty = 0;
+  }
+#endif
+  
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void gp_pipeline_add_draw(gp_pipeline* pipeline, gp_shader* shader, gp_array* array)
+gp_operation* gp_operation_draw_new()
+{
+  gp_operation* operation = malloc(sizeof(gp_operation));
+  operation->func = _gp_operation_draw;
+  
+  _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));
+  data->mArray = NULL;
+  data->mShader = NULL;
+  #ifdef GP_GL
+    glGenVertexArrays(1, &data->mVAO);
+    data->mDirty = 1;
+  #endif
+  operation->mData = (_gp_operation_data*)data;
+  
+  return operation;
+}
+
+void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
+{
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  data->mShader = shader;
+}
+
+void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index)
+{
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  data->mArray = array;
+}
+
+void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
-  list->mOperation = malloc(sizeof(gp_operation));
-  list->mOperation->func = &_gp_operation_draw;
-  list->mOperation->mData = malloc(sizeof(_gp_operation_draw_data));
-  
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)list->mOperation->mData;
-  data->mShader = shader;
-  data->mArray = array;
-#ifdef GP_GL
-  glGenVertexArrays(1, &data->mVAO);
-#endif
-  
+  list->mOperation = operation;
   list->mNext = pipeline->mOperations;
   pipeline->mOperations = list;
 }

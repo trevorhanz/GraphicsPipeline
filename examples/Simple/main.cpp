@@ -51,7 +51,11 @@ int main(int argc, char* argv[])
   shader->Compile(vertexSource, fragmentSource);
   
   Pipeline* pipeline = target->GetPipeline();
-  pipeline->AddDraw(shader, array);
+  
+  DrawOperation* operation = new DrawOperation();
+  operation->SetShader(shader);
+  operation->AddArrayByIndex(array, 0);
+  pipeline->AddOperation(operation);
   
   system->Run();
   

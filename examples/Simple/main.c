@@ -65,7 +65,10 @@ int main(int argc, char* argv[])
   
   gp_pipeline* pipeline = gp_target_get_pipeline(target);
   
-  gp_pipeline_add_draw(pipeline, shader, array);
+  gp_operation* draw = gp_operation_draw_new();
+  gp_operation_draw_set_shader(draw, shader);
+  gp_operation_draw_add_array_by_index(draw, array, 0);
+  gp_pipeline_add_operation(pipeline, draw);
   
   gp_system_run(system);
   
