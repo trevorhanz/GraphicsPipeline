@@ -52,6 +52,8 @@ int main(int argc, char* argv[])
   
   Pipeline* pipeline = target->GetPipeline();
   
+  pipeline->AddOperation(new ClearOperation());
+  
   DrawOperation* operation = new DrawOperation();
   operation->SetShader(shader);
   operation->AddArrayByIndex(array, 0);

@@ -77,6 +77,30 @@ void DebugCallbackFunction(GLenum source,
 typedef struct
 {
   _gp_operation_data      mData;
+} _gp_operation_clear_data;
+
+void _gp_operation_clear(_gp_operation_data* data)
+{
+  _gp_operation_clear_data* d = (_gp_operation_clear_data*)data;
+  
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+}
+
+gp_operation* gp_operation_clear_new()
+{
+  gp_operation* operation = malloc(sizeof(gp_operation));
+  operation->func = _gp_operation_clear;
+  
+  _gp_operation_clear_data* data = malloc(sizeof(_gp_operation_clear_data));
+  operation->mData = (_gp_operation_data*)data;
+  
+  return operation;
+}
+
+typedef struct
+{
+  _gp_operation_data      mData;
 #ifdef GP_GL
   GLuint                  mVAO;
   uint8_t                 mDirty;

@@ -35,6 +35,12 @@ extern "C" {
  */
 
 /*!
+ * Create a new clear operation.
+ * \return Pointer to new operation.
+ */
+GP_EXPORT gp_operation* gp_operation_clear_new();
+
+/*!
  * Creates a new draw operation.
  * \return Pointer to new operation.
  */
@@ -82,6 +88,16 @@ namespace GP
     gp_operation*         mOperation;
     
     friend class Pipeline;
+  };
+  
+  /*!
+   * \brief Extended class for accessing clear operation functions.
+   */
+  class ClearOperation : public Operation
+  {
+  public:
+    //! Constructor
+    inline ClearOperation();
   };
   
   /*!
@@ -134,6 +150,7 @@ namespace GP
   // Implementation
   //
   Operation::Operation(gp_operation* operation) : mOperation(operation) {}
+  ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
   DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
   void DrawOperation::SetShader(Shader* shader)
   {

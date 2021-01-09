@@ -47,9 +47,6 @@
   
   [[self openGLContext] makeCurrentContext];
   
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  
   _gp_pipeline_execute(mTarget->mPipeline);
   
   [[self openGLContext] flushBuffer];

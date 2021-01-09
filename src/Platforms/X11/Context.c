@@ -112,9 +112,6 @@ void _gp_target_draw(gp_target* target)
 {
   glXMakeCurrent(target->mParent->mDisplay, target->mWindow, target->mContext);
   
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  
   _gp_pipeline_execute(target->mPipeline);
   
   glXSwapBuffers(target->mParent->mDisplay, target->mWindow);

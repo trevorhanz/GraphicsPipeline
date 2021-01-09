@@ -57,9 +57,6 @@ void Target::Draw()
 {
   mContext->makeCurrent(this);
   
-  glClear(GL_COLOR_BUFFER_BIT);
-  glClear(GL_DEPTH_BUFFER_BIT);
-  
   glViewport(0, 0, width(), height());
   
   _gp_pipeline_execute(mPipeline);
