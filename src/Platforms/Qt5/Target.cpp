@@ -69,8 +69,6 @@ void Target::Draw()
 
 void Target::exposeEvent(QExposeEvent* event)
 {
-  gp_log_debug("expose");
-  
   Draw();
 }
 

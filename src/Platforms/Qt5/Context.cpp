@@ -77,7 +77,6 @@ gp_target* gp_context_target_new(gp_context* context)
 {
   gp_target* target = new gp_target();
   target->mTarget = new Target(context->mShare);
-//   target->mTarget->GetWidget()->show();
   
   return target;
 }
