@@ -50,11 +50,14 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
 
   case WM_DESTROY:
     return 0;
-
-  case WM_REDRAW:
+  
+  case WM_PAINT:
     {
-      gp_target* target = wParam;
-      wglMakeCurrent(GetDC(target->mWindow), target->mContext);
+      gp_target* target = (gp_target*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+      PAINTSTRUCT ps;
+      HDC hDC = BeginPaint(hWnd, &ps);
+      wglMakeCurrent(hDC, target->mContext);
 
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -62,6 +65,7 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
       _gp_pipeline_execute(target->mPipeline);
 
       SwapBuffers(GetDC(target->mWindow));
+      EndPaint(hWnd, &ps);
     }
     return 0;
 

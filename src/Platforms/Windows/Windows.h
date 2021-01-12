@@ -23,8 +23,7 @@
 
 #include <windows.h>
 
-#define WM_REDRAW WM_USER + 1
-#define WM_SOCKET WM_USER + 2
+#define WM_SOCKET WM_USER + 1
 
 struct _gp_system
 {

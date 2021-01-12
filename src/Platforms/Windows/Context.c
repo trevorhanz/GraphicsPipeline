@@ -154,7 +154,7 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 
 void gp_target_redraw(gp_target* target)
 {
-  SendMessage(target->mWindow, WM_REDRAW, target, 0);
+  RedrawWindow(target->mWindow, 0, 0, RDW_INVALIDATE);
 }
 
 
