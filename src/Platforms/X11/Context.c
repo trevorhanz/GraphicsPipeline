@@ -52,7 +52,10 @@ gp_target* gp_context_target_new(gp_context* context)
   target->mPipeline = malloc(sizeof(struct _gp_pipeline));
   target->mPipeline->mOperations = NULL;
   target->mDirty = 1;
-  context->mParent->mTarget = target;
+  gp_target_list* list = malloc(sizeof(gp_target_list));
+  list->mNext = context->mParent->mTargets;
+  list->mTarget = target;
+  context->mParent->mTargets = list;
   _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
   
   target->mWake = gp_system_io_read_new(context->mParent, target->mPipe[0]);
