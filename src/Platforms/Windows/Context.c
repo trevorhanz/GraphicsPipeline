@@ -125,7 +125,6 @@ gp_target* gp_context_target_new(gp_context* context)
 
   target->mWindow = hWnd;
   target->mContext = hRC;
-  target->mParent->mParent->mTarget = target;
 
   ShowWindow(target->mWindow, SW_SHOW);
 

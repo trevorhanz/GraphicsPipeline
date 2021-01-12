@@ -76,7 +76,6 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
 gp_system* gp_system_new()
 {
   gp_system* system = malloc(sizeof(gp_system));
-  system->mTarget = 0;
 
   WNDCLASS wc;                                          // Windows Class Structure
   wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;        // Redraw On Size, And Own DC For Window.

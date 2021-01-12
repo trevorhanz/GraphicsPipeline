@@ -28,7 +28,6 @@
 
 struct _gp_system
 {
-  gp_target*            mTarget;
   HWND                  mInternalWindow;
 };
 
