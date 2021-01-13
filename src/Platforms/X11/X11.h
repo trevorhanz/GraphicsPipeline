@@ -29,10 +29,17 @@
 
 typedef struct __gp_event _gp_event;
 
+typedef struct _gp_target_list gp_target_list;
+struct _gp_target_list
+{
+  gp_target_list*         mNext;
+  gp_target*              mTarget;
+};
+
 struct _gp_system
 {
   Display*                mDisplay;
-  gp_target*              mTarget;
+  gp_target_list*         mTargets;
   
   _gp_event*              mEvent;
   gp_io*                  mIO;        // X11 connection listener

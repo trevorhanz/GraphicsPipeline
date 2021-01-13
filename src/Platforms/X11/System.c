@@ -32,6 +32,7 @@
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
+  system->mTargets = NULL;
   system->mEvent = _gp_event_new();
   
   char* display = getenv("DISPLAY");
@@ -140,7 +141,15 @@ void _gp_system_process_events(gp_io* io)
     
     if(event.type == Expose)
     {
-      gp_target_redraw(system->mTarget);
+      gp_target_list* list = system->mTargets;
+      while(list != NULL)
+      {
+        if(list->mTarget->mWindow == event.xexpose.window)
+        {
+          gp_target_redraw(list->mTarget);
+        }
+        list = list->mNext;
+      }
     }
   }
 }

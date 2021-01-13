@@ -22,6 +22,29 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#if defined(GP_LINUX) || defined(GP_MACOS)
+#include <unistd.h>
+
+#define LOG(color, prefix)\
+  char* fmt;\
+  if((isatty(fileno(stdout)) != 0))\
+  {\
+    int size = strlen(format)+strlen(prefix)+strlen(color)+10;\
+    fmt = malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s%s\033[0m\n", color, prefix, format);\
+  }\
+  else\
+  {\
+    int size = strlen(format)+strlen(prefix)+2;\
+    fmt = malloc(sizeof(char)*size);\
+    snprintf(fmt, size, "%s%s\n", prefix, format);\
+  }\
+  va_list args;\
+  va_start(args, format);\
+  vprintf(fmt, args);\
+  va_end(args);\
+  free(fmt);
+#else
 #define LOG(color, prefix)\
   char* fmt;\
   size_t size = strlen(format)+strlen(prefix)+2;\
@@ -32,6 +55,7 @@
   vprintf(fmt, args);\
   va_end(args);\
   free(fmt);
+#endif
 
 void gp_log(const char* format, ...)
 {

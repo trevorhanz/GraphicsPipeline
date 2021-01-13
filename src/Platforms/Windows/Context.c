@@ -124,7 +124,6 @@ gp_target* gp_context_target_new(gp_context* context)
 
   target->mWindow = hWnd;
   target->mContext = hRC;
-  target->mParent->mParent->mTarget = target;
 
   ShowWindow(target->mWindow, SW_SHOW);
 
@@ -154,7 +153,7 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 
 void gp_target_redraw(gp_target* target)
 {
-  SendMessage(target->mWindow, WM_REDRAW, target, 0);
+  RedrawWindow(target->mWindow, 0, 0, RDW_INVALIDATE);
 }
 
 
