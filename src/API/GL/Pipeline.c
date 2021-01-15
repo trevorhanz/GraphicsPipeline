@@ -91,9 +91,7 @@ gp_operation* gp_operation_clear_new()
 {
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_clear;
-  
-  _gp_operation_clear_data* data = malloc(sizeof(_gp_operation_clear_data));
-  operation->mData = (_gp_operation_data*)data;
+  operation->mData = malloc(sizeof(_gp_operation_clear_data));
   
   return operation;
 }
@@ -164,14 +162,14 @@ gp_operation* gp_operation_draw_new()
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_draw;
   
-  _gp_operation_draw_data* data = malloc(sizeof(_gp_operation_draw_data));
+  operation->mData = malloc(sizeof(_gp_operation_draw_data));
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   data->mArrays = NULL;
   data->mShader = NULL;
   #ifdef GP_GL
     data->mVAO = 0;
     data->mDirty = 1;
   #endif
-  operation->mData = (_gp_operation_data*)data;
   
   return operation;
 }
