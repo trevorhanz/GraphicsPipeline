@@ -128,6 +128,9 @@ void _gp_operation_draw(_gp_operation_data* data)
   CHECK_GL_ERROR();
   
 #ifdef GP_GL
+  if(d->mVAO == 0)
+    glGenVertexArrays(1, &d->mVAO);
+  
   glBindVertexArray(d->mVAO);
   if(d->mDirty == 1)
   {
@@ -165,7 +168,7 @@ gp_operation* gp_operation_draw_new()
   data->mArrays = NULL;
   data->mShader = NULL;
   #ifdef GP_GL
-    glGenVertexArrays(1, &data->mVAO);
+    data->mVAO = 0;
     data->mDirty = 1;
   #endif
   operation->mData = (_gp_operation_data*)data;
@@ -177,7 +180,10 @@ void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
 {
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   data->mShader = shader;
+  
+#ifdef GP_GL
   data->mDirty = 1;
+#endif
 }
 
 void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset)
@@ -192,7 +198,10 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   a->mStride = stride;
   a->mOffset = offset;
   data->mArrays = a;
+  
+#ifdef GP_GL
   data->mDirty = 1;
+#endif
 }
 
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
