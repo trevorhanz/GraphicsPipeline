@@ -46,6 +46,12 @@ struct _gp_shader
   GLuint                  mAttribute;
 };
 
+struct _gp_uniform
+{
+  GLuint                  mLocation;
+  void*                   mData;
+};
+
 typedef struct
 {
   int test;

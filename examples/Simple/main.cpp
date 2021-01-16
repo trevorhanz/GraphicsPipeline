@@ -30,9 +30,10 @@ const char* vertexSource =
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
+    "uniform vec4 Color;                          \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
+    "  gl_FragColor = Color;                      \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
@@ -50,12 +51,17 @@ int main(int argc, char* argv[])
   
   shader->Compile(vertexSource, fragmentSource);
   
+  float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
+  Uniform* color = shader->CreateUniform("Color");
+  color->SetVec4(c);
+  
   Pipeline* pipeline = target->GetPipeline();
   
   pipeline->AddOperation(new ClearOperation());
   
   DrawOperation* operation = new DrawOperation();
   operation->SetShader(shader);
+  operation->SetUniform(color);
   operation->AddArrayByIndex(array, 0, 2);
   pipeline->AddOperation(operation);
   

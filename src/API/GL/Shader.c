@@ -26,6 +26,7 @@
 #include "GL.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 int _check_shader_status(unsigned int shader, const char* type)
 {
@@ -92,3 +93,18 @@ void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragme
   
   shader->mAttribute = glGetAttribLocation(shader->mProgram, "position");
 }
+
+gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
+{
+  gp_uniform* uniform = malloc(sizeof(gp_uniform));
+  uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
+  
+  return uniform;
+}
+
+void gp_uniform_set_vec4(gp_uniform* uniform, float* data)
+{
+  uniform->mData = malloc(sizeof(float)*4);
+  memcpy(uniform->mData, data, sizeof(float)*4);
+}
+

@@ -108,6 +108,14 @@ struct _gp_array_list
   uintptr_t               mOffset;
 };
 
+typedef struct _gp_uniform_list gp_uniform_list;
+
+struct _gp_uniform_list
+{
+  gp_uniform_list*        mNext;
+  gp_uniform*             mUniform;
+};
+
 typedef struct
 {
   _gp_operation_data      mData;
@@ -117,6 +125,7 @@ typedef struct
 #endif
   gp_shader*              mShader;
   gp_array_list*          mArrays;
+  gp_uniform_list*        mUniforms;
 } _gp_operation_draw_data;
 
 void _gp_operation_draw(_gp_operation_data* data)
@@ -135,6 +144,15 @@ void _gp_operation_draw(_gp_operation_data* data)
 #endif
   
   glUseProgram(d->mShader->mProgram);
+  
+  gp_uniform_list* uniform = d->mUniforms;
+  while(uniform != NULL)
+  {
+    float* data = uniform->mUniform->mData;
+    glUniform4f(uniform->mUniform->mLocation, data[0], data[1], data[2], data[3]);
+    
+    uniform = uniform->mNext;
+  }
   
   gp_array_list* array = d->mArrays;
   while(array != NULL)
@@ -164,6 +182,7 @@ gp_operation* gp_operation_draw_new()
   
   operation->mData = malloc(sizeof(_gp_operation_draw_data));
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  data->mUniforms = NULL;
   data->mArrays = NULL;
   data->mShader = NULL;
   #ifdef GP_GL
@@ -196,6 +215,20 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   a->mStride = stride;
   a->mOffset = offset;
   data->mArrays = a;
+  
+#ifdef GP_GL
+  data->mDirty = 1;
+#endif
+}
+
+void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
+{
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  
+  gp_uniform_list* u = malloc(sizeof(gp_uniform_list));
+  u->mNext = data->mUniforms;
+  u->mUniform = uniform;
+  data->mUniforms = u;
   
 #ifdef GP_GL
   data->mDirty = 1;

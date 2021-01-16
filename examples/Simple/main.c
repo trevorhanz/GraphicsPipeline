@@ -43,9 +43,10 @@ const char* vertexSource =
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
+    "uniform vec4 Color;                          \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
+    "  gl_FragColor = Color;                      \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
@@ -63,6 +64,10 @@ int main(int argc, char* argv[])
   
   gp_shader_compile(shader, vertexSource, fragmentSource);
   
+  float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
+  gp_uniform* color = gp_shader_uniform_new_by_name(shader, "Color");
+  gp_uniform_set_vec4(color, c);
+  
   gp_pipeline* pipeline = gp_target_get_pipeline(target);
   
   gp_operation* clear = gp_operation_clear_new();
@@ -70,6 +75,7 @@ int main(int argc, char* argv[])
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
+  gp_operation_draw_set_uniform(draw, color);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_pipeline_add_operation(pipeline, draw);
   

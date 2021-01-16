@@ -54,6 +54,13 @@ GP_EXPORT gp_operation* gp_operation_draw_new();
 GP_EXPORT void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader);
 
 /*!
+ * Sets a uniform object to be used.
+ * \param operation Draw operation for which to apply the uniform object.
+ * \param uniform New uniform object to be used.
+ */
+GP_EXPORT void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform);
+
+/*!
  * Add an array object to be used in this draw operation.
  * Array will be attached to shader program by layout index value.
  * \param operation Draw operation to add the array object to.
@@ -119,6 +126,12 @@ namespace GP
     inline void SetShader(Shader* shader);
     
     /*!
+     * Sets a uniform object to be used.
+     * \param uniform New uniform object to be used.
+     */
+    inline void SetUniform(Uniform* uniform);
+    
+    /*!
      * Add an array object to be used in this draw operation.
      * Array will be attached to shader program by layout index value.
      * \param array New array object to be added.
@@ -161,6 +174,10 @@ namespace GP
   void DrawOperation::SetShader(Shader* shader)
   {
     gp_operation_draw_set_shader(mOperation, shader->mShader);
+  }
+  void DrawOperation::SetUniform(Uniform* uniform)
+  {
+    gp_operation_draw_set_uniform(mOperation, uniform->mUniform);
   }
   void DrawOperation::AddArrayByIndex(Array* array, int index, int components, int stride, int offset)
   {
