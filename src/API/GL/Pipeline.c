@@ -149,7 +149,21 @@ void _gp_operation_draw(_gp_operation_data* data)
   while(uniform != NULL)
   {
     float* data = uniform->mUniform->mData;
-    glUniform4f(uniform->mUniform->mLocation, data[0], data[1], data[2], data[3]);
+    switch(uniform->mUniform->mSize)
+    {
+      case 1:
+        glUniform1f(uniform->mUniform->mLocation, data[0]);
+        break;
+      case 2:
+        glUniform2f(uniform->mUniform->mLocation, data[0], data[1]);
+        break;
+      case 3:
+        glUniform3f(uniform->mUniform->mLocation, data[0], data[1], data[2]);
+        break;
+      case 4:
+        glUniform4f(uniform->mUniform->mLocation, data[0], data[1], data[2], data[3]);
+        break;
+    }
     
     uniform = uniform->mNext;
   }

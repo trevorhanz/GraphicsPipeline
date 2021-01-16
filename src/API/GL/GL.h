@@ -49,6 +49,7 @@ struct _gp_shader
 struct _gp_uniform
 {
   GLuint                  mLocation;
+  uint8_t                 mSize;
   void*                   mData;
 };
 

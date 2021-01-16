@@ -23,9 +23,10 @@
 
 const char* vertexSource =
     "attribute vec4 position;                     \n"
+    "uniform vec2 Offset;                         \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_Position = vec4(position.xyz, 1.0);     \n"
+    "  gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);\n"
     "}                                            \n";
 const char* fragmentSource =
     "void main()                                  \n"
@@ -39,7 +40,7 @@ float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 typedef struct
 {
   gp_target* target;
-  gp_array* array;
+  gp_uniform* offset;
   int frame;
 } animation_data;
 
@@ -52,9 +53,9 @@ void TimerCallback(gp_timer* timer)
   float offset = data->frame%200/200.0;
   if(offset > .5) offset = 1.0-offset;
   offset -= .25;
-  float vertexData2[] = {0.0f+offset, 0.5f, 0.5f+offset, -0.5f, -0.5f+offset, -0.5f};
   
-  gp_array_set_data(data->array, vertexData2, 6);
+  float o[] = {offset, 0.0f};
+  gp_uniform_set_vec2(data->offset, o);
   
   gp_target_redraw(data->target);
   
@@ -73,7 +74,6 @@ int main(int argc, char* argv[])
   
   animation_data* data = malloc(sizeof(animation_data));
   data->target = target;
-  data->array = array;
   data->frame = 0;
   
   gp_timer* timer = gp_system_timer_new(system);
@@ -85,6 +85,10 @@ int main(int argc, char* argv[])
   
   gp_shader_compile(shader, vertexSource, fragmentSource);
   
+  float o[] = {0.0f, 0.0f};
+  data->offset = gp_shader_uniform_new_by_name(shader, "Offset");
+  gp_uniform_set_vec2(data->offset, o);
+  
   gp_pipeline* pipeline = gp_target_get_pipeline(target);
   
   gp_operation* clear = gp_operation_clear_new();
@@ -92,6 +96,7 @@ int main(int argc, char* argv[])
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
+  gp_operation_draw_set_uniform(draw, data->offset);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_pipeline_add_operation(pipeline, draw);
   

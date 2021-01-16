@@ -26,9 +26,10 @@ using namespace GP;
 
 const char* vertexSource =
     "attribute vec4 position;                     \n"
+    "uniform vec2 Offset;                         \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_Position = vec4(position.xyz, 1.0);     \n"
+    "  gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);\n"
     "}                                            \n";
 const char* fragmentSource =
     "void main()                                  \n"
@@ -37,7 +38,7 @@ const char* fragmentSource =
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
-#define TIMEOUT .1
+#define TIMEOUT .01
 
 int main(int argc, char* argv[])
 {
@@ -48,6 +49,7 @@ int main(int argc, char* argv[])
   Target* target = context->CreateTarget();
   Array* array = context->CreateArray();
   Shader* shader = context->CreateShader();
+  Uniform* uniform;
   
   int frame = 0;
   Timer* timer = system->CreateTimer();
@@ -58,9 +60,9 @@ int main(int argc, char* argv[])
     float offset = frame%200/200.0;
     if(offset > .5) offset = 1.0-offset;
     offset -= .25;
-    float vertexData2[] = {0.0f+offset, 0.5f, 0.5f+offset, -0.5f, -0.5f+offset, -0.5f};
     
-    array->SetData(vertexData2, 6);
+    float o[] = {offset, 0.0f};
+    uniform->SetVec2(o);
     
     target->Redraw();
     
@@ -72,12 +74,17 @@ int main(int argc, char* argv[])
   
   shader->Compile(vertexSource, fragmentSource);
   
+  float o[] = {0.0f, 0.0f};
+  uniform = shader->CreateUniform("Offset");
+  uniform->SetVec2(o);
+  
   Pipeline* pipeline = target->GetPipeline();
   
   pipeline->AddOperation(new ClearOperation());
   
   DrawOperation* operation = new DrawOperation();
   operation->SetShader(shader);
+  operation->SetUniform(uniform);
   operation->AddArrayByIndex(array, 0, 2);
   pipeline->AddOperation(operation);
   

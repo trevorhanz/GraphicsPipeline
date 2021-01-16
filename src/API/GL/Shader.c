@@ -98,12 +98,35 @@ gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
 {
   gp_uniform* uniform = malloc(sizeof(gp_uniform));
   uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
+  uniform->mSize = 0;
   
   return uniform;
 }
 
+void gp_uniform_set_float(gp_uniform* uniform, float data)
+{
+  uniform->mSize = 1;
+  uniform->mData = malloc(sizeof(float)*1);
+  memcpy(uniform->mData, &data, sizeof(float)*1);
+}
+
+void gp_uniform_set_vec2(gp_uniform* uniform, float* data)
+{
+  uniform->mSize = 2;
+  uniform->mData = malloc(sizeof(float)*2);
+  memcpy(uniform->mData, data, sizeof(float)*2);
+}
+
+void gp_uniform_set_vec3(gp_uniform* uniform, float* data)
+{
+  uniform->mSize = 3;
+  uniform->mData = malloc(sizeof(float)*3);
+  memcpy(uniform->mData, data, sizeof(float)*3);
+}
+
 void gp_uniform_set_vec4(gp_uniform* uniform, float* data)
 {
+  uniform->mSize = 4;
   uniform->mData = malloc(sizeof(float)*4);
   memcpy(uniform->mData, data, sizeof(float)*4);
 }
