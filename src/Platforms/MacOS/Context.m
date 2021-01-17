@@ -69,7 +69,7 @@ gp_array* gp_context_array_new(gp_context* context)
 
 gp_texture* gp_context_texture_new(gp_context* context)
 {
-  gp_texture* texture = new gp_texture();
+  gp_texture* texture = malloc(sizeof(gp_texture));
   
   _gp_generate_texture(texture);
   
