@@ -103,6 +103,7 @@ gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
   return uniform;
 }
 
+void _gp_uniform_load_int(gp_uniform* uniform) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
 void _gp_uniform_load_float(gp_uniform* uniform) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}
 void _gp_uniform_load_vec2(gp_uniform* uniform)
 {
@@ -128,6 +129,12 @@ void _gp_uniform_load_vec4(gp_uniform* uniform)
     uniform->mData = malloc(size);\
   }\
   uniform->mOperation = op;
+
+void gp_uniform_set_texture(gp_uniform* uniform, gp_texture* texture)
+{
+  UNIFORM_SET(_gp_uniform_load_int, sizeof(GLuint));
+  memcpy(uniform->mData, &texture->mTexture, sizeof(GLuint));
+}
 
 void gp_uniform_set_float(gp_uniform* uniform, float data)
 {

@@ -41,6 +41,10 @@ extern "C" {
  * \brief \ref Array object.
  * Graphics primative that stores an array of numerical data.
  * 
+ * \typedef gp_texture
+ * \brief \ref Texture object.
+ * Graphics primative that stores multi-dimensional texture data.
+ * 
  * \typedef gp_shader
  * \brief \ref Shader object.
  * Graphics primative that contains a shader program.
@@ -66,6 +70,7 @@ typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
 typedef struct _gp_target gp_target;
 typedef struct _gp_array gp_array;
+typedef struct _gp_texture gp_texture;
 typedef struct _gp_shader gp_shader;
 typedef struct _gp_uniform gp_uniform;
 typedef struct _gp_pipeline gp_pipeline;

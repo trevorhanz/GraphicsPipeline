@@ -40,6 +40,11 @@ struct _gp_array
   GLuint                  mVBO;
 };
 
+struct _gp_texture
+{
+  GLuint                  mTexture;
+};
+
 struct _gp_shader
 {
   GLuint                  mProgram;
@@ -91,6 +96,8 @@ void _gp_pipeline_execute(gp_pipeline* pipeline);
 void _gp_api_init();
 
 void _gp_generate_array(gp_array* array);
+
+void _gp_generate_texture(gp_texture* texture);
 
 #ifdef __cplusplus
 }

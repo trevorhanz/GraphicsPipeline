@@ -16,6 +16,7 @@ set(PUBLIC_HEADERS
     ../include/GraphicsPipeline/Shader.h
     ../include/GraphicsPipeline/System.h
     ../include/GraphicsPipeline/Target.h
+    ../include/GraphicsPipeline/Texture.h
     ../include/GraphicsPipeline/Types.h
     ../include/GraphicsPipeline/Web.h
     ../include/GraphicsPipeline/Windows.h
@@ -38,6 +39,7 @@ set(GL_SRC
   API/GL/Pipeline.c
   API/GL/Array.c
   API/GL/Shader.c
+  API/GL/Texture.c
   )
 
 #

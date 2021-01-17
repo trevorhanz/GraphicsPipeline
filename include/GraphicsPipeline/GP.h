@@ -27,6 +27,7 @@
 #include "Shader.h"
 #include "Logging.h"
 #include "Target.h"
+#include "Texture.h"
 #include "Types.h"
 
 #endif // __GRAPHICS_PIPELINE_H__

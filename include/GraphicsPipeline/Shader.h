@@ -55,6 +55,13 @@ GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const ch
 GP_EXPORT gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name);
 
 /*!
+ * Set textire data into a gp_uniform object.
+ * \param uniform Uniform object to have data loaded.
+ * \param data Pointer to array of data to be loaded.
+ */
+GP_EXPORT void gp_uniform_set_texture(gp_uniform* uniform, gp_texture* texture);
+
+/*!
  * Set float data into a gp_uniform object.
  * \param uniform Uniform object to have data loaded.
  * \param data Pointer to array of data to be loaded.

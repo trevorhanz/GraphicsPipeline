@@ -57,6 +57,13 @@ GP_EXPORT gp_target* gp_context_target_new(gp_context* context);
 GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
 
 /*!
+ * Create a new gp_texture object tied to a context.
+ * \param context Context object used to create texture.
+ * \return Newly created texture.
+ */
+GP_EXPORT gp_texture* gp_context_texture_new(gp_context* context);
+
+/*!
  * Create a new gp_shader object tied to a context.
  * \param context Context object used to create shader.
  * \return Newly created shader.
