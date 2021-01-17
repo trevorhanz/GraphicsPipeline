@@ -134,6 +134,16 @@ void _gp_operation_draw(_gp_operation_data* data)
   
   CHECK_GL_ERROR();
   
+  glUseProgram(d->mShader->mProgram);
+  
+  gp_uniform_list* uniform = d->mUniforms;
+  while(uniform != NULL)
+  {
+    uniform->mUniform->mOperation(uniform->mUniform);
+    
+    uniform = uniform->mNext;
+  }
+  
 #ifdef GP_GL
   if(d->mVAO == 0)
     glGenVertexArrays(1, &d->mVAO);
@@ -142,32 +152,6 @@ void _gp_operation_draw(_gp_operation_data* data)
   if(d->mDirty == 1)
   {
 #endif
-  
-  glUseProgram(d->mShader->mProgram);
-  
-  gp_uniform_list* uniform = d->mUniforms;
-  while(uniform != NULL)
-  {
-    float* data = uniform->mUniform->mData;
-    switch(uniform->mUniform->mSize)
-    {
-      case 1:
-        glUniform1f(uniform->mUniform->mLocation, data[0]);
-        break;
-      case 2:
-        glUniform2f(uniform->mUniform->mLocation, data[0], data[1]);
-        break;
-      case 3:
-        glUniform3f(uniform->mUniform->mLocation, data[0], data[1], data[2]);
-        break;
-      case 4:
-        glUniform4f(uniform->mUniform->mLocation, data[0], data[1], data[2], data[3]);
-        break;
-    }
-    
-    uniform = uniform->mNext;
-  }
-  
   gp_array_list* array = d->mArrays;
   while(array != NULL)
   {

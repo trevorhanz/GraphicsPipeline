@@ -98,36 +98,58 @@ gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
 {
   gp_uniform* uniform = malloc(sizeof(gp_uniform));
   uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
-  uniform->mSize = 0;
+  uniform->mOperation = 0;
   
   return uniform;
 }
 
+void _gp_uniform_load_float(gp_uniform* uniform) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}
+void _gp_uniform_load_vec2(gp_uniform* uniform)
+{
+  float* data = uniform->mData;
+  glUniform2f(uniform->mLocation, data[0], data[1]);
+}
+void _gp_uniform_load_vec3(gp_uniform* uniform)
+{
+  float* data = uniform->mData;
+  glUniform3f(uniform->mLocation, data[0], data[1], data[2]);
+}
+void _gp_uniform_load_vec4(gp_uniform* uniform)
+{
+  float* data = uniform->mData;
+  glUniform4f(uniform->mLocation, data[0], data[1], data[2], data[3]);
+}
+
+#define UNIFORM_SET(op, size)\
+  if(uniform->mOperation != op)\
+  {\
+    if(uniform->mOperation)\
+      free(uniform->mData);\
+    uniform->mData = malloc(size);\
+  }\
+  uniform->mOperation = op;
+
 void gp_uniform_set_float(gp_uniform* uniform, float data)
 {
-  uniform->mSize = 1;
-  uniform->mData = malloc(sizeof(float)*1);
-  memcpy(uniform->mData, &data, sizeof(float)*1);
+  UNIFORM_SET(_gp_uniform_load_float, sizeof(float)*1);
+  memcpy(uniform->mData, &data, sizeof(float));
 }
 
 void gp_uniform_set_vec2(gp_uniform* uniform, float* data)
 {
-  uniform->mSize = 2;
-  uniform->mData = malloc(sizeof(float)*2);
+  UNIFORM_SET(_gp_uniform_load_vec2, sizeof(float)*2);
   memcpy(uniform->mData, data, sizeof(float)*2);
 }
 
 void gp_uniform_set_vec3(gp_uniform* uniform, float* data)
 {
-  uniform->mSize = 3;
-  uniform->mData = malloc(sizeof(float)*3);
+  UNIFORM_SET(_gp_uniform_load_vec3, sizeof(float)*3);
   memcpy(uniform->mData, data, sizeof(float)*3);
 }
 
 void gp_uniform_set_vec4(gp_uniform* uniform, float* data)
 {
-  uniform->mSize = 4;
-  uniform->mData = malloc(sizeof(float)*4);
+  UNIFORM_SET(_gp_uniform_load_vec4, sizeof(float)*4);
   memcpy(uniform->mData, data, sizeof(float)*4);
 }
 

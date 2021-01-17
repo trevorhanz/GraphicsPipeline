@@ -46,10 +46,12 @@ struct _gp_shader
   GLuint                  mAttribute;
 };
 
+typedef void(*LoadUniform)(gp_uniform* uniform);
+
 struct _gp_uniform
 {
   GLuint                  mLocation;
-  uint8_t                 mSize;
+  LoadUniform             mOperation;
   void*                   mData;
 };
 
