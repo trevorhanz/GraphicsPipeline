@@ -34,6 +34,10 @@ extern "C" {
  * \{
  */
 
+typedef unsigned int gp_draw_mode;
+extern const gp_draw_mode GP_MODE_TRIANGLES;
+extern const gp_draw_mode GP_MODE_TRIANGLE_STRIP;
+
 /*!
  * Create a new clear operation.
  * \return Pointer to new operation.
@@ -71,6 +75,20 @@ GP_EXPORT void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform
  * \param offset Byte offset of first element.
  */
 GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset);
+
+/*!
+ * Set the number of verticies in the draw operation.
+ * \param operation Draw operation for which to set the vertex count.
+ * \param count The number of verticies in the draw operation.
+ */
+GP_EXPORT void gp_operation_draw_set_verticies(gp_operation* operation, int count);
+
+/*!
+ * Set the draw mode for a draw operation.
+ * \param operation Draw operation for which to change the draw mode.
+ * \param mode The drawing mode to use.
+ */
+GP_EXPORT void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode);
 
 /*!
   * Add an operation to the end of the pipeline.
@@ -141,6 +159,18 @@ namespace GP
      * \param offset Byte offset of first element.
      */
     inline void AddArrayByIndex(Array* array, int index, int components, int stride = 0, int offset = 0);
+    
+    /*!
+     * Set the number of verticies in the draw operation.
+     * \param count The number of verticies in the draw operation.
+     */
+    inline void SetVerticies(int count);
+    
+    /*!
+     * Set the draw mode for a draw operation.
+     * \param mode The drawing mode to use.
+     */
+    inline void SetMode(gp_draw_mode mode);
   };
   
   /*!
@@ -183,6 +213,8 @@ namespace GP
   {
     gp_operation_draw_add_array_by_index(mOperation, array->mArray, index, components, stride, offset);
   }
+  void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies(mOperation, count);}
+  void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode(mOperation, mode);}
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}

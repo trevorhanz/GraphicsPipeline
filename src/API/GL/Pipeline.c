@@ -38,6 +38,9 @@
 
 #include <stdlib.h>
 
+const gp_draw_mode GP_MODE_TRIANGLES = GL_TRIANGLES;
+const gp_draw_mode GP_MODE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP;
+
 // Apple doesn't seem to have support for debug callbacks
 #if !defined(__APPLE__) && defined(GP_GL)
 void DebugCallbackFunction(GLenum source,
@@ -126,6 +129,8 @@ typedef struct
   gp_shader*              mShader;
   gp_array_list*          mArrays;
   gp_uniform_list*        mUniforms;
+  unsigned int            mVerticies;
+  gp_draw_mode            mMode;
 } _gp_operation_draw_data;
 
 void _gp_operation_draw(_gp_operation_data* data)
@@ -170,7 +175,7 @@ void _gp_operation_draw(_gp_operation_data* data)
   }
 #endif
   
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(d->mMode, 0, d->mVerticies);
 }
 
 gp_operation* gp_operation_draw_new()
@@ -187,6 +192,8 @@ gp_operation* gp_operation_draw_new()
     data->mVAO = 0;
     data->mDirty = 1;
   #endif
+  data->mVerticies = 0;
+  data->mMode = GL_TRIANGLES;
   
   return operation;
 }
@@ -231,6 +238,18 @@ void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
 #ifdef GP_GL
   data->mDirty = 1;
 #endif
+}
+
+void gp_operation_draw_set_verticies(gp_operation* operation, int count)
+{
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  data->mVerticies = count;
+}
+
+void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode)
+{
+  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  data->mMode = mode;
 }
 
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)

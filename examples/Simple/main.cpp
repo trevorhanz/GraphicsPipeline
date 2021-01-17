@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
   operation->SetShader(shader);
   operation->SetUniform(color);
   operation->AddArrayByIndex(array, 0, 2);
+  operation->SetVerticies(3);
   pipeline->AddOperation(operation);
   
   system->Run();
