@@ -78,8 +78,7 @@ namespace GP
     gp_texture*           mTexture;     //!< Internal array object
     
     friend class Context;
-    friend class Pipeline;
-    friend class DrawOperation;
+    friend class Uniform;
   };
   
   //

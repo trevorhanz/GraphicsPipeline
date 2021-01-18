@@ -22,6 +22,7 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Texture.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,6 +90,20 @@ GP_EXPORT void gp_uniform_set_vec3(gp_uniform* uniform, float* data);
  */
 GP_EXPORT void gp_uniform_set_vec4(gp_uniform* uniform, float* data);
 
+/*!
+ * Set float[3][3] data into a gp_uniform object.
+ * \param uniform Uniform object to have data loaded.
+ * \param data Pointer to array of data to be loaded.
+ */
+GP_EXPORT void gp_uniform_set_mat3(gp_uniform* uniform, float* data);
+
+/*!
+ * Set float[4][4] data into a gp_uniform object.
+ * \param uniform Uniform object to have data loaded.
+ * \param data Pointer to array of data to be loaded.
+ */
+GP_EXPORT void gp_uniform_set_mat4(gp_uniform* uniform, float* data);
+
 //! \} // Shader
 
 #ifdef __cplusplus
@@ -149,6 +164,12 @@ namespace GP
      * Set float data into a Uniform object.
      * \param data Pointer to array of data to be loaded.
      */
+    inline void SetTexture(Texture* texture);
+    
+    /*!
+     * Set float data into a Uniform object.
+     * \param data Pointer to array of data to be loaded.
+     */
     inline void SetFloat(float data);
     
     /*!
@@ -169,6 +190,18 @@ namespace GP
      */
     inline void SetVec4(float* data);
     
+    /*!
+     * Set float[3][3] data into a Uniform object.
+     * \param data Pointer to array of data to be loaded.
+     */
+    inline void SetMat3(float* data);
+    
+    /*!
+     * Set float[4][4] data into a Uniform object.
+     * \param data Pointer to array of data to be loaded.
+     */
+    inline void SetMat4(float* data);
+    
   private:
     gp_uniform*       mUniform;
     
@@ -186,10 +219,13 @@ namespace GP
   
   Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {}
   Uniform::~Uniform() {}
+  void Uniform::SetTexture(Texture* texture) {gp_uniform_set_texture(mUniform, texture->mTexture);}
   void Uniform::SetFloat(float data) {gp_uniform_set_float(mUniform, data);}
   void Uniform::SetVec2(float* data) {gp_uniform_set_vec2(mUniform, data);}
   void Uniform::SetVec3(float* data) {gp_uniform_set_vec3(mUniform, data);}
   void Uniform::SetVec4(float* data) {gp_uniform_set_vec4(mUniform, data);}
+  void Uniform::SetMat3(float* data) {gp_uniform_set_mat3(mUniform, data);}
+  void Uniform::SetMat4(float* data) {gp_uniform_set_mat4(mUniform, data);}
 }
 #endif // __cplusplus
 

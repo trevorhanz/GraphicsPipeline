@@ -120,6 +120,14 @@ void _gp_uniform_load_vec4(gp_uniform* uniform)
   float* data = uniform->mData;
   glUniform4f(uniform->mLocation, data[0], data[1], data[2], data[3]);
 }
+void _gp_uniform_load_mat3(gp_uniform* uniform)
+{
+  glUniformMatrix3fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
+}
+void _gp_uniform_load_mat4(gp_uniform* uniform)
+{
+  glUniformMatrix4fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
+}
 
 #define UNIFORM_SET(op, size)\
   if(uniform->mOperation != op)\
@@ -160,3 +168,14 @@ void gp_uniform_set_vec4(gp_uniform* uniform, float* data)
   memcpy(uniform->mData, data, sizeof(float)*4);
 }
 
+void gp_uniform_set_mat3(gp_uniform* uniform, float* data)
+{
+  UNIFORM_SET(_gp_uniform_load_mat3, sizeof(float)*9);
+  memcpy(uniform->mData, data, sizeof(float)*9);
+}
+
+void gp_uniform_set_mat4(gp_uniform* uniform, float* data)
+{
+  UNIFORM_SET(_gp_uniform_load_mat4, sizeof(float)*16);
+  memcpy(uniform->mData, data, sizeof(float)*16);
+}
