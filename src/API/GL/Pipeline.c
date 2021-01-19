@@ -122,7 +122,7 @@ struct _gp_uniform_list
 typedef struct
 {
   _gp_operation_data      mData;
-#ifdef GP_GL
+#ifndef GP_GLES2
   GLuint                  mVAO;
   uint8_t                 mDirty;
 #endif
@@ -149,7 +149,7 @@ void _gp_operation_draw(_gp_operation_data* data)
     uniform = uniform->mNext;
   }
   
-#ifdef GP_GL
+#ifndef GP_GLES2
   if(d->mVAO == 0)
     glGenVertexArrays(1, &d->mVAO);
   
@@ -170,7 +170,7 @@ void _gp_operation_draw(_gp_operation_data* data)
     
     array = array->mNext;
   }
-#ifdef GP_GL
+#ifndef GP_GLES2
   d->mDirty = 0;
   }
 #endif
@@ -188,10 +188,10 @@ gp_operation* gp_operation_draw_new()
   data->mUniforms = NULL;
   data->mArrays = NULL;
   data->mShader = NULL;
-  #ifdef GP_GL
-    data->mVAO = 0;
-    data->mDirty = 1;
-  #endif
+#ifndef GP_GLES2
+  data->mVAO = 0;
+  data->mDirty = 1;
+#endif
   data->mVerticies = 0;
   data->mMode = GL_TRIANGLES;
   
@@ -203,7 +203,7 @@ void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   data->mShader = shader;
   
-#ifdef GP_GL
+#ifndef GP_GLES2
   data->mDirty = 1;
 #endif
 }
@@ -221,7 +221,7 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   a->mOffset = offset;
   data->mArrays = a;
   
-#ifdef GP_GL
+#ifndef GP_GLES2
   data->mDirty = 1;
 #endif
 }
@@ -235,7 +235,7 @@ void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
   u->mUniform = uniform;
   data->mUniforms = u;
   
-#ifdef GP_GL
+#ifndef GP_GLES2
   data->mDirty = 1;
 #endif
 }

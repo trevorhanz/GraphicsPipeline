@@ -37,7 +37,7 @@ void gp_texture_set_data(gp_texture* texture, float* data, unsigned int width, u
   
   glTexImage2D(GL_TEXTURE_2D,
     0,                            // Level of detail (mip-level) (0 is base image)
-    GL_RGBA,                      // Internal format
+    GL_RGBA32F,                   // Internal format
     width,                        // Width
     height,                       // Height
     0,                            // Border

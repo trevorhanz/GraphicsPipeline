@@ -31,8 +31,7 @@
 #include <OpenGL/gl3.h>
 #endif // __APPLE__
 #else // GP_GL
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include <GLES3/gl3.h>
 #endif // GP_GL
 
 struct _gp_array

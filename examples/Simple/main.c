@@ -37,16 +37,19 @@
 //     "  fragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
 //     "}                                            \n";
 const char* vertexSource =
-    "attribute vec4 position;                     \n"
+    "#version 300 es                              \n"
+    "in highp vec4 position;                      \n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
-    "uniform vec4 Color;                          \n"
+    "#version 300 es                              \n"
+    "uniform highp vec4 Color;                    \n"
+    "out highp vec4 fragColor;                    \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_FragColor = Color;                      \n"
+    "  fragColor = Color;                         \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 

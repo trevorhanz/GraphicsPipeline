@@ -57,7 +57,7 @@ set(INC "")
 
 if(EMSCRIPTEN)
   set(GP_WEB ON)
-  set(GP_GLES ON)
+  set(GP_GLES3 ON)
   
   list(APPEND SRC ${GL_SRC})
   list(APPEND SRC
@@ -68,12 +68,12 @@ if(EMSCRIPTEN)
 elseif(ANDROID)
   set(GP_MOBILE ON)
   set(GP_ANDROID ON)
-  set(GP_GLES ON)
+  set(GP_GLES3 ON)
   
-  find_path(GLES2_INCLUDE_DIR GLES2/gl2.h
+  find_path(GLES3_INCLUDE_DIR GLES3/gl3.h
     HINTS ${ANDROID_NDK})
-  find_library(GLES2_LIBRARY libGLESv2.so
-    HINTS ${GLES2_INCLUDE_DIR}/../lib)
+  find_library(GLES3_LIBRARY libGLESv3.so
+    HINTS ${GLES3_INCLUDE_DIR}/../lib)
   find_path(EGL_INCLUDE_DIR EGL/egl.h
     HINTS ${ANDROID_NDK})
   find_library(EGL_LIBRARY libEGL.so
@@ -87,8 +87,8 @@ elseif(ANDROID)
               log)
   
   list(APPEND SRC ${GL_SRC})
-  list(APPEND INC ${GLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
-  list(APPEND LIB ${GLES2_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
+  list(APPEND INC ${GLES3_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
+  list(APPEND LIB ${GLES3_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   
   list(APPEND SRC
     Platforms/Android/Android.h
@@ -209,8 +209,10 @@ configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 
 if(EMSCRIPTEN)
   set_target_properties(Native PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
-  
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.13")
+    target_link_options(Native PUBLIC "SHELL:-s MAX_WEBGL_VERSION=2")
+  endif()
   add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
   target_link_libraries(GraphicsPipeline-main Native)

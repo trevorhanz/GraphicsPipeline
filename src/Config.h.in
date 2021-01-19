@@ -24,6 +24,7 @@
 // API Info
 //
 #cmakedefine GP_GL
-#cmakedefine GP_GLES
+#cmakedefine GP_GLES3
+#cmakedefine GP_GLES2
 
 #endif /// __GP_CONFIG_H__
