@@ -24,15 +24,18 @@
 #include <QHBoxLayout>
 
 const char* vertexSource =
-    "attribute vec4 position;                     \n"
+    "#version 300 es                              \n"
+    "in highp vec4 position;                      \n"
     "void main()                                  \n"
     "{                                            \n"
     "  gl_Position = vec4(position.xyz, 1.0);     \n"
     "}                                            \n";
 const char* fragmentSource =
+    "#version 300 es                              \n"
+    "out highp vec4 fragColor;                    \n"
     "void main()                                  \n"
     "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
+    "  fragColor = vec4(0.0f, 1.0f, 0.0f, 0.0f);  \n"
     "}                                            \n";
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
@@ -60,6 +63,7 @@ int main(int argc, char* argv[])
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
+  gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   
   gp_target_get_qwidget(target)->show();
