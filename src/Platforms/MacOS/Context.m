@@ -23,6 +23,7 @@
 #include <OpenGL/gl3.h>
 
 #include "View.h"
+#include "Platforms/Defaults.h"
 
 void gp_context_free(gp_context* context)
 {
@@ -38,7 +39,7 @@ gp_target* gp_context_target_new(gp_context* context)
                            NSWindowStyleMaskClosable |
                            NSWindowStyleMaskResizable |
                            NSWindowStyleMaskMiniaturizable;
-  target->mWindow = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 640, 480)
+  target->mWindow = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT)
   styleMask:windowStyle backing:NSBackingStoreBuffered defer:NO]
   autorelease];
   [target->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
@@ -46,7 +47,7 @@ gp_target* gp_context_target_new(gp_context* context)
   [target->mWindow makeKeyAndOrderFront:nil];
 
   // Create OpenGL view
-  target->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, 800, 600 ) pixelFormat:context->mPixelFormat];
+  target->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT ) pixelFormat:context->mPixelFormat];
   NSOpenGLContext* newContext = [ [ NSOpenGLContext alloc ] initWithFormat:context->mPixelFormat shareContext:context->mShare ];
   [target->mView setOpenGLContext: newContext];
   [target->mWindow setContentView:target->mView];

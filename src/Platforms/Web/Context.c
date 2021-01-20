@@ -17,10 +17,27 @@
 
 #include <API/GL/GL.h>
 #include "Web.h"
+#include "Platforms/Defaults.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
+EM_JS(int, _gp_canvas_get_width, (int index), {
+  return document.getElementById("_gp_canvas_"+index).width;
+});
+
+EM_JS(int, _gp_canvas_get_height, (int index), {
+  return document.getElementById("_gp_canvas_"+index).height;
+});
+
+EM_JS(void, _gp_canvas_set_width, (int index, int value), {
+  document.getElementById("_gp_canvas_"+index).width = value;
+});
+
+EM_JS(void, _gp_canvas_set_height, (int index, int value), {
+  document.getElementById("_gp_canvas_"+index).height = value;
+});
 
 void gp_context_free(gp_context* context)
 {
@@ -47,6 +64,9 @@ gp_target* gp_context_target_new(gp_context* context)
     element.id = "_gp_canvas_"+$0;
     document.body.appendChild(element);
   }, index);
+  
+  _gp_canvas_set_width(index, GP_DEFAULT_WINDOW_WIDTH);
+  _gp_canvas_set_height(index, GP_DEFAULT_WINDOW_HEIGHT);
   
   target->mContext = emscripten_webgl_create_context(buff, &attrs);
   
