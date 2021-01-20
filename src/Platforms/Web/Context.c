@@ -18,6 +18,7 @@
 #include <API/GL/GL.h>
 #include "Web.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -35,7 +36,19 @@ gp_target* gp_context_target_new(gp_context* context)
   attrs.majorVersion = 2;
   attrs.minorVersion = 0;
   
-  target->mContext = emscripten_webgl_create_context("#canvas1", &attrs);
+  char buff[15];
+  int index = context->mParent->mCanvasIndex++;
+  snprintf(buff, 15, "#_gp_canvas_%d", index);
+  
+  EM_ASM({
+    let div = document.createElement("div");
+    
+    let element = document.createElement("canvas");
+    element.id = "_gp_canvas_"+$0;
+    document.body.appendChild(element);
+  }, index);
+  
+  target->mContext = emscripten_webgl_create_context(buff, &attrs);
   
   EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(target->mContext);
   assert(res == EMSCRIPTEN_RESULT_SUCCESS);
@@ -43,13 +56,13 @@ gp_target* gp_context_target_new(gp_context* context)
   
   target->mPipeline = _gp_pipeline_new();
   
-  context->mParent->mTarget = target;
-  
   const GLubyte* glVersion = glGetString(GL_VERSION);
   gp_log_info("GL Version: %s", glVersion);
   
   const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
   gp_log_info("GLSL Version: %s", glslVersion);
+  
+  gp_target_redraw(target);
   
   return target;
 }
@@ -87,6 +100,8 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 void _gp_target_redraw_callback(void* data)
 {
   gp_target* target = (gp_target*)data;
+  
+  emscripten_webgl_make_context_current(target->mContext);
   
   _gp_pipeline_execute(target->mPipeline);
 }

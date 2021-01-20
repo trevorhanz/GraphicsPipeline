@@ -28,7 +28,7 @@
 
 struct _gp_system
 {
-  gp_target*                            mTarget;
+  int                                   mCanvasIndex;
 };
 
 struct _gp_context
