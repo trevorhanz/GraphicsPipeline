@@ -308,7 +308,7 @@ void _gp_api_init()
   if(glDebugMessageCallback)
   {
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(DebugCallbackFunction, 0);
+    glDebugMessageCallback((GLDEBUGPROC)DebugCallbackFunction, 0);
   }
 #endif // __APPLE__
 #endif // GP_DEBUG
