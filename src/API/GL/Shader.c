@@ -28,6 +28,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+void gp_shader_free(gp_shader* shader)
+{
+  glDeleteProgram(shader->mProgram);
+  free(shader);
+}
+
 int _check_shader_status(unsigned int shader, const char* type)
 {
   GLint isCompiled = 0;

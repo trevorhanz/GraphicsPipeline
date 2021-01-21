@@ -24,6 +24,14 @@
 #endif // GP_GL
 #include "GL.h"
 
+#include <stdlib.h>
+
+void gp_array_free(gp_array* array)
+{
+  glDeleteBuffers(1, &array->mVBO);
+  free(array);
+}
+
 void gp_array_set_data(gp_array* array, float* data, unsigned int count)
 {
   glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
