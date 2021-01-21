@@ -17,7 +17,6 @@
 
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/MacOS.h>
-#include "Context.h"
 #include "MacOS.h"
 
 #import <Foundation/Foundation.h>
