@@ -18,9 +18,13 @@ endif(POLICY CMP0074)
 
 option(GP_BUILD_QT5 "Build Qt5 support." OFF)
 option(GP_BUILD_TEST "Build unit tests." OFF)
+option(GP_BUILD_EXAMPLES "BUILD example programs." OFF)
 
 add_subdirectory(src)
-add_subdirectory(examples)
+
+if(GP_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif(GP_BUILD_EXAMPLES)
 
 if(GP_BUILD_TEST)
   enable_testing()
