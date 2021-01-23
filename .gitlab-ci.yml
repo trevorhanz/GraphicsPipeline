@@ -20,7 +20,7 @@ build_ubuntu_16:
   script:
     - mkdir build
     - cd build
-    - cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON ../
     - make
 
 build_ubuntu_18:
@@ -29,7 +29,7 @@ build_ubuntu_18:
   script:
     - mkdir build
     - cd build
-    - cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON ../
     - make
 
 build_ubuntu_20:
@@ -38,7 +38,7 @@ build_ubuntu_20:
   script:
     - mkdir build
     - cd build
-    - cmake -DGP_BUILD_TEST=ON ../
+    - cmake -DGP_BUILD_EXAMPLES=ON -DGP_BUILD_TEST=ON ../
     - make
 
 build_centos_7:
@@ -47,7 +47,7 @@ build_centos_7:
   script:
     - mkdir build
     - cd build
-    - cmake3 ../
+    - cmake3 -DGP_BUILD_EXAMPLES=ON ../
     - make
 
 build_centos_8:
@@ -56,7 +56,7 @@ build_centos_8:
   script:
     - mkdir build
     - cd build
-    - cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON ../
     - make
 
 build_windows:
@@ -65,7 +65,7 @@ build_windows:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/MinGW-W64.cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/MinGW-W64.cmake ../
     - make
 
 build_osx:
@@ -78,7 +78,7 @@ build_osx:
     - export OSXCROSS_TARGET=o64
     - export OSXCROSS_TARGET_DIR=/opt/osxcross/
     - export OSXCROSS_SDK=/opt/osxcross/SDK/MacOSX10.14.sdk/
-    - cmake -DCMAKE_TOOLCHAIN_FILE=/opt/osxcross/toolchain.cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON -DCMAKE_TOOLCHAIN_FILE=/opt/osxcross/toolchain.cmake ../
     - make
 
 build_web:
@@ -87,7 +87,7 @@ build_web:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/Emscripten.cmake ../
+    - cmake -DGP_BUILD_EXAMPLES=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/Modules/Emscripten.cmake ../
     - make
 
 build_android:
@@ -98,6 +98,7 @@ build_android:
     - cd build
     - >
        cmake 
+       -DGP_BUILD_EXAMPLES=ON
        -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake 
        -DANDROID_ABI=x86 
        -DANDROID_NATIVE_API_LEVEL=28 
