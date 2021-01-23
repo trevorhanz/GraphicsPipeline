@@ -16,6 +16,7 @@
 ************************************************************************/
 
 #include "X11.h"
+#include "../../Utils/List.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -34,13 +35,6 @@
 #define max(X,Y) ((X) > (Y) ? (X) : (Y))
 #endif
 
-typedef struct __gp_event_link _gp_event_link; 
-struct __gp_event_link
-{
-  _gp_event_link*         mNext;
-  void*                   mData;
-};
-
 struct __gp_event
 {
   fd_set                  mReadFDs;
@@ -50,13 +44,15 @@ struct __gp_event
   unsigned int            mRunning;
   int                     mPipe[2];
   
-  _gp_event_link*         mIORead;
-  _gp_event_link*         mIOWrite;
-  _gp_event_link*         mTimer;
+  gp_list                 mIORead;
+  gp_list                 mIOWrite;
+  gp_list                 mTimer;
 };
 
 struct _gp_timer
 {
+  gp_list_node            mNode;
+  _gp_event*              mEvent;
   int                     mFD;
   gp_timer_callback       mCallback;
   void*                   mUserData;
@@ -64,6 +60,8 @@ struct _gp_timer
 
 struct _gp_io
 {
+  gp_list_node            mNode;
+  _gp_event*              mEvent;
   int                     mFD;
   gp_io_callback          mCallback;
   void*                   mUserData;
@@ -97,9 +95,9 @@ _gp_event* _gp_event_new()
   event->mWriteFDMax = -1;
   event->mRunning = 0;
   
-  event->mIORead = NULL;
-  event->mIOWrite = NULL;
-  event->mTimer = NULL;
+  gp_list_init(&event->mIORead);
+  gp_list_init(&event->mIOWrite);
+  gp_list_init(&event->mTimer);
   
   _gp_event_pipe_new(event, &event->mPipe[0]);
   _gp_event_fd_set(event->mPipe[0], &event->mReadFDs, &event->mReadFDMax);
@@ -137,39 +135,39 @@ void _gp_event_run(_gp_event* event)
         }
       }
       
-      _gp_event_link* link = event->mIORead;
-      while(link != NULL)
+      gp_list_node* node = gp_list_front(&event->mIORead);
+      while(node != NULL)
       {
-        gp_io* io = link->mData;
+        gp_io* io = (gp_io*)node;
         if(FD_ISSET(io->mFD, &readfds))
         {
           io->mCallback(io);
         }
-        link = link->mNext;
+        node = gp_list_node_next(node);
       }
       
-      link = event->mIOWrite;
-      while(link != NULL)
+      node = gp_list_front(&event->mIOWrite);
+      while(node != NULL)
       {
-        gp_io* io = link->mData;
+        gp_io* io = (gp_io*)node;
         if(FD_ISSET(io->mFD, &writefds))
         {
           io->mCallback(io);
         }
-        link = link->mNext;
+        node = gp_list_node_next(node);
       }
       
-      link = event->mTimer;
-      while(link != NULL)
+      node = gp_list_front(&event->mTimer);
+      while(node != NULL)
       {
-        gp_timer* timer = link->mData;
+        gp_timer* timer = (gp_timer*)node;
         if(FD_ISSET(timer->mFD, &readfds))
         {
           uint64_t buff;
           read(timer->mFD, &buff, sizeof(uint64_t));
           timer->mCallback(timer);
         }
-        link = link->mNext;
+        node = gp_list_node_next(node);
       }
     }
   }
@@ -186,21 +184,23 @@ void _gp_event_wake(_gp_event* event)
 gp_timer* _gp_event_timer_new(_gp_event* event)
 {
   gp_timer* timer = malloc(sizeof(gp_timer));
+  timer->mEvent = event;
   timer->mFD = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
   timer->mCallback = NULL;
   
   _gp_event_fd_set(timer->mFD, &event->mReadFDs, &event->mReadFDMax);
   
-  _gp_event_link* link = malloc(sizeof(_gp_event_link));
-  link->mNext = event->mTimer;
-  link->mData = timer;
-  event->mTimer = link;
+  gp_list_push_back(&event->mTimer, (gp_list_node*)timer);
   
   return timer;
 }
 
 void gp_timer_free(gp_timer* timer)
 {
+  _gp_event_fd_clr(timer->mFD, &timer->mEvent->mReadFDs, &timer->mEvent->mReadFDMax);
+  
+  gp_list_remove(&timer->mEvent->mTimer, (gp_list_node*)timer);
+  
   free(timer);
 }
 
@@ -244,14 +244,12 @@ void gp_timer_disarm(gp_timer* timer)
 gp_io* _gp_event_io_read_new(_gp_event* event, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  io->mEvent = event;
   io->mFD = fd;
   
   _gp_event_fd_set(fd, &event->mReadFDs, &event->mReadFDMax);
   
-  _gp_event_link* link = malloc(sizeof(_gp_event_link));
-  link->mNext = event->mIORead;
-  link->mData = io;
-  event->mIORead = link;
+  gp_list_push_back(&event->mIORead, (gp_list_node*)io);
   
   return io;
 }
@@ -259,21 +257,23 @@ gp_io* _gp_event_io_read_new(_gp_event* event, int fd)
 gp_io* _gp_event_io_write_new(_gp_event* event, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  io->mEvent = event;
   io->mFD = fd;
   
   _gp_event_fd_set(fd, &event->mWriteFDs, &event->mWriteFDMax);
   
-  _gp_event_link* link = malloc(sizeof(_gp_event_link));
-  link->mNext = event->mIOWrite;
-  link->mData = io;
-  event->mIOWrite = link;
+  gp_list_push_back(&event->mIOWrite, (gp_list_node*)io);
   
   return io;
 }
 
 void gp_io_free(gp_io* io)
 {
-  // TODO - clear fd
+  _gp_event_fd_clr(io->mFD, &io->mEvent->mReadFDs, &io->mEvent->mReadFDMax);
+  _gp_event_fd_clr(io->mFD, &io->mEvent->mWriteFDs, &io->mEvent->mWriteFDMax);
+  
+  gp_list_remove(&io->mEvent->mIORead, (gp_list_node*)io);
+  gp_list_remove(&io->mEvent->mIOWrite, (gp_list_node*)io);
   
   free(io);
 }
