@@ -43,14 +43,28 @@ set(GL_SRC
   )
 
 #
+# Utils sources
+#
+set(UTILS_HEADERS
+  Utils/List.h
+  )
+
+set(UTILS_SRC
+  ${UTILS_HEADERS}
+  Utils/List.c
+  )
+
+#
 # Source Groups
 #
 source_group("Header Files\\Public" FILES ${PUBLIC_HEADERS})
 source_group("Header Files\\API" FILES ${GL_HEADERS} ${GLES_HEADERS})
 source_group("Header Files\\Platform" REGULAR_EXPRESSION "Platforms.+\.h")
+source_group("Header Files\\Utils" REGULAR_EXPRESSION "Utils.+\.h")
 
 source_group("Source Files\\API" REGULAR_EXPRESSION "API")
 source_group("Source Files\\Platform" REGULAR_EXPRESSION "Platforms")
+source_group("Source Files\\Utils" REGULAR_EXPRESSION "Utils")
 
 set(LIB "")
 set(INC "")
@@ -101,7 +115,7 @@ else(ANDROID)
   set(GP_GL ON)
   
   find_package(OpenGL REQUIRED)
-  list(APPEND SRC ${GL_SRC})
+  list(APPEND SRC ${GL_SRC} ${UTILS_SRC})
   list(APPEND INC ${OPENGL_INCLUDE_DIRS})
   list(APPEND LIB ${OPENGL_LIBRARIES})
   
@@ -158,6 +172,7 @@ else(ANDROID)
     
     set(Qt5_SRC
       ${GL_SRC}
+      ${UTILS_SRC}
       Platforms/Qt5/Context.cpp
       Platforms/Qt5/Event.cpp
       Platforms/Qt5/IOCallback.cpp

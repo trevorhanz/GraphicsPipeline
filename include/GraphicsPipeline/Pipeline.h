@@ -97,6 +97,13 @@ GP_EXPORT void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode 
   */
 GP_EXPORT void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation);
 
+/*!
+ * Remove an operation from the pipeline.
+ * \param pipeline Pipeline from which to remove the operation.
+ * \param operation operation to be removed.
+ */
+GP_EXPORT void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation);
+
 //! \} // Pipeline
 
 #ifdef __cplusplus

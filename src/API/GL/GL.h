@@ -21,6 +21,8 @@
 #include <GraphicsPipeline/Types.h>
 #include <GraphicsPipeline/Common.h>
 
+#include "../../Utils/List.h"
+
 #ifdef GP_GL
 #ifndef __APPLE__
 #include <GL/gl.h>
@@ -74,14 +76,13 @@ typedef struct _gp_operation_list gp_operation_list;
 
 struct _gp_operation_list
 {
+  gp_list_node            mNode;
   gp_operation*           mOperation;
-  gp_operation_list*      mNext;
 };
 
 struct _gp_pipeline
 {
-  gp_operation_list*      mOperations;
-  gp_operation_list*      mOperationsEnd;
+  gp_list                 mOperations;
 };
 
 #ifdef __cplusplus

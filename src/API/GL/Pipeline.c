@@ -257,35 +257,36 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
   list->mOperation = operation;
-  list->mNext = NULL;
-  if(pipeline->mOperationsEnd != NULL)
-  {
-    pipeline->mOperationsEnd->mNext = list;
-  }
-  else
-  {
-    pipeline->mOperations = list;
-    pipeline->mOperationsEnd = list;
-  }
+  gp_list_push_back(&pipeline->mOperations, (gp_list_node*)list);
+}
+
+int _gp_list_find_operation(gp_list_node* node, void* userdata)
+{
+  return ((gp_operation_list*)node)->mOperation == (gp_operation*)userdata;
+}
+
+void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation)
+{
+  gp_list_node* node = gp_list_find(&pipeline->mOperations, _gp_list_find_operation, (void*)operation);
+  gp_list_remove(&pipeline->mOperations, node);
 }
 
 gp_pipeline* _gp_pipeline_new()
 {
   gp_pipeline* pipeline = malloc(sizeof(gp_pipeline));
-  pipeline->mOperations = NULL;
-  pipeline->mOperationsEnd = NULL;
+  gp_list_init(&pipeline->mOperations);
   
   return pipeline;
 }
 
 void _gp_pipeline_execute(gp_pipeline* pipeline)
 {
-  gp_operation_list* list = pipeline->mOperations;
+  gp_operation_list* list = (gp_operation_list*)gp_list_front(&pipeline->mOperations);
   while(list != NULL)
   {
     list->mOperation->func(list->mOperation->mData);
     
-    list = list->mNext;
+    list = (gp_operation_list*)gp_list_node_next((gp_list_node*)list);
   }
 }
 
