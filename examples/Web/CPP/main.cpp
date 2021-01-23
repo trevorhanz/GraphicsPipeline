@@ -19,8 +19,6 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Web.h>
 
-
-
 using namespace GP;
 
 // Shader sources
@@ -42,9 +40,9 @@ int main(int argv, char* argc[])
 {
   System* system = new System();
   
-  Context* context = system->CreateContext();
+  Web::Context* context = (Web::Context*)system->CreateContext();
   
-  Target* target = context->CreateTarget();
+  Target* target = context->CreateTarget("#WebExample");
   Array* array = context->CreateArray();
   Shader* shader = context->CreateShader();
   
@@ -57,6 +55,7 @@ int main(int argv, char* argc[])
   DrawOperation* operation = new DrawOperation();
   operation->SetShader(shader);
   operation->AddArrayByIndex(array, 0, 2);
+  operation->SetVerticies(3);
   pipeline->AddOperation(operation);
   
   system->Run();

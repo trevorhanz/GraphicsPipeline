@@ -21,22 +21,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
-EM_JS(int, _gp_canvas_get_width, (int index), {
-  return document.getElementById("_gp_canvas_"+index).width;
+EM_JS(int, _gp_canvas_get_width, (const char* id), {
+  return document.getElementById(UTF8ToString(id)).width;
 });
 
-EM_JS(int, _gp_canvas_get_height, (int index), {
-  return document.getElementById("_gp_canvas_"+index).height;
+EM_JS(int, _gp_canvas_get_height, (const char* id), {
+  return document.getElementById(UTF8ToString(id)).height;
 });
 
-EM_JS(void, _gp_canvas_set_width, (int index, int value), {
-  document.getElementById("_gp_canvas_"+index).width = value;
+EM_JS(void, _gp_canvas_set_width, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).width = value;
 });
 
-EM_JS(void, _gp_canvas_set_height, (int index, int value), {
-  document.getElementById("_gp_canvas_"+index).height = value;
+EM_JS(void, _gp_canvas_set_height, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).height = value;
 });
 
 void gp_context_free(gp_context* context)
@@ -44,31 +45,17 @@ void gp_context_free(gp_context* context)
   free(context);
 }
 
-gp_target* gp_context_target_new(gp_context* context)
+void _gp_target_build(gp_target* target)
 {
-  gp_target* target = malloc(sizeof(gp_target));
-  
   EmscriptenWebGLContextAttributes attrs;
   emscripten_webgl_init_context_attributes(&attrs);
   attrs.majorVersion = 2;
   attrs.minorVersion = 0;
   
-  char buff[15];
-  int index = context->mParent->mCanvasIndex++;
-  snprintf(buff, 15, "#_gp_canvas_%d", index);
+  _gp_canvas_set_width(&target->mID[1], GP_DEFAULT_WINDOW_WIDTH);
+  _gp_canvas_set_height(&target->mID[1], GP_DEFAULT_WINDOW_HEIGHT);
   
-  EM_ASM({
-    let div = document.createElement("div");
-    
-    let element = document.createElement("canvas");
-    element.id = "_gp_canvas_"+$0;
-    document.body.appendChild(element);
-  }, index);
-  
-  _gp_canvas_set_width(index, GP_DEFAULT_WINDOW_WIDTH);
-  _gp_canvas_set_height(index, GP_DEFAULT_WINDOW_HEIGHT);
-  
-  target->mContext = emscripten_webgl_create_context(buff, &attrs);
+  target->mContext = emscripten_webgl_create_context(target->mID, &attrs);
   
   EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(target->mContext);
   assert(res == EMSCRIPTEN_RESULT_SUCCESS);
@@ -83,6 +70,38 @@ gp_target* gp_context_target_new(gp_context* context)
   gp_log_info("GLSL Version: %s", glslVersion);
   
   gp_target_redraw(target);
+}
+
+gp_target* gp_context_target_new(gp_context* context)
+{
+  gp_target* target = malloc(sizeof(gp_target));
+  target->mID = malloc(sizeof(char)*15);
+  
+  int index = context->mParent->mCanvasIndex++;
+  snprintf(target->mID, 15, "#_gp_canvas_%d", index);
+  
+  EM_ASM({
+    let div = document.createElement("div");
+    
+    let element = document.createElement("canvas");
+    element.id = UTF8ToString($0);
+    document.body.appendChild(element);
+  }, &target->mID[1]);
+  
+  _gp_target_build(target);
+  
+  return target;
+}
+
+gp_target* gp_context_target_new_from_id(gp_context* context, const char* id)
+{
+  gp_target* target = malloc(sizeof(gp_target));
+  
+  int size = strlen(id);
+  target->mID = malloc(sizeof(char)*size);
+  memcpy(target->mID, id, sizeof(char)*size);
+  
+  _gp_target_build(target);
   
   return target;
 }

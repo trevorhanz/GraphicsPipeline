@@ -20,5 +20,62 @@
 #ifndef __GP_WEB_H__
 #define __GP_WEB_H__
 
+#include "Common.h"
+#include "Context.h"
+#include "Types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+ * \defgroup Web
+ * \{
+ */
+
+/*!
+ * Creates a target object tied to this context using a canvas id.
+ * \param context Context object used to create target.
+ * \param id ID string of canvas object to be used.
+ * \return Newly created target.
+ */
+GP_EXPORT gp_target* gp_context_target_new_from_id(gp_context* context, const char* id);
+
+//! \} // Web
+
+#ifdef __cplusplus
+}
+
+namespace GP
+{
+namespace Web
+{
+  /*!
+   * \brief Wrapper class for ::gp_context extended for Web features.
+   */
+  class Context : public GP::Context
+  {
+  protected:
+    //! Constructor
+    inline Context(gp_context* context);
+    
+  public:
+    /*!
+     * Creates a target object tied to this context using a canvas id.
+     * \param id ID string of canvas object to be used.
+     * \return Newly created Target.
+     */
+    inline Target* CreateTarget(const char* id);
+  };
+  
+  /*
+   * Implementation
+   */
+  Context::Context(gp_context* context) : GP::Context(context) {}
+  Target* Context::CreateTarget(const char* id) {return new Target(gp_context_target_new_from_id(mContext, id));}
+}
+}
+
+#endif
 
 #endif // __GP_WEB_H__
