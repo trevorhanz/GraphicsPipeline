@@ -73,7 +73,7 @@ if(EMSCRIPTEN)
   set(GP_WEB ON)
   set(GP_GLES3 ON)
   
-  list(APPEND SRC ${GL_SRC})
+  list(APPEND SRC ${GL_SRC} ${UTILS_SRC})
   list(APPEND SRC
     Platforms/Web/System.c
     Platforms/Web/Context.c
