@@ -51,10 +51,7 @@ gp_target* gp_context_target_new(gp_context* context)
   target->mParent = context;
   target->mPipeline = _gp_pipeline_new();
   target->mDirty = 1;
-  gp_target_list* list = malloc(sizeof(gp_target_list));
-  list->mNext = context->mParent->mTargets;
-  list->mTarget = target;
-  context->mParent->mTargets = list;
+  gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)target);
   _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
   
   target->mWake = gp_system_io_read_new(context->mParent, target->mPipe[0]);

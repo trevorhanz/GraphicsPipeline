@@ -22,6 +22,8 @@
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Logging.h>
 
+#include "../../Utils/List.h"
+
 #include <X11/Xlib.h>
 
 #include <GL/glew.h>
@@ -29,18 +31,10 @@
 
 typedef struct __gp_event _gp_event;
 
-typedef struct _gp_target_list gp_target_list;
-struct _gp_target_list
-{
-  gp_target_list*         mNext;
-  gp_target*              mTarget;
-};
-
 struct _gp_system
 {
   Display*                mDisplay;
-  gp_target_list*         mTargets;
-  
+  gp_list                 mTargets;
   _gp_event*              mEvent;
   gp_io*                  mIO;        // X11 connection listener
 };
@@ -57,6 +51,7 @@ struct _gp_context
 
 struct _gp_target
 {
+  gp_list_node            mNode;
   gp_context*             mParent;
   gp_pipeline*            mPipeline;
   Window                  mWindow;
