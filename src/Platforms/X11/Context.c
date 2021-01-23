@@ -113,7 +113,7 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 
 void gp_target_redraw(gp_target* target)
 {
-  write(target->mPipe[1], "x", 1);
+  size_t r = write(target->mPipe[1], "x", 1);
   
   target->mDirty = 1;
 }

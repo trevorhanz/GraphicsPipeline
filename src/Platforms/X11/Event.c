@@ -164,7 +164,7 @@ void _gp_event_run(_gp_event* event)
         if(FD_ISSET(timer->mFD, &readfds))
         {
           uint64_t buff;
-          read(timer->mFD, &buff, sizeof(uint64_t));
+          size_t r = read(timer->mFD, &buff, sizeof(uint64_t));
           timer->mCallback(timer);
         }
         node = gp_list_node_next(node);
