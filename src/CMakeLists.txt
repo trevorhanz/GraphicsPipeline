@@ -100,7 +100,7 @@ elseif(ANDROID)
               # you want CMake to locate.
               log)
   
-  list(APPEND SRC ${GL_SRC})
+  list(APPEND SRC ${GL_SRC} ${UTILS_SRC})
   list(APPEND INC ${GLES3_INCLUDE_DIR} ${EGL_INCLUDE_DIR} Platforms/Android/)
   list(APPEND LIB ${GLES3_LIBRARY} ${EGL_LIBRARY} ${log-lib} android)
   

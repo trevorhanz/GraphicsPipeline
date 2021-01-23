@@ -93,8 +93,7 @@ gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* win
     return NULL;
   }
   
-  target->mPipeline = malloc(sizeof(struct _gp_pipeline));
-  target->mPipeline->mOperations = NULL;
+  target->mPipeline = _gp_pipeline_new();
   
   return target;
 }
