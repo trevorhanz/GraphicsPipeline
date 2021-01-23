@@ -25,6 +25,7 @@
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
+  system->mCanvasIndex = 0;
   
   return system;
 }
@@ -44,11 +45,7 @@ gp_context* gp_system_context_new(gp_system* system)
 
 void gp_system_run(gp_system* system)
 {
-  if(system->mTarget)
-  {
-    gp_pipeline* pipeline = gp_target_get_pipeline(system->mTarget);
-    _gp_pipeline_execute(pipeline);
-  }
+  
 }
 
 gp_timer* gp_system_timer_new(gp_system* system)

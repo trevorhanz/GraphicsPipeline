@@ -82,7 +82,7 @@ namespace GP
    */
   class Context
   {
-  private:
+  protected:
     //! Constructor
     inline Context(gp_context* context);
   public:
@@ -107,7 +107,7 @@ namespace GP
      */
     inline Shader* CreateShader();
     
-  private:
+  protected:
     gp_context*           mContext;
     
     friend class System;

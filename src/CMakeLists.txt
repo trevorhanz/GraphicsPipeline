@@ -59,8 +59,8 @@ set(UTILS_SRC
 #
 source_group("Header Files\\Public" FILES ${PUBLIC_HEADERS})
 source_group("Header Files\\API" FILES ${GL_HEADERS} ${GLES_HEADERS})
-source_group("Header Files\\Platform" REGULAR_EXPRESSION "Platforms.+\.h")
-source_group("Header Files\\Utils" REGULAR_EXPRESSION "Utils.+\.h")
+source_group("Header Files\\Platform" REGULAR_EXPRESSION "Platforms.*\.h")
+source_group("Header Files\\Utils" REGULAR_EXPRESSION "Utils.*\.h")
 
 source_group("Source Files\\API" REGULAR_EXPRESSION "API")
 source_group("Source Files\\Platform" REGULAR_EXPRESSION "Platforms")
@@ -182,7 +182,7 @@ else(ANDROID)
       Platforms/Qt5/TimerCallback.cpp)
     
     add_library(GP_Qt5 ${Qt5_SRC})
-    target_include_directories(GP_Qt5 PRIVATE ${INC} API/GL/)
+    target_include_directories(GP_Qt5 PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR} API/GL/)
     target_include_directories(GP_Qt5 PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)

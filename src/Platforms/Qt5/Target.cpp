@@ -18,6 +18,7 @@
 #include <GraphicsPipeline/Logging.h>
 
 #include "Target.h"
+#include "Platforms/Defaults.h"
 
 Target::Target(QOpenGLContext* share)
   : mContext(new QOpenGLContext(this)),
@@ -31,6 +32,7 @@ Target::Target(QOpenGLContext* share)
   mContext->create();
   
   mContainer = QWidget::createWindowContainer(this);
+  mContainer->resize(GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT);
   mContainer->show();
   
   mContext->makeCurrent(this);

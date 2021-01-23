@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "../../API/GL/GL.h"
+#include "Platforms/Defaults.h"
 
 void _gp_target_wake_callback(gp_io* io)
 {
@@ -65,7 +66,8 @@ gp_target* gp_context_target_new(gp_context* context)
   StructureNotifyMask | DestroyNotify | PointerMotionMask | FocusChangeMask;
   
   target->mWindow = XCreateWindow(context->mDisplay, RootWindow(context->mDisplay, context->mVisualInfo->screen),
-                                  0, 0, 1024, 768, 0, context->mVisualInfo->depth, InputOutput, context->mVisualInfo->visual,
+                                  0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT,
+                                  0, context->mVisualInfo->depth, InputOutput, context->mVisualInfo->visual,
                                   CWBorderPixel | CWColormap | CWEventMask, &attr);
   
   target->mContext = glXCreateContext(context->mDisplay, context->mVisualInfo, context->mShare, True);

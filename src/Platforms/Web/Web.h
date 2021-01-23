@@ -28,7 +28,7 @@
 
 struct _gp_system
 {
-  gp_target*                            mTarget;
+  int                                   mCanvasIndex;
 };
 
 struct _gp_context
@@ -39,6 +39,7 @@ struct _gp_context
 
 struct _gp_target
 {
+  char*                                 mID;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mContext;
   GLuint                                vbo;
   GLuint                                shaderProgram;

@@ -24,6 +24,7 @@
 #include <GraphicsPipeline/Context.h>
 #include "API/GL/GL.h"
 #include "Windows.h"
+#include "Platforms/Defaults.h"
 
 void gp_context_free(gp_context* context)
 {
@@ -40,9 +41,9 @@ gp_target* gp_context_target_new(gp_context* context)
   DWORD                 dwStyle;                                    // Window Style
   RECT                  WindowRect;                                 // Grabs Rectangle Upper Left / Lower Right Values
   WindowRect.left = (long)0;                                        // Set Left Value To 0
-  WindowRect.right = (long)720;                                     // Set Right Value To Requested Width
+  WindowRect.right = (long)GP_DEFAULT_WINDOW_WIDTH;                 // Set Right Value To Requested Width
   WindowRect.top = (long)0;                                         // Set Top Value To 0
-  WindowRect.bottom = (long)480;                                    // Set Bottom Value To Requested Height
+  WindowRect.bottom = (long)GP_DEFAULT_WINDOW_HEIGHT;               // Set Bottom Value To Requested Height
   HWND                  hWnd;
 
   static PIXELFORMATDESCRIPTOR pfd =                                // pfd Tells Windows How We Want Things To Be
