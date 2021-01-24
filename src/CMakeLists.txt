@@ -232,7 +232,7 @@ if(EMSCRIPTEN)
   endif()
   add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
-  target_link_libraries(GraphicsPipeline-main GP_Native)
+  target_link_libraries(GraphicsPipeline-main GP_Interface GP_Native)
 endif(EMSCRIPTEN)
 
 #
