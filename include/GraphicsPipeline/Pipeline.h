@@ -91,6 +91,29 @@ GP_EXPORT void gp_operation_draw_set_verticies(gp_operation* operation, int coun
 GP_EXPORT void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode);
 
 /*!
+ * Create a new viewport operation.
+ * \return Newly created viewport operation.
+ */
+GP_EXPORT gp_operation* gp_operation_viewport_new();
+
+/*!
+ * Get the underline pipeline of the viewport.
+ * \param operation Viewport operation for which to get the pipeline.
+ * \return The pipeline of the viewport operation.
+ */
+GP_EXPORT gp_pipeline* gp_operation_viewport_get_pipeline(gp_operation* operation);
+
+/*!
+ * Set the dimensions of the viewport operation.
+ * \param operation Viewport operation for witch to set the dimensions.
+ * \param x Distance of Viewport from the left edge of the window in pixels.
+ * \param y Distance of Viewport from the bottom edge of the window in pixels.
+ * \param width Width of the Viewport in pixels.
+ * \param height Height of the Viewport in pixels.
+ */
+GP_EXPORT void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, int width, int height);
+
+/*!
   * Add an operation to the end of the pipeline.
   * \param pipeline Pipeline to add operation to.
   * \param operation Operation to be added.
@@ -181,6 +204,34 @@ namespace GP
   };
   
   /*!
+   * \brief Extended class for accessing viewport operation functions.
+   */
+  class ViewportOperation : public Operation
+  {
+  public:
+    //! Constructor
+    inline ViewportOperation();
+    
+    /*!
+     * Get the underline Pipeline of the viewport.
+     * \return The Pipeline of the viewport operation.
+     */
+    inline Pipeline* GetPipeline();
+    
+    /*!
+     * Set the dimensions of the viewport operation.
+     * \param x Distance of Viewport from the left edge of the window in pixels.
+     * \param y Distance of Viewport from the bottom edge of the window in pixels.
+     * \param width Width of the Viewport in pixels.
+     * \param height Height of the Viewport in pixels.
+     */
+    inline void SetDimensions(int x, int y, int width, int height);
+    
+  private:
+    Pipeline*         mPipeline;
+  };
+  
+  /*!
    * \brief Wrapper class for ::gp_pipeline 
    */
   class Pipeline
@@ -222,6 +273,16 @@ namespace GP
   }
   void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies(mOperation, count);}
   void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode(mOperation, mode);}
+  
+  ViewportOperation::ViewportOperation()
+    : Operation(gp_operation_viewport_new()),
+    mPipeline(new Pipeline(gp_operation_viewport_get_pipeline(mOperation)))
+    {}
+  Pipeline* ViewportOperation::GetPipeline() {return mPipeline;}
+  void ViewportOperation::SetDimensions(int x, int y, int width, int height)
+  {
+    gp_operation_viewport_set_dimesions(mOperation, x, y, width, height);
+  }
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}

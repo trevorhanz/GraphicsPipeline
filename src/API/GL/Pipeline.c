@@ -252,6 +252,57 @@ void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode)
   data->mMode = mode;
 }
 
+typedef struct
+{
+  _gp_operation_data      mData;
+  gp_pipeline*            mPipeline;
+  int                     mX;
+  int                     mY;
+  int                     mWidth;
+  int                     mHeight;
+} _gp_operation_viewport_data;
+
+void _gp_operation_viewport(_gp_operation_data* data)
+{
+  _gp_operation_viewport_data* d = (_gp_operation_viewport_data*)data;
+  
+  glViewport(d->mX, d->mY, d->mWidth, d->mHeight);
+  
+  _gp_pipeline_execute(d->mPipeline);
+}
+
+gp_operation* gp_operation_viewport_new()
+{
+  gp_operation* operation = malloc(sizeof(gp_operation));
+  operation->func = _gp_operation_viewport;
+  
+  operation->mData = malloc(sizeof(_gp_operation_viewport_data));
+  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
+  data->mPipeline = _gp_pipeline_new();
+  data->mX = 0;
+  data->mY = 0;
+  data->mWidth = 0;
+  data->mHeight = 0;
+  
+  return operation;
+}
+
+gp_pipeline* gp_operation_viewport_get_pipeline(gp_operation* operation)
+{
+  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
+  return data->mPipeline;
+}
+
+void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, int width, int height)
+{
+  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
+  data->mX = x;
+  data->mY = y;
+  data->mWidth = width;
+  data->mHeight = height;
+}
+
+
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
