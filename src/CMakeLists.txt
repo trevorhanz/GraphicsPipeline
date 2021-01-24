@@ -186,31 +186,33 @@ else(ANDROID)
     target_include_directories(GP_Qt5 PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
-    target_link_libraries(GP_Qt5 Qt5::Widgets ${LIB} Interface)
+    target_link_libraries(GP_Qt5 PRIVATE Qt5::Widgets ${LIB} GP_Interface)
     set_property(TARGET GP_Qt5 PROPERTY OUTPUT_NAME GPQt5)
+    set_property(TARGET GP_Qt5 PROPERTY EXPORT_NAME Qt5)
     set_property(TARGET GP_Qt5 PROPERTY CXX_STANDARD 11)
-    add_library(GP::Qt5 ALIAS GP_Qt5)
     
   endif(GP_BUILD_QT5)
 endif(EMSCRIPTEN)
 
-add_library(Interface INTERFACE)
-target_include_directories(Interface INTERFACE
+add_library(GP_Interface INTERFACE)
+target_include_directories(GP_Interface INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
   $<INSTALL_INTERFACE:include>)
+set_property(TARGET GP_Interface PROPERTY EXPORT_NAME Interface)
 
-add_library(Native ${SRC})
-target_include_directories(Native PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(Native PUBLIC
+add_library(GP_Native ${SRC})
+target_include_directories(GP_Native PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(GP_Native PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
   $<INSTALL_INTERFACE:include>)
-target_link_libraries(Native ${LIB} Interface)
-set_property(TARGET Native PROPERTY OUTPUT_NAME GPNative)
-set_property(TARGET Native PROPERTY C_STANDARD 99)
+target_link_libraries(GP_Native PRIVATE ${LIB} GP_Interface)
+set_property(TARGET GP_Native PROPERTY OUTPUT_NAME GPNative)
+set_property(TARGET GP_Native PROPERTY EXPORT_NAME Native)
+set_property(TARGET GP_Native PROPERTY C_STANDARD 99)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type )
 if(build_type STREQUAL "DEBUG")
-  target_compile_definitions(Native PRIVATE GP_DEBUG)
+  target_compile_definitions(GP_Native PRIVATE GP_DEBUG)
   
   if(GP_BUILD_QT5)
     target_compile_definitions(GP_Qt5 PRIVATE GP_DEBUG)
@@ -223,14 +225,14 @@ endif(NOT BUILD_SHARED_LIBS)
 configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 
 if(EMSCRIPTEN)
-  set_target_properties(Native PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
+  set_target_properties(GP_Native PROPERTIES OUTPUT_NAME GP PREFIX "" SUFFIX .bc)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -std=c++11 -O3 -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
   if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.13")
-    target_link_options(Native PUBLIC "SHELL:-s MAX_WEBGL_VERSION=2")
+    target_link_options(GP_Native PUBLIC "SHELL:-s MAX_WEBGL_VERSION=2")
   endif()
   add_executable(GraphicsPipeline-main Platforms/Web/main.cpp)
   set_target_properties(GraphicsPipeline-main PROPERTIES OUTPUT_NAME GP PREFIX "")
-  target_link_libraries(GraphicsPipeline-main Native)
+  target_link_libraries(GraphicsPipeline-main GP_Native)
 endif(EMSCRIPTEN)
 
 #
@@ -240,22 +242,40 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(../cmake/GraphicsPipelineConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineConfig.cmake
+  ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfig.cmake
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
 
 write_basic_package_version_file(
-    "GraphicsPipelineVersion.cmake"
+    ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineVersion.cmake
+    VERSION 0.0.0
     COMPATIBILITY SameMajorVersion
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/GraphicsPipelineVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
+install(FILES ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfig.cmake
+              ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
 install(DIRECTORY ../include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)
-install(TARGETS Interface Native
-        EXPORT GP
+install(TARGETS GP_Interface
+        EXPORT GraphicsPipelineInterface
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
-install(EXPORT GP NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
+install(EXPORT GraphicsPipelineInterface NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+install(TARGETS GP_Native
+        EXPORT GraphicsPipelineNative
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
+install(EXPORT GraphicsPipelineNative NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+if(GP_BUILD_QT5)
+  install(TARGETS GP_Qt5
+          EXPORT GraphicsPipelineQt5
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
+  install(EXPORT GraphicsPipelineQt5 NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+endif(GP_BUILD_QT5)
+
+set(GraphicsPipeline_DIR ${PROJECT_BINARY_DIR}/cmake/ CACHE INTERNAL "" FORCE)
+set(GraphicsPipeline_IN_TREE ON CACHE INTERNAL "" FORCE)

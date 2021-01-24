@@ -1,5 +1,37 @@
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/GP.cmake")
+macro(ComponentNotFound component)
+  if(${GraphicsPipeline_FIND_REQUIRED_${component}})
+    message(FATAL_ERROR "GraphicsPipeline: Required component not found: ${component}")
+  endif()
+endmacro()
 
-# set_and_check(GP_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
+# Load components a ALIAS targets if built in the same source tree
+if(GraphicsPipeline_IN_TREE)
+  foreach(component ${GraphicsPipeline_FIND_COMPONENTS})
+    if(TARGET GP_${component})
+      add_library(GP::${component} ALIAS GP_${component})
+      set(GraphicsPipeline_${component}_FOUND TRUE)
+    else()
+      ComponentNotFound(${component})
+    endif()
+  endforeach()
+  
+  return()
+endif()
+
+macro(LoadComponent component)
+  if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/GraphicsPipeline${component}.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/GraphicsPipeline${component}.cmake")
+    set(GraphicsPipeline_${component}_FOUND TRUE)
+  else()
+    ComponentNotFound(${component})
+  endif()
+endmacro()
+
+# Always load Interface component as it is needed for all other components
+LoadComponent(Interface)
+
+foreach(component ${GraphicsPipeline_FIND_COMPONENTS})
+  LoadComponent(${component})
+endforeach()
