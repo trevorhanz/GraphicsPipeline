@@ -37,6 +37,7 @@
 #endif
 
 #include <stdlib.h>
+#include <stdint.h>
 
 const gp_draw_mode GP_MODE_TRIANGLES = GL_TRIANGLES;
 const gp_draw_mode GP_MODE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP;
