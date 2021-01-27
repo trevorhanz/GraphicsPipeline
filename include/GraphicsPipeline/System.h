@@ -62,6 +62,12 @@ GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
 GP_EXPORT void gp_system_run(gp_system* system);
 
 /*!
+ * Stop the main event loop for a running system object.
+ * \param system Pointer to system object to be stopped.
+ */
+GP_EXPORT void gp_system_stop(gp_system* system);
+
+/*!
  * Create a new gp_timer object tied to the event loop
  * of the gp_system object.
  * \param system Pointer to system object to be used.

@@ -69,6 +69,8 @@ void _gp_event_free(_gp_event* event);
 
 void _gp_event_run(_gp_event* event);
 
+void _gp_event_stop(_gp_event* event);
+
 void _gp_event_wake(_gp_event* event);
 
 gp_timer* _gp_event_timer_new(_gp_event* event);

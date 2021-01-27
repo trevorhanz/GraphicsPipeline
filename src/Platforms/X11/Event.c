@@ -173,6 +173,13 @@ void _gp_event_run(_gp_event* event)
   }
 }
 
+void _gp_event_stop(_gp_event* event)
+{
+  event->mRunning = 0;
+  
+  _gp_event_wake(event);
+}
+
 void _gp_event_wake(_gp_event* event)
 {
   if(write(event->mPipe[1], "x", 1) == -1)
