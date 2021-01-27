@@ -34,10 +34,16 @@ extern "C" {
  */
 
 /*!
- * Free gp_shader object.
- * \param shader Shader object to be freed.
+ * Increase shader ref count.
+ * \param shader Shader to have its ref count increased.
  */
-GP_EXPORT void gp_shader_free(gp_shader* shader);
+GP_EXPORT void gp_shader_ref(gp_shader* shader);
+
+/*!
+ * Decreate shader ref count.
+ * \param shader Shader to have its ref count decreased.
+ */
+GP_EXPORT void gp_shader_unref(gp_shader* shader);
 
 /*!
  * Compile a gp_shader object with a vertext and fragment source code.
@@ -54,6 +60,18 @@ GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const ch
  * \return Newly created gp_uniform object.
  */
 GP_EXPORT gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name);
+
+/*!
+ * Increase uniform ref count.
+ * \param uniform Uniform to have its ref count increased.
+ */
+GP_EXPORT void gp_uniform_ref(gp_uniform* uniform);
+
+/*!
+ * Decreate uniform ref count.
+ * \param uniform Uniform to have its ref count decreased.
+ */
+GP_EXPORT void gp_uniform_unref(gp_uniform* uniform);
 
 /*!
  * Set textire data into a gp_uniform object.
@@ -122,6 +140,9 @@ namespace GP
     //! Constructor
     inline Shader(gp_shader* shader);
   public:
+    //! Copy Constructor
+    inline Shader(const Shader& other);
+    
     //! Destructor
     inline ~Shader();
     
@@ -137,7 +158,10 @@ namespace GP
      * \param name Name of the uniform variable in the shader code.
      * \return Newly created Uniform object.
      */
-    inline Uniform* CreateUniform(const char* name);
+    inline Uniform CreateUniform(const char* name);
+    
+    //! Equal operator
+    inline const Shader& operator = (const Shader& other);
     
   private:
     gp_shader*        mShader;
@@ -157,6 +181,9 @@ namespace GP
     inline Uniform(gp_uniform* uniform);
     
   public:
+    //! Copy Constructor
+    inline Uniform(const Uniform& other);
+    
     //! Destructor
     inline ~Uniform();
     
@@ -202,6 +229,9 @@ namespace GP
      */
     inline void SetMat4(float* data);
     
+    //! Equal operator
+    inline const Uniform& operator = (const Uniform& other);
+    
   private:
     gp_uniform*       mUniform;
     
@@ -212,13 +242,30 @@ namespace GP
   //
   // Implementation
   //
-  Shader::Shader(gp_shader* shader) : mShader(shader) {}
-  Shader::~Shader() {gp_shader_free(mShader);}
+  Shader::Shader(gp_shader* shader) : mShader(shader) {gp_shader_ref(mShader);}
+  Shader::Shader(const Shader& other)
+  {
+    mShader = other.mShader;
+    gp_shader_ref(mShader);
+  }
+  Shader::~Shader() {gp_shader_unref(mShader);}
   void Shader::Compile(const char* vertex, const char* fragment) {gp_shader_compile(mShader, vertex, fragment);}
-  Uniform* Shader::CreateUniform(const char* name) {return new Uniform(gp_shader_uniform_new_by_name(mShader, name));}
+  Uniform Shader::CreateUniform(const char* name) {return Uniform(gp_shader_uniform_new_by_name(mShader, name));}
+  const Shader& Shader::operator = (const Shader& other)
+  {
+    gp_shader_unref(mShader);
+    mShader = other.mShader;
+    gp_shader_ref(mShader);
+    return *this;
+  }
   
-  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {}
-  Uniform::~Uniform() {}
+  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {gp_uniform_ref(mUniform);}
+  Uniform::Uniform(const Uniform& other)
+  {
+    mUniform = other.mUniform;
+    gp_uniform_ref(mUniform);
+  }
+  Uniform::~Uniform() {gp_uniform_unref(mUniform);}
   void Uniform::SetTexture(Texture* texture) {gp_uniform_set_texture(mUniform, texture->mTexture);}
   void Uniform::SetFloat(float data) {gp_uniform_set_float(mUniform, data);}
   void Uniform::SetVec2(float* data) {gp_uniform_set_vec2(mUniform, data);}
@@ -226,6 +273,13 @@ namespace GP
   void Uniform::SetVec4(float* data) {gp_uniform_set_vec4(mUniform, data);}
   void Uniform::SetMat3(float* data) {gp_uniform_set_mat3(mUniform, data);}
   void Uniform::SetMat4(float* data) {gp_uniform_set_mat4(mUniform, data);}
+  const Uniform& Uniform::operator = (const Uniform& other)
+  {
+    gp_uniform_unref(mUniform);
+    mUniform = other.mUniform;
+    gp_uniform_ref(mUniform);
+    return *this;
+  }
 }
 #endif // __cplusplus
 

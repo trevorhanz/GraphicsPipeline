@@ -33,10 +33,16 @@ extern "C" {
  */
 
 /*!
- * Free array object.
- * \param array Pointer to array to be freed.
+ * Increase array object reference count.
+ * \param array Array object for which to increase the ref count.
  */
-  GP_EXPORT void gp_array_free(gp_array* array);
+GP_EXPORT void gp_array_ref(gp_array* array);
+
+/*!
+ * Decrease array object reference count.
+ * \param array Array object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_array_unref(gp_array* array);
   
 /*!
  * Upload data to an array object.
@@ -61,7 +67,11 @@ namespace GP
   private:
     //! Constructor
     inline Array(gp_array* array);
+    
   public:
+    //! Copy Constructor
+    inline Array(const Array& other);
+    
     //! Destructor
     inline ~Array();
     
@@ -71,6 +81,9 @@ namespace GP
      * \param count Number of elements in data array;
      */
     inline void SetData(float* data, unsigned int count);
+    
+    //! Equal operator
+    inline const Array& operator = (const Array& other);
     
   private:
     gp_array*           mArray;     //!< Internal array object
@@ -83,9 +96,21 @@ namespace GP
   //
   // Implementation
   //
-  Array::Array(gp_array* array) : mArray(array) {}
-  Array::~Array() {gp_array_free(mArray);}
+  Array::Array(gp_array* array) : mArray(array) {gp_array_ref(mArray);}
+  Array::Array(const Array& other)
+  {
+    mArray = other.mArray;
+    gp_array_ref(mArray);
+  }
+  Array::~Array() {gp_array_unref(mArray);}
   void Array::SetData(float* data, unsigned int count) {gp_array_set_data(mArray, data, count);}
+  const Array& Array::operator = (const Array& other)
+  {
+    gp_array_unref(mArray);
+    mArray = other.mArray;
+    gp_array_ref(mArray);
+    return *this;
+  }
 }
 
 #endif // __cplusplus

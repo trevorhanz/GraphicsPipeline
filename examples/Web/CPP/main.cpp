@@ -38,26 +38,26 @@ float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argv, char* argc[])
 {
-  System* system = new System();
+  System system;
   
-  Web::Context* context = (Web::Context*)system->CreateContext();
+  Web::Context* context = (Web::Context*)system.CreateContext();
   
   Target* target = context->CreateTarget("#WebExample");
-  Array* array = context->CreateArray();
-  Shader* shader = context->CreateShader();
+  Array array = context->CreateArray();
+  Shader shader = context->CreateShader();
   
-  array->SetData(vertexData, 6);
+  array.SetData(vertexData, 6);
   
-  shader->Compile(vertexSource, fragmentSource);
+  shader.Compile(vertexSource, fragmentSource);
   
-  Pipeline* pipeline = target->GetPipeline();
+  Pipeline pipeline = target->GetPipeline();
   
-  DrawOperation* operation = new DrawOperation();
-  operation->SetShader(shader);
-  operation->AddArrayByIndex(array, 0, 2);
-  operation->SetVerticies(3);
-  pipeline->AddOperation(operation);
+  DrawOperation operation;
+  operation.SetShader(shader);
+  operation.AddArrayByIndex(array, 0, 2);
+  operation.SetVerticies(3);
+  pipeline.AddOperation(operation);
   
-  system->Run();
+  system.Run();
 }
 

@@ -42,5 +42,8 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
+  gp_io_free(io);
+  gp_system_free(system);
+  
   return EXIT_SUCCESS;
 }

@@ -99,13 +99,13 @@ namespace GP
      * Create an Array object tied to this Context.
      * \return Newly created Array object.
      */
-    inline Array* CreateArray();
+    inline Array CreateArray();
     
     /*!
      * Create a Shader object tied to this Context.
      * \return Newly created Shader object.
      */
-    inline Shader* CreateShader();
+    inline Shader CreateShader();
     
   protected:
     gp_context*           mContext;
@@ -119,8 +119,8 @@ namespace GP
   Context::Context(gp_context* context) : mContext(context) {}
   Context::~Context() {gp_context_free(mContext);}
   Target* Context::CreateTarget() {return new Target(gp_context_target_new(mContext));}
-  Array* Context::CreateArray() {return new Array(gp_context_array_new(mContext));}
-  Shader* Context::CreateShader() {return new Shader(gp_context_shader_new(mContext));}
+  Array Context::CreateArray() {return Array(gp_context_array_new(mContext));}
+  Shader Context::CreateShader() {return Shader(gp_context_shader_new(mContext));}
 }
 #endif
 

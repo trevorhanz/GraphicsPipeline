@@ -22,6 +22,7 @@
 #include <GraphicsPipeline/Common.h>
 
 #include "../../Utils/List.h"
+#include "../../Utils/RefCounter.h"
 
 #ifdef GP_GL
 #ifndef __APPLE__
@@ -39,17 +40,20 @@
 struct _gp_array
 {
   GLuint                  mVBO;
+  gp_refcounter           mRef;
 };
 
 struct _gp_texture
 {
   GLuint                  mTexture;
+  gp_refcounter           mRef;
 };
 
 struct _gp_shader
 {
   GLuint                  mProgram;
   GLuint                  mAttribute;
+  gp_refcounter           mRef;
 };
 
 typedef void(*LoadUniform)(gp_uniform* uniform);
@@ -59,17 +63,21 @@ struct _gp_uniform
   GLuint                  mLocation;
   LoadUniform             mOperation;
   void*                   mData;
+  gp_refcounter           mRef;
 };
 
-typedef struct
+typedef struct __gp_operation_data _gp_operation_data;
+
+struct __gp_operation_data
 {
-  int test;
-} _gp_operation_data;
+  void (*free)(_gp_operation_data* data);
+};
 
 struct _gp_operation
 {
   void (*func)(_gp_operation_data* data);
   _gp_operation_data*     mData;
+  gp_refcounter           mRef;
 };
 
 typedef struct _gp_operation_list gp_operation_list;
@@ -91,9 +99,13 @@ extern "C" {
 
 gp_pipeline* _gp_pipeline_new();
 
+void _gp_pipeline_free(gp_pipeline* pipeline);
+
 void _gp_pipeline_execute(gp_pipeline* pipeline);
 
 void _gp_api_init();
+
+void _gp_generate_shader(gp_shader* shader);
 
 void _gp_generate_array(gp_array* array);
 

@@ -42,17 +42,24 @@ float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argc, char* argv[])
 {
-  System* system = new System();
+  System system;
   
-  Context* context = system->CreateContext();
+  Context* context = system.CreateContext();
   
   Target* target = context->CreateTarget();
-  Array* array = context->CreateArray();
-  Shader* shader = context->CreateShader();
-  Uniform* uniform;
+  Array array = context->CreateArray();
+  Shader shader = context->CreateShader();
+  
+  array.SetData(vertexData, 6);
+  
+  shader.Compile(vertexSource, fragmentSource);
+  
+  float o[] = {0.0f, 0.0f};
+  Uniform uniform = shader.CreateUniform("Offset");
+  uniform.SetVec2(o);
   
   int frame = 0;
-  Timer* timer = system->CreateTimer();
+  Timer* timer = system.CreateTimer();
   timer->SetCallback([&](Timer* timer)
   {
     timer->Arm(TIMEOUT);
@@ -62,7 +69,7 @@ int main(int argc, char* argv[])
     offset -= .25;
     
     float o[] = {offset, 0.0f};
-    uniform->SetVec2(o);
+    uniform.SetVec2(o);
     
     target->Redraw();
     
@@ -70,26 +77,23 @@ int main(int argc, char* argv[])
   });
   timer->Arm(TIMEOUT);
   
-  array->SetData(vertexData, 6);
+  Pipeline pipeline = target->GetPipeline();
   
-  shader->Compile(vertexSource, fragmentSource);
+  ClearOperation clear;
+  pipeline.AddOperation(clear);
   
-  float o[] = {0.0f, 0.0f};
-  uniform = shader->CreateUniform("Offset");
-  uniform->SetVec2(o);
+  DrawOperation operation;
+  operation.SetShader(shader);
+  operation.SetUniform(uniform);
+  operation.AddArrayByIndex(array, 0, 2);
+  operation.SetVerticies(3);
+  pipeline.AddOperation(operation);
   
-  Pipeline* pipeline = target->GetPipeline();
+  system.Run();
   
-  pipeline->AddOperation(new ClearOperation());
-  
-  DrawOperation* operation = new DrawOperation();
-  operation->SetShader(shader);
-  operation->SetUniform(uniform);
-  operation->AddArrayByIndex(array, 0, 2);
-  operation->SetVerticies(3);
-  pipeline->AddOperation(operation);
-  
-  system->Run();
+  delete timer;
+  delete target;
+  delete context;
   
   return EXIT_SUCCESS;
 }

@@ -23,9 +23,9 @@ using namespace GP;
 
 int main(int argc, char* argv[])
 {
-  System* system = new System();
+  System system;
   
-  IO* io = system->CreateReadIO(0); // STDIN;
+  IO* io = system.CreateReadIO(0); // STDIN;
   io->SetCallback([](IO*)
   {
     std::string in;
@@ -33,7 +33,9 @@ int main(int argc, char* argv[])
     std::cout << "IO: " << in << std::endl;
   });
   
-  system->Run();
+  system.Run();
+  
+  delete io;
   
   return EXIT_SUCCESS;
 }

@@ -37,5 +37,8 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
+  gp_timer_free(timer);
+  gp_system_free(system);
+  
   return EXIT_SUCCESS;
 }

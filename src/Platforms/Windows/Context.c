@@ -153,7 +153,15 @@ gp_shader* gp_context_shader_new(gp_context* context)
 {
   gp_shader* shader = malloc(sizeof(struct _gp_shader));
 
+  _gp_generate_shader(shader);
+  
   return shader;
+}
+
+void gp_target_free(gp_target* target)
+{
+  _gp_pipeline_free(target->mPipeline);
+  free(target);
 }
 
 gp_pipeline* gp_target_get_pipeline(gp_target* target)

@@ -28,10 +28,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-void gp_shader_free(gp_shader* shader)
+void _gp_generate_shader(gp_shader* shader)
 {
-  glDeleteProgram(shader->mProgram);
-  free(shader);
+  shader->mProgram = 0;
+  shader->mAttribute = 0;
+  gp_ref_init(&shader->mRef);
+}
+
+void gp_shader_ref(gp_shader* shader)
+{
+  gp_ref_inc(&shader->mRef);
+}
+
+void gp_shader_unref(gp_shader* shader)
+{
+  if(gp_ref_dec(&shader->mRef))
+  {
+    glDeleteProgram(shader->mProgram);
+    free(shader);
+  }
 }
 
 int _check_shader_status(unsigned int shader, const char* type)
@@ -105,8 +120,25 @@ gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
   gp_uniform* uniform = malloc(sizeof(gp_uniform));
   uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
   uniform->mOperation = 0;
+  uniform->mData = 0;
+  gp_ref_init(&uniform->mRef);
   
   return uniform;
+}
+
+void gp_uniform_ref(gp_uniform* uniform)
+{
+  gp_ref_inc(&uniform->mRef);
+}
+
+void gp_uniform_unref(gp_uniform* uniform)
+{
+  if(gp_ref_dec(&uniform->mRef))
+  {
+    if(uniform->mData)
+      free(uniform->mData);
+    free(uniform);
+  }
 }
 
 void _gp_uniform_load_int(gp_uniform* uniform) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}

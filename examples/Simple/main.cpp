@@ -42,34 +42,38 @@ float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argc, char* argv[])
 {
-  System* system = new System();
+  System system;
   
-  Context* context = system->CreateContext();
+  Context* context = system.CreateContext();
   
   Target* target = context->CreateTarget();
-  Array* array = context->CreateArray();
-  Shader* shader = context->CreateShader();
+  Array array = context->CreateArray();
+  Shader shader = context->CreateShader();
   
-  array->SetData(vertexData, 6);
+  array.SetData(vertexData, 6);
   
-  shader->Compile(vertexSource, fragmentSource);
+  shader.Compile(vertexSource, fragmentSource);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
-  Uniform* color = shader->CreateUniform("Color");
-  color->SetVec4(c);
+  Uniform color = shader.CreateUniform("Color");
+  color.SetVec4(c);
   
-  Pipeline* pipeline = target->GetPipeline();
+  Pipeline pipeline = target->GetPipeline();
   
-  pipeline->AddOperation(new ClearOperation());
+  ClearOperation clear;
+  pipeline.AddOperation(clear);
   
-  DrawOperation* operation = new DrawOperation();
-  operation->SetShader(shader);
-  operation->SetUniform(color);
-  operation->AddArrayByIndex(array, 0, 2);
-  operation->SetVerticies(3);
-  pipeline->AddOperation(operation);
+  DrawOperation operation;
+  operation.SetShader(shader);
+  operation.SetUniform(color);
+  operation.AddArrayByIndex(array, 0, 2);
+  operation.SetVerticies(3);
+  pipeline.AddOperation(operation);
   
-  system->Run();
+  system.Run();
+  
+  delete target;
+  delete context;
   
   return EXIT_SUCCESS;
 }

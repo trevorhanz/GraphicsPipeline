@@ -83,10 +83,9 @@ gp_target* gp_context_target_new(gp_context* context)
 
 gp_array* gp_context_array_new(gp_context* context)
 {
-  QOpenGLFunctions* functions = context->mShare->functions();
-  
   gp_array* array = new gp_array();
-  functions->glGenBuffers(1, &array->mVBO);
+  
+  _gp_generate_array(array);
   
   return array;
 }
@@ -104,7 +103,14 @@ gp_shader* gp_context_shader_new(gp_context* context)
 {
   gp_shader* shader = new gp_shader;
   
+  _gp_generate_shader(shader);
+  
   return shader;
+}
+
+void gp_target_free(gp_target* target)
+{
+  free(target);
 }
 
 gp_pipeline* gp_target_get_pipeline(gp_target* target)

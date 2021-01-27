@@ -33,11 +33,17 @@ extern "C" {
  */
 
 /*!
- * Free texture object.
- * \param texture Pointer to array to be freed.
+ * Increase texture object reference count.
+ * \param texture Texture object for which to increase the ref count.
  */
-  GP_EXPORT void gp_texture_free(gp_texture* texture);
-  
+GP_EXPORT void gp_texture_ref(gp_texture* texture);
+
+/*!
+ * Decrease texture object reference count.
+ * \param texture Texture object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_texture_unref(gp_texture* texture);
+
 /*!
  * Upload data to a texture object.
  * \param texture Pointer to texture object.
@@ -63,6 +69,9 @@ namespace GP
     //! Constructor
     inline Texture(gp_texture* texture);
   public:
+    //! Copy Constructor
+    inline Texture(const Texture& other);
+    
     //! Destructor
     inline ~Texture();
     
@@ -74,6 +83,9 @@ namespace GP
      */
     inline void SetData(float* data, unsigned int width, unsigned int height);
     
+    //! Equal operator
+    inline const Texture& operator = (const Texture& other);
+    
   private:
     gp_texture*           mTexture;     //!< Internal array object
     
@@ -84,9 +96,21 @@ namespace GP
   //
   // Implementation
   //
-  Texture::Texture(gp_texture* texture) : mTexture(texture) {}
-  Texture::~Texture() {gp_texture_free(mTexture);}
+  Texture::Texture(gp_texture* texture) : mTexture(texture) {gp_texture_ref(mTexture);}
+  Texture::Texture(const Texture& other)
+  {
+    mTexture = other.mTexture;
+    gp_texture_ref(mTexture);
+  }
+  Texture::~Texture() {gp_texture_unref(mTexture);}
   void Texture::SetData(float* data, unsigned int width, unsigned int height) {gp_texture_set_data(mTexture, data, width, height);}
+  const Texture& Texture::operator = (const Texture& other)
+  {
+    gp_texture_unref(mTexture);
+    mTexture = other.mTexture;
+    gp_texture_ref(mTexture);
+    return *this;
+  }
 }
 
 #endif // __cplusplus

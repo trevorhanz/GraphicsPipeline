@@ -25,6 +25,22 @@
 #endif // GP_GL
 #include "GL.h"
 
+#include <stdlib.h>
+
+void gp_texture_ref(gp_texture* texture)
+{
+  gp_ref_inc(&texture->mRef);
+}
+
+void gp_texture_unref(gp_texture* texture)
+{
+  if(gp_ref_dec(&texture->mRef))
+  {
+    glDeleteTextures(1, &texture->mTexture);
+    free(texture);
+  }
+}
+
 void gp_texture_set_data(gp_texture* texture, float* data, unsigned int width, unsigned int height)
 {
   glBindTexture(GL_TEXTURE_2D, texture->mTexture);
@@ -50,4 +66,5 @@ void gp_texture_set_data(gp_texture* texture, float* data, unsigned int width, u
 void _gp_generate_texture(gp_texture* texture)
 {
   glGenTextures(1, &texture->mTexture);
+  gp_ref_init(&texture->mRef);
 }

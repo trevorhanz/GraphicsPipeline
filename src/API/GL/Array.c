@@ -16,6 +16,7 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/Array.h>
+#include <GraphicsPipeline/Logging.h>
 
 #ifdef GP_GL
 #ifndef __APPLE__
@@ -26,10 +27,18 @@
 
 #include <stdlib.h>
 
-void gp_array_free(gp_array* array)
+void gp_array_ref(gp_array* array)
 {
-  glDeleteBuffers(1, &array->mVBO);
-  free(array);
+  gp_ref_inc(&array->mRef);
+}
+
+void gp_array_unref(gp_array* array)
+{
+  if(gp_ref_dec(&array->mRef))
+  {
+    glDeleteBuffers(1, &array->mVBO);
+    free(array);
+  }
 }
 
 void gp_array_set_data(gp_array* array, float* data, unsigned int count)
@@ -42,4 +51,5 @@ void gp_array_set_data(gp_array* array, float* data, unsigned int count)
 void _gp_generate_array(gp_array* array)
 {
   glGenBuffers(1, &array->mVBO);
+  gp_ref_init(&array->mRef);
 }

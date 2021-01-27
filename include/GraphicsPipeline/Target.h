@@ -33,6 +33,12 @@ extern "C" {
  */
 
 /*!
+ * Free target object.
+ * \param target Target object to be freed.
+ */
+GP_EXPORT void gp_target_free(gp_target* target);
+
+/*!
  * Get the gp_pipeline tied to a gp_target.
  * \param target Pointer to target object.
  * \return Pointer to pipeline object.
@@ -68,7 +74,7 @@ namespace GP
      * Retrieve GP::Pipeline object.
      * \return Pointer to GP::Pipeline.
      */
-    inline Pipeline* GetPipeline();
+    inline Pipeline GetPipeline();
     
     /*!
      * Schedules the target to be redrawn.
@@ -77,7 +83,6 @@ namespace GP
     
   private:
     gp_target*        mTarget;
-    Pipeline*         mPipeline;
     
     friend class Context;
   };
@@ -85,9 +90,9 @@ namespace GP
   //
   // Implementation
   //
-  Target::Target(gp_target* target) : mTarget(target), mPipeline(new Pipeline(gp_target_get_pipeline(target))) {}
-  Target::~Target() {}
-  Pipeline* Target::GetPipeline() {return mPipeline;}
+  Target::Target(gp_target* target) : mTarget(target) {}
+  Target::~Target() {gp_target_free(mTarget);}
+  Pipeline Target::GetPipeline() {return Pipeline(gp_target_get_pipeline(mTarget));}
   void Target::Redraw() {gp_target_redraw(mTarget);}
 }
 

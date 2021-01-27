@@ -78,6 +78,20 @@ void DebugCallbackFunction(GLenum source,
   }\
 }
 
+void gp_operation_ref(gp_operation* operation)
+{
+  gp_ref_inc(&operation->mRef);
+}
+
+void gp_operation_unref(gp_operation* operation)
+{
+  if(gp_ref_dec(&operation->mRef))
+  {
+    operation->mData->free(operation->mData);
+    free(operation);
+  }
+}
+
 typedef struct
 {
   _gp_operation_data      mData;
@@ -96,6 +110,8 @@ gp_operation* gp_operation_clear_new()
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_clear;
   operation->mData = malloc(sizeof(_gp_operation_clear_data));
+  operation->mData->free = (void(*)(_gp_operation_data*))free;
+  gp_ref_init(&operation->mRef);
   
   return operation;
 }
@@ -105,7 +121,7 @@ typedef struct _gp_array_list gp_array_list;
 struct _gp_array_list
 {
   gp_array_list*          mNext;
-  GLuint                  mVBO;
+  gp_array*               mArray;
   int                     mIndex;
   int                     mComponents;
   int                     mStride;
@@ -161,7 +177,7 @@ void _gp_operation_draw(_gp_operation_data* data)
   gp_array_list* array = d->mArrays;
   while(array != NULL)
   {
-    glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, array->mArray->mVBO);
     
     CHECK_GL_ERROR();
     
@@ -179,12 +195,43 @@ void _gp_operation_draw(_gp_operation_data* data)
   glDrawArrays(d->mMode, 0, d->mVerticies);
 }
 
+void _gp_operation_draw_free(_gp_operation_data* data)
+{
+  _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
+  
+  gp_shader_unref(d->mShader);
+  
+  // TODO - free VAO
+  gp_array_list* array = d->mArrays;
+  while(array != NULL)
+  {
+    gp_array_list* temp = array;
+    gp_array_unref(array->mArray);
+    
+    array = array->mNext;
+    free(temp);
+  }
+  
+  gp_uniform_list* uniform = d->mUniforms;
+  while(uniform != NULL)
+  {
+    gp_uniform_list* temp = uniform;
+    gp_uniform_unref(uniform->mUniform);
+    
+    uniform = uniform->mNext;
+    free(temp);
+  }
+  
+  free(d);
+}
+
 gp_operation* gp_operation_draw_new()
 {
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_draw;
-  
+  gp_ref_init(&operation->mRef);
   operation->mData = malloc(sizeof(_gp_operation_draw_data));
+  operation->mData->free = _gp_operation_draw_free;
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   data->mUniforms = NULL;
   data->mArrays = NULL;
@@ -202,7 +249,10 @@ gp_operation* gp_operation_draw_new()
 void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
 {
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  if(data->mShader)
+    gp_shader_unref(data->mShader);
   data->mShader = shader;
+  gp_shader_ref(data->mShader);
   
 #ifndef GP_GLES2
   data->mDirty = 1;
@@ -215,12 +265,14 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   
   gp_array_list* a = malloc(sizeof(gp_array_list));
   a->mNext = data->mArrays;
-  a->mVBO = array->mVBO;
+  a->mArray = array;
   a->mIndex = index;
   a->mComponents = components;
   a->mStride = stride;
   a->mOffset = offset;
   data->mArrays = a;
+  
+  gp_array_ref(array);
   
 #ifndef GP_GLES2
   data->mDirty = 1;
@@ -235,6 +287,8 @@ void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
   u->mNext = data->mUniforms;
   u->mUniform = uniform;
   data->mUniforms = u;
+  
+  gp_uniform_ref(uniform);
   
 #ifndef GP_GLES2
   data->mDirty = 1;
@@ -272,12 +326,20 @@ void _gp_operation_viewport(_gp_operation_data* data)
   _gp_pipeline_execute(d->mPipeline);
 }
 
+void _gp_operation_viewport_free(_gp_operation_data* data)
+{
+  _gp_operation_viewport_data* d = (_gp_operation_viewport_data*)data;
+  _gp_pipeline_free(d->mPipeline);
+  free(d);
+}
+
 gp_operation* gp_operation_viewport_new()
 {
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_viewport;
   
   operation->mData = malloc(sizeof(_gp_operation_viewport_data));
+  operation->mData->free = _gp_operation_viewport_free;
   _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
   data->mPipeline = _gp_pipeline_new();
   data->mX = 0;
@@ -309,6 +371,7 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
   list->mOperation = operation;
+  gp_operation_ref(operation);
   gp_list_push_back(&pipeline->mOperations, (gp_list_node*)list);
 }
 
@@ -321,6 +384,8 @@ void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation
 {
   gp_list_node* node = gp_list_find(&pipeline->mOperations, _gp_list_find_operation, (void*)operation);
   gp_list_remove(&pipeline->mOperations, node);
+  gp_operation_unref(operation);
+  free(node);
 }
 
 gp_pipeline* _gp_pipeline_new()
@@ -329,6 +394,19 @@ gp_pipeline* _gp_pipeline_new()
   gp_list_init(&pipeline->mOperations);
   
   return pipeline;
+}
+
+void _gp_pipeline_free(gp_pipeline* pipeline)
+{
+  gp_list_node* node = gp_list_front(&pipeline->mOperations);
+  while(node)
+  {
+    gp_operation_list* op = (gp_operation_list*)node;
+    node = gp_list_node_next(node);
+    gp_operation_unref(op->mOperation);
+    free(op);
+  }
+  free(pipeline);
 }
 
 void _gp_pipeline_execute(gp_pipeline* pipeline)

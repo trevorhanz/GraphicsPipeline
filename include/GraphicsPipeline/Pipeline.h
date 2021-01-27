@@ -39,6 +39,18 @@ extern const gp_draw_mode GP_MODE_TRIANGLES;
 extern const gp_draw_mode GP_MODE_TRIANGLE_STRIP;
 
 /*!
+ * Increase the reference count of an operation.
+ * \param operation Operation object for which to add the ref count.
+ */
+GP_EXPORT void gp_operation_ref(gp_operation* operation);
+
+/*!
+ * Decrease the reference count of an operation.
+ * \param operation Operation object for which to add the ref count.
+ */
+GP_EXPORT void gp_operation_unref(gp_operation* operation);
+
+/*!
  * Create a new clear operation.
  * \return Pointer to new operation.
  */
@@ -143,6 +155,18 @@ namespace GP
     //! Constructor
     inline Operation(gp_operation* operation);
     
+    //! Copy Cunstructor
+    inline Operation(const Operation& other);
+    
+  public:
+    //! Destructor
+    inline ~Operation();
+    
+    //! Equal operator
+    inline const Operation& operator = (const Operation& operation);
+    
+  protected:
+    
     gp_operation*         mOperation;
     
     friend class Pipeline;
@@ -171,13 +195,13 @@ namespace GP
      * Sets the shader program to be used for this draw operation.
      * \param shader Shader object to be used.
      */
-    inline void SetShader(Shader* shader);
+    inline void SetShader(const Shader& shader);
     
     /*!
      * Sets a uniform object to be used.
      * \param uniform New uniform object to be used.
      */
-    inline void SetUniform(Uniform* uniform);
+    inline void SetUniform(const Uniform& uniform);
     
     /*!
      * Add an array object to be used in this draw operation.
@@ -188,7 +212,7 @@ namespace GP
      * \param stride Byte offset between consecutive elements.
      * \param offset Byte offset of first element.
      */
-    inline void AddArrayByIndex(Array* array, int index, int components, int stride = 0, int offset = 0);
+    inline void AddArrayByIndex(const Array& array, int index, int components, int stride = 0, int offset = 0);
     
     /*!
      * Set the number of verticies in the draw operation.
@@ -216,7 +240,7 @@ namespace GP
      * Get the underline Pipeline of the viewport.
      * \return The Pipeline of the viewport operation.
      */
-    inline Pipeline* GetPipeline();
+    inline Pipeline GetPipeline();
     
     /*!
      * Set the dimensions of the viewport operation.
@@ -226,9 +250,6 @@ namespace GP
      * \param height Height of the Viewport in pixels.
      */
     inline void SetDimensions(int x, int y, int width, int height);
-    
-  private:
-    Pipeline*         mPipeline;
   };
   
   /*!
@@ -243,11 +264,10 @@ namespace GP
     inline ~Pipeline();
     
     /*!
-     * Add draw operation to the end of this pipeline object.
-     * \param shader Shader object to be used in operation.
-     * \param array Array object to be used in operation.
+     * Add an operation to the end of this pipeline object.
+     * \param operation Operation to be added.
      */
-    inline void AddOperation(Operation* operation);
+    inline void AddOperation(const Operation& operation);
     
   private:
     gp_pipeline*          mPipeline;
@@ -256,29 +276,41 @@ namespace GP
   //
   // Implementation
   //
-  Operation::Operation(gp_operation* operation) : mOperation(operation) {}
+  Operation::Operation(gp_operation* operation) : mOperation(operation) {gp_operation_ref(mOperation);}
+  Operation::Operation(const Operation& other)
+  {
+    mOperation = other.mOperation;
+    gp_operation_ref(mOperation);
+  }
+  Operation::~Operation() {gp_operation_unref(mOperation);}
+  const Operation& Operation::operator = (const Operation& other)
+  {
+    gp_operation_unref(mOperation);
+    mOperation = other.mOperation;
+    gp_operation_ref(mOperation);
+    return *this;
+  }
   ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
   DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
-  void DrawOperation::SetShader(Shader* shader)
+  void DrawOperation::SetShader(const Shader& shader)
   {
-    gp_operation_draw_set_shader(mOperation, shader->mShader);
+    gp_operation_draw_set_shader(mOperation, shader.mShader);
   }
-  void DrawOperation::SetUniform(Uniform* uniform)
+  void DrawOperation::SetUniform(const Uniform& uniform)
   {
-    gp_operation_draw_set_uniform(mOperation, uniform->mUniform);
+    gp_operation_draw_set_uniform(mOperation, uniform.mUniform);
   }
-  void DrawOperation::AddArrayByIndex(Array* array, int index, int components, int stride, int offset)
+  void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, int stride, int offset)
   {
-    gp_operation_draw_add_array_by_index(mOperation, array->mArray, index, components, stride, offset);
+    gp_operation_draw_add_array_by_index(mOperation, array.mArray, index, components, stride, offset);
   }
   void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies(mOperation, count);}
   void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode(mOperation, mode);}
   
   ViewportOperation::ViewportOperation()
-    : Operation(gp_operation_viewport_new()),
-    mPipeline(new Pipeline(gp_operation_viewport_get_pipeline(mOperation)))
+    : Operation(gp_operation_viewport_new())
     {}
-  Pipeline* ViewportOperation::GetPipeline() {return mPipeline;}
+  Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline(mOperation));}
   void ViewportOperation::SetDimensions(int x, int y, int width, int height)
   {
     gp_operation_viewport_set_dimesions(mOperation, x, y, width, height);
@@ -286,9 +318,9 @@ namespace GP
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}
-  void Pipeline::AddOperation(Operation* operation)
+  void Pipeline::AddOperation(const Operation& operation)
   {
-    gp_pipeline_add_operation(mPipeline, operation->mOperation);
+    gp_pipeline_add_operation(mPipeline, operation.mOperation);
   }
 }
 #endif // __cplusplus

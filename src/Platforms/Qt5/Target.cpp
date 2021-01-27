@@ -40,7 +40,7 @@ Target::Target(QOpenGLContext* share)
 
 Target::~Target()
 {
-  delete mPipeline;
+  _gp_pipeline_free(mPipeline);
 }
 
 QWidget* Target::GetWidget()
