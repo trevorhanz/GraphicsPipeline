@@ -18,11 +18,11 @@
 #ifndef __GP_REFCOUNTER_H__
 #define __GP_REFCOUNTER_H__
 
-#ifdef __STDC_NO_AUTOMICS__
+#if __STDC_NO_ATOMICS__ 
 typedef int _gp_refcounter_type;
 #else
 #ifndef __cplusplus
-# include <stdatomic.h>
+#include <stdatomic.h>
 #else
 # include <atomic>
 # define _Atomic(X) std::atomic< X >
