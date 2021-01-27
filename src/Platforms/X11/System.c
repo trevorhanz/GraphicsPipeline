@@ -44,6 +44,8 @@ gp_system* gp_system_new()
     return NULL;
   }
   
+  system->mDeleteMessage = XInternAtom(system->mDisplay, "WM_DELETE_WINDOW", False);
+  
   return system;
 }
 
@@ -150,6 +152,14 @@ void _gp_system_process_events(gp_io* io)
           gp_target_redraw(target);
         }
         node = gp_list_node_next(node);
+      }
+    }
+    
+    if(event.type == ClientMessage)
+    {
+      if(event.xclient.data.l[0] == system->mDeleteMessage)
+      {
+        gp_system_stop(system);
       }
     }
   }

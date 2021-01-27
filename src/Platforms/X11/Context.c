@@ -78,6 +78,8 @@ gp_target* gp_context_target_new(gp_context* context)
   XMapRaised(context->mDisplay, target->mWindow);
   XFlush(context->mDisplay);
   
+  XSetWMProtocols(context->mDisplay, target->mWindow, &context->mParent->mDeleteMessage, 1);
+  
   return target;
 }
 
