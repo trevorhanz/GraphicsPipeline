@@ -53,6 +53,8 @@ void gp_system_free(gp_system* system)
 {
   assert(system != NULL);
   
+  XCloseDisplay(system->mDisplay);
+  
   _gp_event_free(system->mEvent);
   free(system);
 }
@@ -176,6 +178,8 @@ void gp_system_run(gp_system* system)
   gp_io_set_userdata(io, (void*)system);
   
   _gp_event_run(system->mEvent);
+  
+  gp_io_free(io);
 }
 
 void gp_system_stop(gp_system* system)

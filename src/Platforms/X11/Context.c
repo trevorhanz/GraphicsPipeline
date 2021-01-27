@@ -42,7 +42,9 @@ void _gp_target_wake_callback(gp_io* io)
 
 void gp_context_free(gp_context* context)
 {
+  glXDestroyContext(context->mDisplay, context->mShare);
   XFreeColormap(context->mDisplay, context->mColorMap);
+  XFree(context->mVisualInfo);
   free(context);
 }
 
