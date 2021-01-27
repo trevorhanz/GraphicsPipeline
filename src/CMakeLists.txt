@@ -47,11 +47,13 @@ set(GL_SRC
 #
 set(UTILS_HEADERS
   Utils/List.h
+  Utils/RefCounter.h
   )
 
 set(UTILS_SRC
   ${UTILS_HEADERS}
   Utils/List.c
+  Utils/RefCounter.c
   )
 
 #
@@ -208,7 +210,7 @@ target_include_directories(GP_Native PUBLIC
 target_link_libraries(GP_Native PRIVATE ${LIB} GP_Interface)
 set_property(TARGET GP_Native PROPERTY OUTPUT_NAME GPNative)
 set_property(TARGET GP_Native PROPERTY EXPORT_NAME Native)
-set_property(TARGET GP_Native PROPERTY C_STANDARD 99)
+set_property(TARGET GP_Native PROPERTY C_STANDARD 11)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type )
 if(build_type STREQUAL "DEBUG")
