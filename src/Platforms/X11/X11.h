@@ -36,7 +36,7 @@ struct _gp_system
   Display*                mDisplay;
   gp_list                 mTargets;
   _gp_event*              mEvent;
-  gp_io*                  mIO;        // X11 connection listener
+  Atom                    mDeleteMessage;
 };
 
 struct _gp_context
