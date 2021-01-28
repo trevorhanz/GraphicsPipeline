@@ -21,6 +21,8 @@
 #include <GraphicsPipeline/Types.h>
 #include <API/GL/GL.h>
 
+#include "../../Utils/RefCounter.h"
+
 #include <windows.h>
 
 #define WM_SOCKET WM_USER + 1
@@ -36,6 +38,7 @@ struct _gp_context
   HGLRC                 mShare;
   HWND                  mWindow;
   unsigned int          mPixelFormat;
+  gp_refcounter         mRef;
 };
 
 struct _gp_target
