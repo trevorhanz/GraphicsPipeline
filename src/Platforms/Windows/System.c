@@ -130,7 +130,8 @@ gp_context* gp_system_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
   context->mParent = system;
-
+  gp_ref_init(&context->mRef);
+  
   HWND hWnd;
   if (!(hWnd = CreateWindowEx(0,                        // Extended Style For The Window
       "GraphicsPipeline",                               // Class Name

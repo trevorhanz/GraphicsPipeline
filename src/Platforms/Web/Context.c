@@ -40,9 +40,17 @@ EM_JS(void, _gp_canvas_set_height, (const char* id, int value), {
   document.getElementById(UTF8ToString(id)).height = value;
 });
 
-void gp_context_free(gp_context* context)
+void gp_context_ref(gp_context* context)
 {
-  free(context);
+  gp_ref_inc(&context->mRef);
+}
+
+void gp_context_unref(gp_context* context)
+{
+  if(gp_ref_dec(&context->mRef))
+  {
+    free(context);
+  }
 }
 
 void _gp_target_build(gp_target* target)

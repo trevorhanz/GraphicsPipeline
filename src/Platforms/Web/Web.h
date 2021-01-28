@@ -26,6 +26,8 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+#include "../../Utils/RefCounter.h"
+
 struct _gp_system
 {
   int                                   mCanvasIndex;
@@ -35,6 +37,7 @@ struct _gp_context
 {
   gp_system*                            mParent;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mShare;
+  gp_refcounter                         mRef;
 };
 
 struct _gp_target

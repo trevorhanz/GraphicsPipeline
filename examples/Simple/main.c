@@ -86,7 +86,6 @@ int main(int argc, char* argv[])
   gp_system_run(system);
   
   gp_target_free(target);
-  gp_context_free(context);
   gp_system_free(system);
   
   return EXIT_SUCCESS;

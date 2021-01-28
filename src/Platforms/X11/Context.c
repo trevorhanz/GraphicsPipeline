@@ -40,12 +40,20 @@ void _gp_target_wake_callback(gp_io* io)
   }
 }
 
-void gp_context_free(gp_context* context)
+void gp_context_ref(gp_context* context)
 {
-  glXDestroyContext(context->mDisplay, context->mShare);
-  XFreeColormap(context->mDisplay, context->mColorMap);
-  XFree(context->mVisualInfo);
-  free(context);
+  gp_ref_inc(&context->mRef);
+}
+
+void gp_context_unref(gp_context* context)
+{
+  if(gp_ref_dec(&context->mRef))
+  {
+    glXDestroyContext(context->mDisplay, context->mShare);
+    XFreeColormap(context->mDisplay, context->mColorMap);
+    XFree(context->mVisualInfo);
+    free(context);
+  }
 }
 
 gp_target* gp_context_target_new(gp_context* context)

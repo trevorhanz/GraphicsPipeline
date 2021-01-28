@@ -19,9 +19,17 @@
 
 #include <stdlib.h>
 
-void gp_context_free(gp_context* context)
+void gp_context_ref(gp_context* context)
 {
-  free(context);
+  gp_ref_inc(&context->mRef);
+}
+
+void gp_context_unref(gp_context* context)
+{
+  if(gp_ref_dec(&context->mRef))
+  {
+    free(context);
+  }
 }
 
 gp_target* gp_context_target_new(gp_context* context)

@@ -37,10 +37,16 @@ extern "C" {
  */
 
 /*!
- * Free gp_context object
- * \param context Context object to be freed.
+ * Increase context object reference count.
+ * \param context Context object for which to increase the ref count.
  */
-GP_EXPORT void gp_context_free(gp_context* context);
+GP_EXPORT void gp_context_ref(gp_context* context);
+
+/*!
+ * Decrease context object reference count.
+ * \param context Context object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_context_unref(gp_context* context);
 
 /*!
  * Create a new gp_target object tied to a context.
@@ -86,6 +92,9 @@ namespace GP
     //! Constructor
     inline Context(gp_context* context);
   public:
+    //! Copy Constructor
+    inline Context(const Context& other);
+    
     //! Destructor
     inline ~Context();
     
@@ -107,6 +116,9 @@ namespace GP
      */
     inline Shader CreateShader();
     
+    //! Equal operator
+    inline const Context& operator = (const Context& other);
+    
   protected:
     gp_context*           mContext;
     
@@ -116,11 +128,23 @@ namespace GP
   /*
    * Implementation
    */
-  Context::Context(gp_context* context) : mContext(context) {}
-  Context::~Context() {gp_context_free(mContext);}
+  Context::Context(gp_context* context) : mContext(context) {gp_context_ref(mContext);}
+  Context::Context(const Context& other)
+  {
+    mContext = other.mContext;
+    gp_context_ref(mContext);
+  }
+  Context::~Context() {gp_context_unref(mContext);}
   Target* Context::CreateTarget() {return new Target(gp_context_target_new(mContext));}
   Array Context::CreateArray() {return Array(gp_context_array_new(mContext));}
   Shader Context::CreateShader() {return Shader(gp_context_shader_new(mContext));}
+  const Context& Context::operator = (const Context& other)
+  {
+    gp_context_unref(mContext);
+    mContext = other.mContext;
+    gp_context_ref(mContext);
+    return *this;
+  }
 }
 #endif
 

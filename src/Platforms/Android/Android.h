@@ -28,6 +28,8 @@
 #include <GraphicsPipeline/Logging.h>
 #include <API/GL/GL.h>
 
+#include "../../Utils/RefCounter.h"
+
 struct _gp_system
 {
   EGLDisplay                            mDisplay;
@@ -41,6 +43,7 @@ struct _gp_context
   EGLint                                mFormat;
   EGLContext                            mShare;
   EGLSurface                            mShareSurface;
+  gp_refcounter                         mRef;
 };
 
 struct _gp_target

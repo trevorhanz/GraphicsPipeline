@@ -27,7 +27,8 @@ TEST(C, Init)
   gp_context* context = gp_system_context_new(system);
   ASSERT_NE(0, (uintptr_t)context);
   
-  gp_context_free(context);
+  gp_context_ref(context);
+  gp_context_unref(context);
   
   gp_system_free(system);
 }

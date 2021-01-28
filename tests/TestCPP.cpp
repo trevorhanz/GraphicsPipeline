@@ -26,10 +26,7 @@ TEST(CPP, Init)
   System* system = new System();
   ASSERT_NE(0, (uintptr_t)system);
   
-  Context* context = system->CreateContext();
-  ASSERT_NE(0, (uintptr_t)context);
-  
-  delete context;
+  Context context = system->CreateContext();
   
   delete system;
 }

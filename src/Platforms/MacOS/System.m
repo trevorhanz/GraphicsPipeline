@@ -37,6 +37,7 @@ void gp_system_free(gp_system* system)
 gp_context* gp_system_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
+  gp_ref_init(&context->mRef);
   
   NSOpenGLPixelFormatAttribute pixelAttribs[ 16 ];
   int pixNum = 0;

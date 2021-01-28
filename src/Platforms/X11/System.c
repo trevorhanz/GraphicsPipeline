@@ -66,6 +66,7 @@ gp_context* gp_system_context_new(gp_system* system)
   gp_context* context = (gp_context*)malloc(sizeof(struct _gp_context));
   context->mParent = system;
   context->mDisplay = system->mDisplay;
+  gp_ref_init(&context->mRef);
   
   // Get a matching FB config
   static int attrList[] =

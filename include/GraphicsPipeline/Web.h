@@ -60,6 +60,9 @@ namespace Web
     inline Context(gp_context* context);
     
   public:
+    //! Copy Constructor
+    inline Context(const GP::Context& other);
+    
     /*!
      * Creates a target object tied to this context using a canvas id.
      * \param id ID string of canvas object to be used.
@@ -72,6 +75,7 @@ namespace Web
    * Implementation
    */
   Context::Context(gp_context* context) : GP::Context(context) {}
+  Context::Context(const GP::Context& other) : GP::Context(other) {}
   Target* Context::CreateTarget(const char* id) {return new Target(gp_context_target_new_from_id(mContext, id));}
 }
 }

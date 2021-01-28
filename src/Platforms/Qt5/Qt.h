@@ -30,6 +30,8 @@
 #include "TimerCallback.h"
 #include "IOCallback.h"
 
+#include "../../Utils/RefCounter.h"
+
 struct _gp_system
 {
   QApplication*           mApp;
@@ -39,6 +41,7 @@ struct _gp_context
 {
   QOpenGLContext*         mShare;
   QOffscreenSurface*      mSurface;
+  gp_refcounter           mRef;
 };
 
 struct _gp_target

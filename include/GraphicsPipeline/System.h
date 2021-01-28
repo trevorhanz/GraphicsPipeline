@@ -188,9 +188,9 @@ namespace GP
     
     /*!
      * Creates a new GP::Context for this system.
-     * \return Pointer to newly created GP::Context.
+     * \return Newly created GP::Context.
      */
-    inline Context* CreateContext();
+    inline Context CreateContext();
     
     /*!
      * Creates a new GP::Timer for this system.
@@ -295,7 +295,7 @@ namespace GP
   //
   System::System() {mSystem = gp_system_new();}
   System::~System() {gp_system_free(mSystem);}
-  Context* System::CreateContext() {return new Context(gp_system_context_new(mSystem));}
+  Context System::CreateContext() {return Context(gp_system_context_new(mSystem));}
   Timer* System::CreateTimer() {return new Timer(gp_system_timer_new(mSystem));}
   IO* System::CreateReadIO(int fd) {return new IO(gp_system_io_read_new(mSystem, fd));}
   IO* System::CreateWriteIO(int fd) {return new IO(gp_system_io_write_new(mSystem, fd));}

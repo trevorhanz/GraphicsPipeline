@@ -31,6 +31,7 @@
 
 #include "View.h"
 #include "Timer.h"
+#include "../../Utils/RefCounter.h"
 
 struct _gp_system
 {
@@ -42,6 +43,7 @@ struct _gp_context
   gp_system*              mParent;
   NSOpenGLContext*        mShare;
   NSOpenGLPixelFormat*    mPixelFormat;
+  gp_refcounter           mRef;
 };
 
 struct _gp_target

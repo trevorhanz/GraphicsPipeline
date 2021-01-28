@@ -48,6 +48,7 @@ gp_context* gp_system_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
   context->mParent = system;
+  gp_ref_init(&context->mRef);
   
   const EGLint attribs[] = {
     EGL_SURFACE_TYPE, EGL_WINDOW_BIT,

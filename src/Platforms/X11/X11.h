@@ -23,6 +23,7 @@
 #include <GraphicsPipeline/Logging.h>
 
 #include "../../Utils/List.h"
+#include "../../Utils/RefCounter.h"
 
 #include <X11/Xlib.h>
 
@@ -47,6 +48,7 @@ struct _gp_context
   Window                  mWindow;
   Colormap                mColorMap;
   GLXContext              mShare;
+  gp_refcounter           mRef;
 };
 
 struct _gp_target
