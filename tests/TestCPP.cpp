@@ -23,12 +23,9 @@ using namespace GP;
 
 TEST(CPP, Init)
 {
-  System* system = new System();
-  ASSERT_NE(0, (uintptr_t)system);
+  System system;
   
-  Context context = system->CreateContext();
-  
-  delete system;
+  Context context = system.CreateContext();
 }
 
 int main(int argc, char* argv[])
