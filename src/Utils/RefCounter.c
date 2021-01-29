@@ -19,7 +19,7 @@
 
 void gp_ref_init(gp_refcounter* ref)
 {
-#if __STDC_NO_ATOMICS__
+#ifndef GP_ATOMICS
   ref->mRefCount = 0;
 #else
   atomic_init(&ref->mRefCount, 0);
@@ -28,7 +28,7 @@ void gp_ref_init(gp_refcounter* ref)
 
 void gp_ref_inc(gp_refcounter* ref)
 {
-#if __STDC_NO_ATOMICS__
+#ifndef GP_ATOMICS
   ++ref->mRefCount;
 #else
   atomic_fetch_add(&ref->mRefCount, 1);
@@ -37,7 +37,7 @@ void gp_ref_inc(gp_refcounter* ref)
 
 int gp_ref_dec(gp_refcounter* ref)
 {
-#if __STDC_NO_ATOMICS__
+#ifndef GP_ATOMICS
   return (--ref->mRefCount) == 0;
 #else
   return atomic_fetch_sub(&ref->mRefCount, 1) == 1;

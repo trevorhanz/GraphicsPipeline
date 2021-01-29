@@ -18,7 +18,11 @@
 #ifndef __GP_REFCOUNTER_H__
 #define __GP_REFCOUNTER_H__
 
-#if __STDC_NO_ATOMICS__ 
+#if !defined(__STDC_NO_ATOMICS__) && (__STDC_VERSION__ >= 201112L)
+  #define GP_ATOMICS 1
+#endif
+
+#ifndef GP_ATOMICS
 typedef int _gp_refcounter_type;
 #else
 #ifndef __cplusplus
