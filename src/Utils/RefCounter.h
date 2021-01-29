@@ -22,6 +22,11 @@
   #define GP_ATOMICS 1
 #endif
 
+// Workaround for GCC 4.8 bug
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 8)
+  #undef GP_ATOMICS
+#endif
+
 #ifndef GP_ATOMICS
 typedef int _gp_refcounter_type;
 #else
