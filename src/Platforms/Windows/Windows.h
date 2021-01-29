@@ -47,6 +47,7 @@ struct _gp_target
   HGLRC                 mContext;
   HWND                  mWindow;
   gp_pipeline*          mPipeline;
+  gp_refcounter         mRef;
 };
 
 struct _gp_timer

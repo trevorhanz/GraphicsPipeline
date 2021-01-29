@@ -62,6 +62,7 @@ gp_target* gp_context_target_new(gp_context* context)
   target->mParent = context;
   target->mPipeline = _gp_pipeline_new();
   target->mDirty = 1;
+  gp_ref_init(&target->mRef);
   gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)target);
   _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
   
@@ -120,16 +121,24 @@ gp_shader* gp_context_shader_new(gp_context* context)
   return shader;
 }
 
-void gp_target_free(gp_target* target)
+void gp_target_ref(gp_target* target)
 {
-  glXDestroyContext(target->mParent->mDisplay, target->mContext);
-  
-  gp_list_remove(&target->mParent->mParent->mTargets, (gp_list_node*)target);
-  _gp_pipeline_free(target->mPipeline);
-  
-  gp_io_free(target->mWake);
-  
-  free(target);
+  gp_ref_inc(&target->mRef);
+}
+
+void gp_target_unref(gp_target* target)
+{
+  if(gp_ref_dec(&target->mRef))
+  {
+    glXDestroyContext(target->mParent->mDisplay, target->mContext);
+    
+    gp_list_remove(&target->mParent->mParent->mTargets, (gp_list_node*)target);
+    _gp_pipeline_free(target->mPipeline);
+    
+    gp_io_free(target->mWake);
+    
+    free(target);
+  }
 }
 
 gp_pipeline* gp_target_get_pipeline(gp_target* target)

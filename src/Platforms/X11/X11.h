@@ -61,6 +61,7 @@ struct _gp_target
   uint8_t                 mDirty;
   int                     mPipe[2];
   gp_io*                  mWake;
+  gp_refcounter           mRef;
 };
 
 void _gp_target_draw(gp_target* target);

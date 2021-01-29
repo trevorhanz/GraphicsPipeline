@@ -52,6 +52,7 @@ struct _gp_target
   gp_pipeline*            mPipeline;
   NSWindow*               mWindow;
   View*                   mView;
+  gp_refcounter           mRef;
 };
 
 struct _gp_timer

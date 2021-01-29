@@ -33,10 +33,16 @@ extern "C" {
  */
 
 /*!
- * Free target object.
- * \param target Target object to be freed.
+ * Increase target object reference count.
+ * \param target Target object for which to increase the ref count.
  */
-GP_EXPORT void gp_target_free(gp_target* target);
+GP_EXPORT void gp_target_ref(gp_target* target);
+
+/*!
+ * Decrease target object reference count.
+ * \param target Target object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_target_unref(gp_target* target);
 
 /*!
  * Get the gp_pipeline tied to a gp_target.
@@ -67,6 +73,9 @@ namespace GP
     //! Constructor
     inline Target(gp_target* target);
     
+    //! Copy Constructor
+    inline Target(const Target& other);
+    
     //! Destructor
     inline ~Target();
     
@@ -81,6 +90,9 @@ namespace GP
      */
     inline void Redraw();
     
+    //! Equal operator
+    inline const Target& operator = (const Target& other);
+    
   private:
     gp_target*        mTarget;
     
@@ -90,10 +102,22 @@ namespace GP
   //
   // Implementation
   //
-  Target::Target(gp_target* target) : mTarget(target) {}
-  Target::~Target() {gp_target_free(mTarget);}
+  Target::Target(gp_target* target) : mTarget(target) {gp_target_ref(mTarget);}
+  Target::Target(const Target& other)
+  {
+    mTarget = other.mTarget;
+    gp_target_ref(mTarget);
+  }
+  Target::~Target() {gp_target_unref(mTarget);}
   Pipeline Target::GetPipeline() {return Pipeline(gp_target_get_pipeline(mTarget));}
   void Target::Redraw() {gp_target_redraw(mTarget);}
+  const Target& Target::operator = (const Target& other)
+  {
+    gp_target_unref(mTarget);
+    mTarget = other.mTarget;
+    gp_target_ref(mTarget);
+    return *this;
+  }
 }
 
 #endif // __cplusplus

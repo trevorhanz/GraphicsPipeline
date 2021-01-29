@@ -86,6 +86,7 @@ gp_target* gp_context_target_new(gp_context* context)
 {
   gp_target* target = new gp_target();
   target->mTarget = new Target(context->mShare);
+  gp_ref_init(&target->mRef);
   
   return target;
 }
@@ -117,9 +118,17 @@ gp_shader* gp_context_shader_new(gp_context* context)
   return shader;
 }
 
-void gp_target_free(gp_target* target)
+void gp_target_ref(gp_target* target)
 {
-  free(target);
+  gp_ref_inc(&target->mRef);
+}
+
+void gp_target_unref(gp_target* target)
+{
+  if(gp_ref_dec(&target->mRef))
+  {
+    free(target);
+  }
 }
 
 gp_pipeline* gp_target_get_pipeline(gp_target* target)

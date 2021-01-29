@@ -47,6 +47,7 @@ struct _gp_context
 struct _gp_target
 {
   Target*                 mTarget;
+  gp_refcounter           mRef;
 };
 
 struct _gp_timer

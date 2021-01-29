@@ -36,7 +36,8 @@ gp_target* gp_context_target_new(gp_context* context)
   gp_target* target = malloc(sizeof(struct _gp_target));
   target->mParent = context;
   target->mPipeline = _gp_pipeline_new();
-
+  gp_ref_init(&target->mRef);
+  
   DWORD                 dwExStyle;                                  // Window Extended Style
   DWORD                 dwStyle;                                    // Window Style
   RECT                  WindowRect;                                 // Grabs Rectangle Upper Left / Lower Right Values
@@ -158,10 +159,18 @@ gp_shader* gp_context_shader_new(gp_context* context)
   return shader;
 }
 
-void gp_target_free(gp_target* target)
+void gp_target_ref(gp_target* target)
 {
-  _gp_pipeline_free(target->mPipeline);
-  free(target);
+  gp_ref_inc(&target->mRef);
+}
+
+void gp_target_unref(gp_target* target)
+{
+  if(gp_ref_dec(&target->mRef))
+  {
+    _gp_pipeline_free(target->mPipeline);
+    free(target);
+  }
 }
 
 gp_pipeline* gp_target_get_pipeline(gp_target* target)

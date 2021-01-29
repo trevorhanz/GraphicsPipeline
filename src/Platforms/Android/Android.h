@@ -55,6 +55,7 @@ struct _gp_target
   GLuint                                shaderProgram;
   GLint                                 posAttrib;
   gp_pipeline*                          mPipeline;
+  gp_refcounter                         mRef;
 };
 
 struct _gp_timer
