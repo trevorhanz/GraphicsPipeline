@@ -128,7 +128,7 @@ namespace GP
   /*
    * Implementation
    */
-  Context::Context(gp_context* context) : mContext(context) {gp_context_ref(mContext);}
+  Context::Context(gp_context* context) : mContext(context) {}
   Context::Context(const Context& other)
   {
     mContext = other.mContext;

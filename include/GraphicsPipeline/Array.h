@@ -96,7 +96,7 @@ namespace GP
   //
   // Implementation
   //
-  Array::Array(gp_array* array) : mArray(array) {gp_array_ref(mArray);}
+  Array::Array(gp_array* array) : mArray(array) {}
   Array::Array(const Array& other)
   {
     mArray = other.mArray;

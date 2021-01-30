@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
+  gp_operation_unref(clear);
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
@@ -82,9 +83,15 @@ int main(int argc, char* argv[])
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
+  gp_operation_unref(draw);
+  gp_uniform_unref(color);
+  gp_shader_unref(shader);
+  gp_array_unref(array);
   
   gp_system_run(system);
   
+  gp_target_unref(target);
+  gp_context_unref(context);
   gp_system_free(system);
   
   return EXIT_SUCCESS;

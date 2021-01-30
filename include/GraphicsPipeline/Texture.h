@@ -96,7 +96,7 @@ namespace GP
   //
   // Implementation
   //
-  Texture::Texture(gp_texture* texture) : mTexture(texture) {gp_texture_ref(mTexture);}
+  Texture::Texture(gp_texture* texture) : mTexture(texture) {}
   Texture::Texture(const Texture& other)
   {
     mTexture = other.mTexture;

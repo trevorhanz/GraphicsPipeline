@@ -276,7 +276,7 @@ namespace GP
   //
   // Implementation
   //
-  Operation::Operation(gp_operation* operation) : mOperation(operation) {gp_operation_ref(mOperation);}
+  Operation::Operation(gp_operation* operation) : mOperation(operation) {}
   Operation::Operation(const Operation& other)
   {
     mOperation = other.mOperation;

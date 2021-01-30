@@ -102,7 +102,7 @@ namespace GP
   //
   // Implementation
   //
-  Target::Target(gp_target* target) : mTarget(target) {gp_target_ref(mTarget);}
+  Target::Target(gp_target* target) : mTarget(target) {}
   Target::Target(const Target& other)
   {
     mTarget = other.mTarget;

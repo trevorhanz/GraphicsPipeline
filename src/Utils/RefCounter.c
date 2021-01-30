@@ -22,7 +22,7 @@ void gp_ref_init(gp_refcounter* ref)
 #ifndef GP_ATOMICS
   ref->mRefCount = 0;
 #else
-  atomic_init(&ref->mRefCount, 0);
+  atomic_init(&ref->mRefCount, 1);
 #endif
 }
 

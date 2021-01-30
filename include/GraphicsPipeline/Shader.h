@@ -242,7 +242,7 @@ namespace GP
   //
   // Implementation
   //
-  Shader::Shader(gp_shader* shader) : mShader(shader) {gp_shader_ref(mShader);}
+  Shader::Shader(gp_shader* shader) : mShader(shader) {}
   Shader::Shader(const Shader& other)
   {
     mShader = other.mShader;
@@ -259,7 +259,7 @@ namespace GP
     return *this;
   }
   
-  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {gp_uniform_ref(mUniform);}
+  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {}
   Uniform::Uniform(const Uniform& other)
   {
     mUniform = other.mUniform;
