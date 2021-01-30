@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   
   Context context = system.CreateContext();
   
-  Target* target = context.CreateTarget();
+  Target target = context.CreateTarget();
   Array array = context.CreateArray();
   Shader shader = context.CreateShader();
   
@@ -71,13 +71,13 @@ int main(int argc, char* argv[])
     float o[] = {offset, 0.0f};
     uniform.SetVec2(o);
     
-    target->Redraw();
+    target.Redraw();
     
     ++frame;
   });
   timer->Arm(TIMEOUT);
   
-  Pipeline pipeline = target->GetPipeline();
+  Pipeline pipeline = target.GetPipeline();
   
   ClearOperation clear;
   pipeline.AddOperation(clear);
@@ -92,7 +92,6 @@ int main(int argc, char* argv[])
   system.Run();
   
   delete timer;
-  delete target;
   
   return EXIT_SUCCESS;
 }

@@ -42,7 +42,7 @@ int main(int argv, char* argc[])
   
   Web::Context context = system.CreateContext();
   
-  Target* target = context.CreateTarget("#WebExample");
+  Target target = context.CreateTarget("#WebExample");
   Array array = context.CreateArray();
   Shader shader = context.CreateShader();
   
@@ -50,7 +50,7 @@ int main(int argv, char* argc[])
   
   shader.Compile(vertexSource, fragmentSource);
   
-  Pipeline pipeline = target->GetPipeline();
+  Pipeline pipeline = target.GetPipeline();
   
   DrawOperation operation;
   operation.SetShader(shader);

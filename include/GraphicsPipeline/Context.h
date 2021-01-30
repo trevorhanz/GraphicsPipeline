@@ -102,7 +102,7 @@ namespace GP
      * Create a Target object tied to this Context.
      * \return Newly created Target object.
      */
-    inline Target* CreateTarget();
+    inline Target CreateTarget();
     
     /*!
      * Create an Array object tied to this Context.
@@ -135,7 +135,7 @@ namespace GP
     gp_context_ref(mContext);
   }
   Context::~Context() {gp_context_unref(mContext);}
-  Target* Context::CreateTarget() {return new Target(gp_context_target_new(mContext));}
+  Target Context::CreateTarget() {return Target(gp_context_target_new(mContext));}
   Array Context::CreateArray() {return Array(gp_context_array_new(mContext));}
   Shader Context::CreateShader() {return Shader(gp_context_shader_new(mContext));}
   const Context& Context::operator = (const Context& other)

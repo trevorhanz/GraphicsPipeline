@@ -68,7 +68,7 @@ namespace Web
      * \param id ID string of canvas object to be used.
      * \return Newly created Target.
      */
-    inline Target* CreateTarget(const char* id);
+    inline Target CreateTarget(const char* id);
   };
   
   /*
@@ -76,7 +76,7 @@ namespace Web
    */
   Context::Context(gp_context* context) : GP::Context(context) {}
   Context::Context(const GP::Context& other) : GP::Context(other) {}
-  Target* Context::CreateTarget(const char* id) {return new Target(gp_context_target_new_from_id(mContext, id));}
+  Target Context::CreateTarget(const char* id) {return Target(gp_context_target_new_from_id(mContext, id));}
 }
 }
 

@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   
   Context context = system.CreateContext();
   
-  Target* target = context.CreateTarget();
+  Target target = context.CreateTarget();
   Array array = context.CreateArray();
   Shader shader = context.CreateShader();
   
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   Uniform color = shader.CreateUniform("Color");
   color.SetVec4(c);
   
-  Pipeline pipeline = target->GetPipeline();
+  Pipeline pipeline = target.GetPipeline();
   
   ClearOperation clear;
   pipeline.AddOperation(clear);
@@ -71,8 +71,6 @@ int main(int argc, char* argv[])
   pipeline.AddOperation(operation);
   
   system.Run();
-  
-  delete target;
   
   return EXIT_SUCCESS;
 }
