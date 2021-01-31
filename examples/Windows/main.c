@@ -45,7 +45,10 @@ int main(int argc, char* argv[])
   gp_array* array = gp_array_new(context);
   gp_shader* shader = gp_shader_new(context);
   
-  gp_array_set_data(array, vertexData, 6);
+  gp_array_data* ad = gp_array_data_new();
+  gp_array_data_set(ad, vertexData, 6);
+  gp_array_set_data(array, ad);
+  gp_array_data_unref(ad);
   
   gp_shader_compile(shader, vertexSource, fragmentSource);
   

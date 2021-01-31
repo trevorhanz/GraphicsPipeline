@@ -26,6 +26,42 @@
 #include "GL.h"
 
 #include <stdlib.h>
+#include <string.h>
+
+gp_array_data* gp_array_data_new()
+{
+  gp_array_data* data = malloc(sizeof(gp_array_data));
+  
+  data->mData = NULL;
+  data->mCount = 0;
+  gp_ref_init(&data->mRef);
+  
+  return data;
+}
+
+void gp_array_data_ref(gp_array_data* data)
+{
+  gp_ref_inc(&data->mRef);
+}
+
+void gp_array_data_unref(gp_array_data* data)
+{
+  if(gp_ref_dec(&data->mRef))
+  {
+    if(data->mData) free(data->mData);
+    free(data);
+  }
+}
+
+void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count)
+{
+  const size_t size = sizeof(float)*count;
+  
+  if(ad->mData == NULL) ad->mData = malloc(size);
+  
+  memcpy(ad->mData, data, size);
+  ad->mCount = count;
+}
 
 gp_array* gp_array_new(gp_context* context)
 {
@@ -51,9 +87,9 @@ void gp_array_unref(gp_array* array)
   }
 }
 
-void gp_array_set_data(gp_array* array, float* data, unsigned int count)
+void gp_array_set_data(gp_array* array, gp_array_data* data)
 {
   glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
   
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*count, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*data->mCount, data->mData, GL_STATIC_DRAW);
 }

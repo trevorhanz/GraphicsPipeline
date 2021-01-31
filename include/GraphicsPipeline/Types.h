@@ -70,6 +70,7 @@ typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
 typedef struct _gp_target gp_target;
 typedef struct _gp_array gp_array;
+typedef struct _gp_array_data gp_array_data;
 typedef struct _gp_texture gp_texture;
 typedef struct _gp_shader gp_shader;
 typedef struct _gp_uniform gp_uniform;

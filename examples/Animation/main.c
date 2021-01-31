@@ -81,7 +81,10 @@ int main(int argc, char* argv[])
   gp_timer_set_userdata(timer, data);
   gp_timer_arm(timer, TIMEOUT);
   
-  gp_array_set_data(array, vertexData, 6);
+  gp_array_data* ad = gp_array_data_new();
+  gp_array_data_set(ad, vertexData, 6);
+  gp_array_set_data(array, ad);
+  gp_array_data_unref(ad);
   
   gp_shader_compile(shader, vertexSource, fragmentSource);
   

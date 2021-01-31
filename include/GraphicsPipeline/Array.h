@@ -34,6 +34,32 @@ extern "C" {
  */
 
 /*!
+ * Create a new gp_array_data object.
+ * \return Newly created array data object.
+ */
+GP_EXPORT gp_array_data* gp_array_data_new();
+
+/*!
+ * Increase array data object reference count.
+ * \param data Array data object for which to increase the ref count.
+ */
+GP_EXPORT void gp_array_data_ref(gp_array_data* data);
+
+/*!
+ * Decrease array data object reference count.
+ * \param data Array data object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_array_data_unref(gp_array_data* data);
+
+/*!
+ * Store float array in array data object.
+ * \param ad Array data object to be used.
+ * \param data Pointer to array of floats.
+ * \param count Number of elements in data array.
+ */
+GP_EXPORT void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count);
+
+/*!
  * Create a new gp_array object tied to a context.
  * \param context Context object used to create array.
  * \return Newly created array.
@@ -55,10 +81,9 @@ GP_EXPORT void gp_array_unref(gp_array* array);
 /*!
  * Upload data to an array object.
  * \param array Pointer to array object.
- * \param data Pointer to data to be uploaded.
- * \param count Number of element in data array.
+ * \param data Pointer to array data object to be uploaded.
  */
-  GP_EXPORT void gp_array_set_data(gp_array* array, float* data, unsigned int count);
+GP_EXPORT void gp_array_set_data(gp_array* array, gp_array_data* data);
 
 //! \} // Array
 
@@ -67,6 +92,37 @@ GP_EXPORT void gp_array_unref(gp_array* array);
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_array_data
+   */
+  class ArrayData
+  {
+  public:
+    //! Constructor
+    inline ArrayData();
+    
+    //! Copy Constructor
+    inline ArrayData(const ArrayData& other);
+    
+    //! Destructor
+    inline ~ArrayData();
+    
+    /*!
+     * Store float array in array data object.
+     * \param data Pointer to array of floats.
+     * \param count Number of elements in data array.
+     */
+    inline void Set(float* data, unsigned int count);
+    
+    //! Equal operator
+    inline const ArrayData& operator = (const ArrayData& other);
+    
+  private:
+    gp_array_data*      mData;  //!< Internal array data object
+    
+    friend class Array;
+  };
+  
   /*!
    * \brief Wrapper class for ::gp_array.
    */
@@ -84,10 +140,9 @@ namespace GP
     
     /*!
      * Uploads data to %Array object.
-     * \param data %Array of data to be uploaded.
-     * \param count Number of elements in data array;
+     * \param data %ArrayData to be uploaded.
      */
-    inline void SetData(float* data, unsigned int count);
+    inline void SetData(const ArrayData& ad);
     
     //! Equal operator
     inline const Array& operator = (const Array& other);
@@ -102,6 +157,22 @@ namespace GP
   //
   // Implementation
   //
+  ArrayData::ArrayData() : mData(gp_array_data_new()) {}
+  ArrayData::ArrayData(const ArrayData& other)
+  {
+    mData = other.mData;
+    gp_array_data_ref(mData);
+  }
+  ArrayData::~ArrayData() {gp_array_data_unref(mData);}
+  void ArrayData::Set(float* data, unsigned int count) {gp_array_data_set(mData, data, count);}
+  const ArrayData& ArrayData::operator = (const ArrayData& other)
+  {
+    gp_array_data_unref(mData);
+    mData = other.mData;
+    gp_array_data_ref(mData);
+    return *this;
+  }
+  
   Array::Array(const Context& context) : mArray(gp_array_new(context.mContext)) {}
   Array::Array(const Array& other)
   {
@@ -109,7 +180,7 @@ namespace GP
     gp_array_ref(mArray);
   }
   Array::~Array() {gp_array_unref(mArray);}
-  void Array::SetData(float* data, unsigned int count) {gp_array_set_data(mArray, data, count);}
+  void Array::SetData(const ArrayData& ad) {gp_array_set_data(mArray, ad.mData);}
   const Array& Array::operator = (const Array& other)
   {
     gp_array_unref(mArray);

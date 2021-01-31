@@ -37,6 +37,13 @@
 #include <GLES3/gl3.h>
 #endif // GP_GL
 
+struct _gp_array_data
+{
+  float*                  mData;
+  unsigned int            mCount;
+  gp_refcounter           mRef;
+};
+
 struct _gp_array
 {
   GLuint                  mVBO;
