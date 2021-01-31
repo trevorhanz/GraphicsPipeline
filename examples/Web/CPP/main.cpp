@@ -46,7 +46,9 @@ int main(int argv, char* argc[])
   Array array(context);
   Shader shader(context);
   
-  array.SetData(vertexData, 6);
+  ArrayData ad;
+  ad.Set(vertexData, 6);
+  array.SetData(ad);
   
   shader.Compile(vertexSource, fragmentSource);
   
