@@ -58,7 +58,7 @@ extern "C" gp_timer* gp_timer_new(gp_system* system)
   return timer;
 }
 
-extern "C" gp_io* gp_system_io_read_new(gp_system* system, int fd)
+extern "C" gp_io* gp_io_read_new(gp_system* system, int fd)
 {
   gp_io* io = new gp_io();
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Read);
@@ -70,7 +70,7 @@ extern "C" gp_io* gp_system_io_read_new(gp_system* system, int fd)
   return io;
 }
 
-extern "C" gp_io* gp_system_io_write_new(gp_system* system, int fd)
+extern "C" gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   gp_io* io = new gp_io();
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Write);

@@ -117,7 +117,7 @@ GP_EXPORT void gp_timer_disarm(gp_timer* timer);
  * \param fd File descriptor to watch.
  * \return Pointer to Newly created gp_io object.
  */
-GP_EXPORT gp_io* gp_system_io_read_new(gp_system* system, int fd);
+GP_EXPORT gp_io* gp_io_read_new(gp_system* system, int fd);
 
 /*!
  * Create a new gp_io object tied to the event loop
@@ -126,7 +126,7 @@ GP_EXPORT gp_io* gp_system_io_read_new(gp_system* system, int fd);
  * \param fd File descriptor to watch.
  * \return Pointer to Newly created gp_io object.
  */
-GP_EXPORT gp_io* gp_system_io_write_new(gp_system* system, int fd);
+GP_EXPORT gp_io* gp_io_write_new(gp_system* system, int fd);
 
 /*!
  * Free a gp_io object.
@@ -165,6 +165,8 @@ namespace GP
 {
   class Timer;
   class IO;
+  class ReadIO;
+  class WriteIO;
   
   /*!
    * \brief Wrapper class for ::gp_system.
@@ -179,22 +181,6 @@ namespace GP
     inline ~System();
     
     /*!
-     * Creates a new GP::IO for this system that listens
-     * for a file descriptor to become readable.
-     * \param fd File descriptor for which to listen.
-     * \return Pointer to newly created GP::IO.
-     */
-    inline IO* CreateReadIO(int fd);
-    
-    /*!
-     * Creates a new GP::IO for this system that listens
-     * for a file descriptor to become writable.
-     * \param fd File descriptor for which to listen.
-     * \return Pointer to newly created GP::IO.
-     */
-    inline IO* CreateWriteIO(int fd);
-    
-    /*!
      * Start the main loop.
      */
     inline void Run();
@@ -204,6 +190,9 @@ namespace GP
     
     friend class Context;
     friend class Timer;
+    friend class IO;
+    friend class ReadIO;
+    friend class WriteIO;
   };
   
   /*!
@@ -240,8 +229,6 @@ namespace GP
     
     gp_timer*                           mTimer;
     std::function<void(Timer*)>         mCallback;
-    
-    friend class System;
   };
   
   /*!
@@ -249,7 +236,7 @@ namespace GP
    */
   class IO
   {
-  private:
+  protected:
     //! Constructor
     inline IO(gp_io* io);
     
@@ -272,13 +259,23 @@ namespace GP
     friend class System;
   };
   
+  class ReadIO : public IO
+  {
+  public:
+    inline ReadIO(const System& system, int fd);
+  };
+  
+  class WriteIO : public IO
+  {
+  public:
+    inline WriteIO(const System& system, int fd);
+  };
+  
   //
   // Implementation
   //
   System::System() {mSystem = gp_system_new();}
   System::~System() {gp_system_free(mSystem);}
-  IO* System::CreateReadIO(int fd) {return new IO(gp_system_io_read_new(mSystem, fd));}
-  IO* System::CreateWriteIO(int fd) {return new IO(gp_system_io_write_new(mSystem, fd));}
   void System::Run() {gp_system_run(mSystem);}
   
   Timer::Timer(const System& system) : mTimer(gp_timer_new(system.mSystem)) {}
@@ -310,6 +307,10 @@ namespace GP
     IO* THIS = (IO*)gp_io_get_userdata(io);
     THIS->mCallback(THIS);
   }
+  
+  ReadIO::ReadIO(const System& system, int fd) : IO(gp_io_read_new(system.mSystem, fd)) {}
+  
+  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new(system.mSystem, fd)) {}
 }
 #endif // __cplusplus
 

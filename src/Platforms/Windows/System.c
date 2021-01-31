@@ -152,7 +152,7 @@ gp_timer* gp_timer_new(gp_system* system)
   return timer;
 }
 
-gp_io* gp_system_io_read_new(gp_system* system, int fd)
+gp_io* gp_io_read_new(gp_system* system, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
 
@@ -161,7 +161,7 @@ gp_io* gp_system_io_read_new(gp_system* system, int fd)
   return io;
 }
 
-gp_io* gp_system_io_write_new(gp_system* system, int fd)
+gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
   

@@ -142,7 +142,7 @@ gp_target* gp_target_new(gp_context* context)
   gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)target);
   _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
   
-  target->mWake = gp_system_io_read_new(context->mParent, target->mPipe[0]);
+  target->mWake = gp_io_read_new(context->mParent, target->mPipe[0]);
   gp_io_set_callback(target->mWake, _gp_target_wake_callback);
   gp_io_set_userdata(target->mWake, target);
   

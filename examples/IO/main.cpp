@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
 {
   System system;
   
-  IO* io = system.CreateReadIO(0); // STDIN;
-  io->SetCallback([](IO*)
+  ReadIO io(system, 0); // STDIN;
+  io.SetCallback([](IO*)
   {
     std::string in;
     std::cin >> in;
@@ -34,8 +34,6 @@ int main(int argc, char* argv[])
   });
   
   system.Run();
-  
-  delete io;
   
   return EXIT_SUCCESS;
 }

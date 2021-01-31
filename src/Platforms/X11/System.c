@@ -100,7 +100,7 @@ void gp_system_run(gp_system* system)
   
   int fd = XConnectionNumber(system->mDisplay);
   
-  gp_io* io = gp_system_io_read_new(system, fd);
+  gp_io* io = gp_io_read_new(system, fd);
   gp_io_set_callback(io, _gp_system_process_events);
   gp_io_set_userdata(io, (void*)system);
   
@@ -119,12 +119,12 @@ gp_timer* gp_timer_new(gp_system* system)
   return _gp_event_timer_new(system->mEvent);
 }
 
-gp_io* gp_system_io_read_new(gp_system* system, int fd)
+gp_io* gp_io_read_new(gp_system* system, int fd)
 {
   return _gp_event_io_read_new(system->mEvent, fd);
 }
 
-gp_io* gp_system_io_write_new(gp_system* system, int fd)
+gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   return _gp_event_io_write_new(system->mEvent, fd);
 }

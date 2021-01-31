@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 {
   gp_system* system = gp_system_new();
   
-  gp_io* io = gp_system_io_read_new(system, 0); // STDIN
+  gp_io* io = gp_io_read_new(system, 0); // STDIN
   gp_io_set_callback(io, IOCallback);
   
   gp_system_run(system);
