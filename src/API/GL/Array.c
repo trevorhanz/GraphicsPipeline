@@ -27,6 +27,16 @@
 
 #include <stdlib.h>
 
+gp_array* gp_array_new(gp_context* context)
+{
+  gp_array* array = malloc(sizeof(gp_array));
+  
+  glGenBuffers(1, &array->mVBO);
+  gp_ref_init(&array->mRef);
+  
+  return array;
+}
+
 void gp_array_ref(gp_array* array)
 {
   gp_ref_inc(&array->mRef);
@@ -46,10 +56,4 @@ void gp_array_set_data(gp_array* array, float* data, unsigned int count)
   glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
   
   glBufferData(GL_ARRAY_BUFFER, sizeof(float)*count, data, GL_STATIC_DRAW);
-}
-
-void _gp_generate_array(gp_array* array)
-{
-  glGenBuffers(1, &array->mVBO);
-  gp_ref_init(&array->mRef);
 }

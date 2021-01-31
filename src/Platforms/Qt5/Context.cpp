@@ -69,6 +69,11 @@ QWidget* gp_target_get_qwidget(gp_target* target)
   return target->mTarget->GetWidget();
 }
 
+extern "C" gp_context* gp_context_new(gp_system* system)
+{
+  return gp_qt_context_new();
+}
+
 void gp_context_ref(gp_context* context)
 {
   gp_ref_inc(&context->mRef);
@@ -82,40 +87,13 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_context_target_new(gp_context* context)
+gp_target* gp_target_new(gp_context* context)
 {
   gp_target* target = new gp_target();
   target->mTarget = new Target(context->mShare);
   gp_ref_init(&target->mRef);
   
   return target;
-}
-
-gp_array* gp_context_array_new(gp_context* context)
-{
-  gp_array* array = new gp_array();
-  
-  _gp_generate_array(array);
-  
-  return array;
-}
-
-gp_texture* gp_context_texture_new(gp_context* context)
-{
-  gp_texture* texture = new gp_texture();
-  
-  _gp_generate_texture(texture);
-  
-  return texture;
-}
-
-gp_shader* gp_context_shader_new(gp_context* context)
-{
-  gp_shader* shader = new gp_shader;
-  
-  _gp_generate_shader(shader);
-  
-  return shader;
 }
 
 void gp_target_ref(gp_target* target)

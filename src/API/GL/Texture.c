@@ -27,6 +27,16 @@
 
 #include <stdlib.h>
 
+gp_texture* gp_texture_new(gp_context* context)
+{
+  gp_texture* texture = malloc(sizeof(gp_texture));
+  
+  glGenTextures(1, &texture->mTexture);
+  gp_ref_init(&texture->mRef);
+  
+  return texture;
+}
+
 void gp_texture_ref(gp_texture* texture)
 {
   gp_ref_inc(&texture->mRef);
@@ -61,10 +71,4 @@ void gp_texture_set_data(gp_texture* texture, float* data, unsigned int width, u
     GL_FLOAT,                     // Image type
     (GLvoid*)data                 // data
   );
-}
-
-void _gp_generate_texture(gp_texture* texture)
-{
-  glGenTextures(1, &texture->mTexture);
-  gp_ref_init(&texture->mRef);
 }

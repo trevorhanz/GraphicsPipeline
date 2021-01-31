@@ -21,7 +21,7 @@
 #define __GP_WEB_H__
 
 #include "Common.h"
-#include "Context.h"
+#include "Target.h"
 #include "Types.h"
 
 #ifdef __cplusplus
@@ -39,7 +39,7 @@ extern "C" {
  * \param id ID string of canvas object to be used.
  * \return Newly created target.
  */
-GP_EXPORT gp_target* gp_context_target_new_from_id(gp_context* context, const char* id);
+GP_EXPORT gp_target* gp_target_new_from_id(gp_context* context, const char* id);
 
 //! \} // Web
 
@@ -51,32 +51,22 @@ namespace GP
 namespace Web
 {
   /*!
-   * \brief Wrapper class for ::gp_context extended for Web features.
+   * \brief Wrapper class for ::gp_target extended for Web features.
    */
-  class Context : public GP::Context
+  class Target : public GP::Target
   {
-  protected:
-    //! Constructor
-    inline Context(gp_context* context);
-    
   public:
-    //! Copy Constructor
-    inline Context(const GP::Context& other);
+    //! Constructor
+    inline Target(const GP::Context& context, const char* id);
     
-    /*!
-     * Creates a target object tied to this context using a canvas id.
-     * \param id ID string of canvas object to be used.
-     * \return Newly created Target.
-     */
-    inline Target CreateTarget(const char* id);
+    //! Copy Constructor
+    inline Target(const GP::Target& other);
   };
   
   /*
    * Implementation
    */
-  Context::Context(gp_context* context) : GP::Context(context) {}
-  Context::Context(const GP::Context& other) : GP::Context(other) {}
-  Target Context::CreateTarget(const char* id) {return Target(gp_context_target_new_from_id(mContext, id));}
+  Target::Target(const GP::Context& context, const char* id) : GP::Target(gp_target_new_from_id(GetContext(context), id)) {}
 }
 }
 

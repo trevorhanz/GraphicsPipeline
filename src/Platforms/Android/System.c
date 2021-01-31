@@ -44,65 +44,6 @@ void gp_system_free(gp_system* system)
   free(system);
 }
 
-gp_context* gp_system_context_new(gp_system* system)
-{
-  gp_context* context = malloc(sizeof(gp_context));
-  context->mParent = system;
-  gp_ref_init(&context->mRef);
-  
-  const EGLint attribs[] = {
-    EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-    EGL_BLUE_SIZE, 8,
-    EGL_GREEN_SIZE, 8,
-    EGL_RED_SIZE, 8,
-    EGL_NONE
-  };
-  EGLint numConfigs;
-  
-  if(!eglChooseConfig(system->mDisplay, attribs, &context->mConfig, 1, &numConfigs)) {
-    gp_log_error("eglChooseConfig() returned error %d", eglGetError());
-    free(context);
-    return NULL;
-  }
-
-  if(!eglGetConfigAttrib(system->mDisplay, context->mConfig, EGL_NATIVE_VISUAL_ID, &context->mFormat)) {
-    gp_log_error("eglGetConfigAttrib() returned error %d", eglGetError());
-    free(context);
-    return NULL;
-  }
-  
-  const EGLint contextAttribs[] = {
-    EGL_CONTEXT_MAJOR_VERSION, 2,
-    EGL_NONE
-  };
-  
-  if(!(context->mShare = eglCreateContext(system->mDisplay, context->mConfig, 0, contextAttribs))) {
-    gp_log_error("eglCreateContext() returned error %d", eglGetError());
-    free(context);
-    return NULL;
-  }
-  
-  const EGLint surfaceAttribs[] = {
-    EGL_NONE
-  };
-  
-  if(!(context->mShareSurface = eglCreatePbufferSurface(system->mDisplay, context->mConfig, surfaceAttribs))) {
-    gp_log_error("eglCreatePbufferSurface() returned error %d", eglGetError());
-    free(context);
-    return NULL;
-  }
-  
-  if(!eglMakeCurrent(system->mDisplay, context->mShareSurface, context->mShareSurface, context->mShare)) {
-      gp_log_error("eglMakeCurrent() returned error %d", eglGetError());
-      free(context);
-      return NULL;
-    }
-  
-  gp_log_error("GL Version: %s", glGetString(GL_VERSION));
-  
-  return context;
-}
-
 void gp_system_run(gp_system* system)
 {
 }

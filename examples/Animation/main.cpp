@@ -44,11 +44,11 @@ int main(int argc, char* argv[])
 {
   System system;
   
-  Context context = system.CreateContext();
+  Context context(system);
   
-  Target target = context.CreateTarget();
-  Array array = context.CreateArray();
-  Shader shader = context.CreateShader();
+  Target target(context);
+  Array array(context);
+  Shader shader(context);
   
   array.SetData(vertexData, 6);
   

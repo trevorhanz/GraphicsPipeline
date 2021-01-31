@@ -21,7 +21,6 @@
 #define __GP_SYSTEM_H__
 
 #include "Common.h"
-#include "Context.h"
 #include "Types.h"
 
 #ifdef __cplusplus
@@ -46,13 +45,6 @@ GP_EXPORT gp_system* gp_system_new();
  * \param system Pointer to system object to be freed.
  */
 GP_EXPORT void gp_system_free(gp_system* system);
-
-/*!
- * Create a new context object tied to an existing system object.
- * \param system Pointer to existing system object.
- * \return Pointer to new context object.
- */
-GP_EXPORT gp_context* gp_system_context_new(gp_system* system);
 
 /*!
  * Runs the main event loop for a system obect.
@@ -187,12 +179,6 @@ namespace GP
     inline ~System();
     
     /*!
-     * Creates a new GP::Context for this system.
-     * \return Newly created GP::Context.
-     */
-    inline Context CreateContext();
-    
-    /*!
      * Creates a new GP::Timer for this system.
      * \return Pointer to newly created GP::Timer.
      */
@@ -221,6 +207,8 @@ namespace GP
     
   private:
     gp_system*            mSystem;
+    
+    friend class Context;
   };
   
   /*!
@@ -295,7 +283,6 @@ namespace GP
   //
   System::System() {mSystem = gp_system_new();}
   System::~System() {gp_system_free(mSystem);}
-  Context System::CreateContext() {return Context(gp_system_context_new(mSystem));}
   Timer* System::CreateTimer() {return new Timer(gp_system_timer_new(mSystem));}
   IO* System::CreateReadIO(int fd) {return new IO(gp_system_io_read_new(mSystem, fd));}
   IO* System::CreateWriteIO(int fd) {return new IO(gp_system_io_write_new(mSystem, fd));}

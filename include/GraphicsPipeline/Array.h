@@ -22,6 +22,7 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Context.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,13 @@ extern "C" {
  * \defgroup Array
  * \{
  */
+
+/*!
+ * Create a new gp_array object tied to a context.
+ * \param context Context object used to create array.
+ * \return Newly created array.
+ */
+GP_EXPORT gp_array* gp_array_new(gp_context* context);
 
 /*!
  * Increase array object reference count.
@@ -64,11 +72,10 @@ namespace GP
    */
   class Array
   {
-  private:
-    //! Constructor
-    inline Array(gp_array* array);
-    
   public:
+    //! Constructor
+    inline Array(const Context& context);
+    
     //! Copy Constructor
     inline Array(const Array& other);
     
@@ -88,7 +95,6 @@ namespace GP
   private:
     gp_array*           mArray;     //!< Internal array object
     
-    friend class Context;
     friend class Pipeline;
     friend class DrawOperation;
   };
@@ -96,7 +102,7 @@ namespace GP
   //
   // Implementation
   //
-  Array::Array(gp_array* array) : mArray(array) {}
+  Array::Array(const Context& context) : mArray(gp_array_new(context.mContext)) {}
   Array::Array(const Array& other)
   {
     mArray = other.mArray;

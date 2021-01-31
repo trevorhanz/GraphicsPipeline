@@ -24,6 +24,8 @@
 #include <string.h>
 #include <assert.h>
 
+void gp_target_redraw(gp_target* target);
+
 EM_JS(int, _gp_canvas_get_width, (const char* id), {
   return document.getElementById(UTF8ToString(id)).width;
 });
@@ -39,6 +41,15 @@ EM_JS(void, _gp_canvas_set_width, (const char* id, int value), {
 EM_JS(void, _gp_canvas_set_height, (const char* id, int value), {
   document.getElementById(UTF8ToString(id)).height = value;
 });
+
+gp_context* gp_context_new(gp_system* system)
+{
+  gp_context* context = malloc(sizeof(gp_context));
+  context->mParent = system;
+  gp_ref_init(&context->mRef);
+  
+  return context;
+}
 
 void gp_context_ref(gp_context* context)
 {
@@ -82,7 +93,20 @@ void _gp_target_build(gp_target* target)
   gp_target_redraw(target);
 }
 
-gp_target* gp_context_target_new(gp_context* context)
+gp_target* gp_target_new_from_id(gp_context* context, const char* id)
+{
+  gp_target* target = malloc(sizeof(gp_target));
+  
+  int size = strlen(id);
+  target->mID = malloc(sizeof(char)*size);
+  memcpy(target->mID, id, sizeof(char)*size);
+  
+  _gp_target_build(target);
+  
+  return target;
+}
+
+gp_target* gp_target_new(gp_context* context)
 {
   gp_target* target = malloc(sizeof(gp_target));
   target->mID = malloc(sizeof(char)*15);
@@ -101,46 +125,6 @@ gp_target* gp_context_target_new(gp_context* context)
   _gp_target_build(target);
   
   return target;
-}
-
-gp_target* gp_context_target_new_from_id(gp_context* context, const char* id)
-{
-  gp_target* target = malloc(sizeof(gp_target));
-  
-  int size = strlen(id);
-  target->mID = malloc(sizeof(char)*size);
-  memcpy(target->mID, id, sizeof(char)*size);
-  
-  _gp_target_build(target);
-  
-  return target;
-}
-
-gp_array* gp_context_array_new(gp_context* context)
-{
-  gp_array* array = malloc(sizeof(struct _gp_array));
-  
-  _gp_generate_array(array);
-  
-  return array;
-}
-
-gp_texture* gp_context_texture_new(gp_context* context)
-{
-  gp_texture* texture = malloc(sizeof(gp_texture));
-  
-  _gp_generate_texture(texture);
-  
-  return texture;
-}
-
-gp_shader* gp_context_shader_new(gp_context* context)
-{
-  gp_shader* shader = malloc(sizeof(struct _gp_shader));
-  
-  _gp_generate_shader(shader);
-  
-  return shader;
 }
 
 void gp_target_ref(gp_target* target)

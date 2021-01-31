@@ -40,11 +40,11 @@ int main(int argv, char* argc[])
 {
   System system;
   
-  Web::Context context = system.CreateContext();
+  Context context(system);
   
-  Target target = context.CreateTarget("#WebExample");
-  Array array = context.CreateArray();
-  Shader shader = context.CreateShader();
+  Web::Target target(context, "#WebExample");
+  Array array(context);
+  Shader shader(context);
   
   array.SetData(vertexData, 6);
   

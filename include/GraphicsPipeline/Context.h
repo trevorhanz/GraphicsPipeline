@@ -21,11 +21,8 @@
 #define __GP_CONTEXT_H__
 
 #include "Common.h"
-#include "Pipeline.h"
 #include "Types.h"
-#include "Target.h"
-#include "Array.h"
-#include "Shader.h"
+#include "System.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +32,13 @@ extern "C" {
  * \defgroup Context
  * \{
  */
+
+/*!
+ * Create a new context object tied to an existing system object.
+ * \param system Pointer to existing system object.
+ * \return Pointer to new context object.
+ */
+GP_EXPORT gp_context* gp_context_new(gp_system* system);
 
 /*!
  * Increase context object reference count.
@@ -48,34 +52,6 @@ GP_EXPORT void gp_context_ref(gp_context* context);
  */
 GP_EXPORT void gp_context_unref(gp_context* context);
 
-/*!
- * Create a new gp_target object tied to a context.
- * \param context Context object used to create target.
- * \return Newly created target.
- */
-GP_EXPORT gp_target* gp_context_target_new(gp_context* context);
-
-/*!
- * Create a new gp_array object tied to a context.
- * \param context Context object used to create array.
- * \return Newly created array.
- */
-GP_EXPORT gp_array* gp_context_array_new(gp_context* context);
-
-/*!
- * Create a new gp_texture object tied to a context.
- * \param context Context object used to create texture.
- * \return Newly created texture.
- */
-GP_EXPORT gp_texture* gp_context_texture_new(gp_context* context);
-
-/*!
- * Create a new gp_shader object tied to a context.
- * \param context Context object used to create shader.
- * \return Newly created shader.
- */
-GP_EXPORT gp_shader* gp_context_shader_new(gp_context* context);
-
 //! \} // Context
 
 #ifdef __cplusplus
@@ -88,33 +64,15 @@ namespace GP
    */
   class Context
   {
-  protected:
-    //! Constructor
-    inline Context(gp_context* context);
   public:
+    //! Constructor
+    inline Context(const System& system);
+    
     //! Copy Constructor
     inline Context(const Context& other);
     
     //! Destructor
     inline ~Context();
-    
-    /*!
-     * Create a Target object tied to this Context.
-     * \return Newly created Target object.
-     */
-    inline Target CreateTarget();
-    
-    /*!
-     * Create an Array object tied to this Context.
-     * \return Newly created Array object.
-     */
-    inline Array CreateArray();
-    
-    /*!
-     * Create a Shader object tied to this Context.
-     * \return Newly created Shader object.
-     */
-    inline Shader CreateShader();
     
     //! Equal operator
     inline const Context& operator = (const Context& other);
@@ -122,22 +80,21 @@ namespace GP
   protected:
     gp_context*           mContext;
     
-    friend class System;
+    friend class Target;
+    friend class Array;
+    friend class Shader;
   };
   
   /*
    * Implementation
    */
-  Context::Context(gp_context* context) : mContext(context) {}
+  Context::Context(const System& system) : mContext(gp_context_new(system.mSystem)) {}
   Context::Context(const Context& other)
   {
     mContext = other.mContext;
     gp_context_ref(mContext);
   }
   Context::~Context() {gp_context_unref(mContext);}
-  Target Context::CreateTarget() {return Target(gp_context_target_new(mContext));}
-  Array Context::CreateArray() {return Array(gp_context_array_new(mContext));}
-  Shader Context::CreateShader() {return Shader(gp_context_shader_new(mContext));}
   const Context& Context::operator = (const Context& other)
   {
     gp_context_unref(mContext);

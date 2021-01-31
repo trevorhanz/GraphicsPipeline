@@ -57,11 +57,11 @@ int main(int argc, char* argv[])
 {
   gp_system* system = gp_system_new();
   
-  gp_context* context = gp_system_context_new(system);
+  gp_context* context = gp_context_new(system);
   
-  gp_target* target = gp_context_target_new(context);
-  gp_array* array = gp_context_array_new(context);
-  gp_shader* shader = gp_context_shader_new(context);
+  gp_target* target = gp_target_new(context);
+  gp_array* array = gp_array_new(context);
+  gp_shader* shader = gp_shader_new(context);
   
   gp_array_set_data(array, vertexData, 6);
   

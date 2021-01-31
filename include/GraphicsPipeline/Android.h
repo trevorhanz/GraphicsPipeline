@@ -35,7 +35,7 @@
  * \param window ANativeWindow for which the target will be created.
  * \return Pointer to new target object.
  */
-gp_target* gp_context_target_from_native(gp_context* context, ANativeWindow* window);
+gp_target* gp_target_new_from_native(gp_context* context, ANativeWindow* window);
 
 //! \} // Android
 

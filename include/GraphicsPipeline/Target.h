@@ -22,6 +22,7 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Context.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,13 @@ extern "C" {
  * \defgroup Target
  * \{
  */
+
+/*!
+ * Create a new gp_target object tied to a context.
+ * \param context Context object used to create target.
+ * \return Newly created target.
+ */
+GP_EXPORT gp_target* gp_target_new(gp_context* context);
 
 /*!
  * Increase target object reference count.
@@ -69,9 +77,13 @@ namespace GP
    */
   class Target
   {
-  public:
+  protected:
     //! Constructor
     inline Target(gp_target* target);
+    
+  public:
+    //! Constructor
+    inline Target(const Context& context);
     
     //! Copy Constructor
     inline Target(const Target& other);
@@ -93,16 +105,18 @@ namespace GP
     //! Equal operator
     inline const Target& operator = (const Target& other);
     
+  protected:
+    inline static gp_context* GetContext(const Context& context);
+    
   private:
     gp_target*        mTarget;
-    
-    friend class Context;
   };
   
   //
   // Implementation
   //
   Target::Target(gp_target* target) : mTarget(target) {}
+  Target::Target(const Context& context) : mTarget(gp_target_new(context.mContext)) {}
   Target::Target(const Target& other)
   {
     mTarget = other.mTarget;
@@ -118,6 +132,7 @@ namespace GP
     gp_target_ref(mTarget);
     return *this;
   }
+  gp_context* Target::GetContext(const Context& context) {return context.mContext;}
 }
 
 #endif // __cplusplus

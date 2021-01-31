@@ -33,6 +33,13 @@ extern "C" {
  */
 
 /*!
+ * Create a new gp_texture object tied to a context.
+ * \param context Context object used to create texture.
+ * \return Newly created texture.
+ */
+GP_EXPORT gp_texture* gp_texture_new(gp_context* context);
+
+/*!
  * Increase texture object reference count.
  * \param texture Texture object for which to increase the ref count.
  */

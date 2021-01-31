@@ -23,6 +23,7 @@
 #include "Common.h"
 #include "Types.h"
 #include "Texture.h"
+#include "Context.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +33,13 @@ extern "C" {
  * \defgroup Shader
  * \{
  */
+
+/*!
+ * Create a new gp_shader object tied to a context.
+ * \param context Context object used to create shader.
+ * \return Newly created shader.
+ */
+GP_EXPORT gp_shader* gp_shader_new(gp_context* context);
 
 /*!
  * Increase shader ref count.
@@ -136,10 +144,10 @@ namespace GP
    */
   class Shader
   {
-  private:
-    //! Constructor
-    inline Shader(gp_shader* shader);
   public:
+    //! Constructor
+    inline Shader(const Context& context);
+    
     //! Copy Constructor
     inline Shader(const Shader& other);
     
@@ -166,7 +174,6 @@ namespace GP
   private:
     gp_shader*        mShader;
     
-    friend class Context;
     friend class Pipeline;
     friend class DrawOperation;
   };
@@ -242,7 +249,7 @@ namespace GP
   //
   // Implementation
   //
-  Shader::Shader(gp_shader* shader) : mShader(shader) {}
+  Shader::Shader(const Context& context) : mShader(gp_shader_new(context.mContext)) {}
   Shader::Shader(const Shader& other)
   {
     mShader = other.mShader;

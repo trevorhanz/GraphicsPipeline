@@ -25,7 +25,7 @@ TEST(CPP, Init)
 {
   System system;
   
-  Context context = system.CreateContext();
+  Context context(system);
 }
 
 int main(int argc, char* argv[])

@@ -35,15 +35,6 @@ void gp_system_free(gp_system* system)
   free(system);
 }
 
-gp_context* gp_system_context_new(gp_system* system)
-{
-  gp_context* context = malloc(sizeof(gp_context));
-  context->mParent = system;
-  gp_ref_init(&context->mRef);
-  
-  return context;
-}
-
 void gp_system_run(gp_system* system)
 {
   

@@ -28,11 +28,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-void _gp_generate_shader(gp_shader* shader)
+gp_shader* gp_shader_new(gp_context* context)
 {
+  gp_shader* shader = malloc(sizeof(gp_shader));
+  
   shader->mProgram = 0;
   shader->mAttribute = 0;
   gp_ref_init(&shader->mRef);
+  
+  return shader;
 }
 
 void gp_shader_ref(gp_shader* shader)

@@ -24,7 +24,7 @@ TEST(C, Init)
   gp_system* system = gp_system_new();
   ASSERT_NE(0, (uintptr_t)system);
   
-  gp_context* context = gp_system_context_new(system);
+  gp_context* context = gp_context_new(system);
   ASSERT_NE(0, (uintptr_t)context);
   
   gp_context_ref(context);
