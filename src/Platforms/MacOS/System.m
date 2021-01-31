@@ -34,46 +34,6 @@ void gp_system_free(gp_system* system)
   free(system);
 }
 
-gp_context* gp_system_context_new(gp_system* system)
-{
-  gp_context* context = malloc(sizeof(gp_context));
-  gp_ref_init(&context->mRef);
-  
-  NSOpenGLPixelFormatAttribute pixelAttribs[ 16 ];
-  int pixNum = 0;
-
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFAOpenGLProfile;
-  pixelAttribs[ pixNum++ ] = NSOpenGLProfileVersion3_2Core;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFADoubleBuffer;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFAAccelerated;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFAColorSize;
-  pixelAttribs[ pixNum++ ] = 32;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFADepthSize;
-  pixelAttribs[ pixNum++ ] = 16;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFAMultisample,
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFASampleBuffers;
-  pixelAttribs[ pixNum++ ] = 1;
-  pixelAttribs[ pixNum++ ] = NSOpenGLPFASamples;
-  pixelAttribs[ pixNum++ ] = 4;
-  pixelAttribs[ pixNum ] = 0;
-  context->mPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelAttribs];
-
-  context->mShare = [[NSOpenGLContext alloc] initWithFormat:context->mPixelFormat shareContext:NULL];
-  [context->mShare makeCurrentContext];
-
-  // NOTE: GL functions need a context to be bound to get information from
-  int major, minor;
-  glGetIntegerv(GL_MAJOR_VERSION, &major);
-  glGetIntegerv(GL_MINOR_VERSION, &minor);
-  gp_log_info("OpenGL Version: %d.%d", major, minor);
-
-  GLboolean shaderSupport;
-  glGetBooleanv(GL_SHADER_COMPILER, &shaderSupport);
-  gp_log_info("ShaderSupport: %s", (shaderSupport)?"TRUE":"FALSE");
-  
-  return context;
-}
-
 void gp_system_run(gp_system* system)
 {
   [NSApplication sharedApplication];
