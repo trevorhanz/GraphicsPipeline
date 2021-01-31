@@ -68,33 +68,6 @@ gp_target* gp_context_target_new(gp_context* context)
   return target;
 }
 
-gp_array* gp_context_array_new(gp_context* context)
-{
-  gp_array* array = malloc(sizeof(struct _gp_array));
-  
-  _gp_generate_array(array);
-  
-  return array;
-}
-
-gp_texture* gp_context_texture_new(gp_context* context)
-{
-  gp_texture* texture = malloc(sizeof(gp_texture));
-  
-  _gp_generate_texture(texture);
-  
-  return texture;
-}
-
-gp_shader* gp_context_shader_new(gp_context* context)
-{
-  gp_shader* shader = malloc(sizeof(struct _gp_shader));
-  
-  _gp_generate_shader(shader);
-  
-  return shader;
-}
-
 void gp_target_ref(gp_target* target)
 {
   gp_ref_inc(&target->mRef);
