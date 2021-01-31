@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 {
   gp_system* system = gp_system_new();
   
-  gp_timer* timer = gp_system_timer_new(system);
+  gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, TimerCallback);
   gp_timer_arm(timer, 1.0);
   

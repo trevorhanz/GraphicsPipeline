@@ -40,7 +40,7 @@ void gp_system_run(gp_system* system)
   
 }
 
-gp_timer* gp_system_timer_new(gp_system* system)
+gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = malloc(sizeof(gp_timer));
   timer->mTimerID = -1;

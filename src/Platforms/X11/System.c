@@ -114,7 +114,7 @@ void gp_system_stop(gp_system* system)
   _gp_event_stop(system->mEvent);
 }
 
-gp_timer* gp_system_timer_new(gp_system* system)
+gp_timer* gp_timer_new(gp_system* system)
 {
   return _gp_event_timer_new(system->mEvent);
 }

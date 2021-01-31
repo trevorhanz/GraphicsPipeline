@@ -26,13 +26,11 @@ int main(int argc, char* argv[])
 {
   System system;
   
-  Timer* timer = system.CreateTimer();
-  timer->SetCallback([](Timer* timer){std::cout << "Timeout" << std::endl; timer->Arm(1.0);});
-  timer->Arm(1.0);
+  Timer timer(system);
+  timer.SetCallback([](Timer* timer){std::cout << "Timeout" << std::endl; timer->Arm(1.0);});
+  timer.Arm(1.0);
   
   system.Run();
-  
-  delete timer;
   
   return EXIT_SUCCESS;
 }

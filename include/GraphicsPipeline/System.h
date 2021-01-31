@@ -65,7 +65,7 @@ GP_EXPORT void gp_system_stop(gp_system* system);
  * \param system Pointer to system object to be used.
  * \return Pointer to Newly created gp_target object.
  */
-GP_EXPORT gp_timer* gp_system_timer_new(gp_system* system);
+GP_EXPORT gp_timer* gp_timer_new(gp_system* system);
 
 /*!
  * Free a gp_timer object.
@@ -179,12 +179,6 @@ namespace GP
     inline ~System();
     
     /*!
-     * Creates a new GP::Timer for this system.
-     * \return Pointer to newly created GP::Timer.
-     */
-    inline Timer* CreateTimer();
-    
-    /*!
      * Creates a new GP::IO for this system that listens
      * for a file descriptor to become readable.
      * \param fd File descriptor for which to listen.
@@ -209,6 +203,7 @@ namespace GP
     gp_system*            mSystem;
     
     friend class Context;
+    friend class Timer;
   };
   
   /*!
@@ -216,11 +211,10 @@ namespace GP
    */
   class Timer
   {
-  private:
-    //! Constructor
-    inline Timer(gp_timer* timer);
-    
   public:
+    //! Constructor
+    inline Timer(const System& system);
+    
     //! Destructor
     inline ~Timer();
     
@@ -283,12 +277,11 @@ namespace GP
   //
   System::System() {mSystem = gp_system_new();}
   System::~System() {gp_system_free(mSystem);}
-  Timer* System::CreateTimer() {return new Timer(gp_system_timer_new(mSystem));}
   IO* System::CreateReadIO(int fd) {return new IO(gp_system_io_read_new(mSystem, fd));}
   IO* System::CreateWriteIO(int fd) {return new IO(gp_system_io_write_new(mSystem, fd));}
   void System::Run() {gp_system_run(mSystem);}
   
-  Timer::Timer(gp_timer* timer) : mTimer(timer) {}
+  Timer::Timer(const System& system) : mTimer(gp_timer_new(system.mSystem)) {}
   Timer::~Timer() {gp_timer_free(mTimer);}
   void Timer::SetCallback(std::function<void(Timer*)> callback)
   {

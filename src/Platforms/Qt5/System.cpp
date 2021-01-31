@@ -46,7 +46,7 @@ extern "C" void gp_system_run(gp_system* system)
   auto ret = system->mApp->exec();
 }
 
-extern "C" gp_timer* gp_system_timer_new(gp_system* system)
+extern "C" gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = new gp_timer();
   timer->mTimer = new QTimer();

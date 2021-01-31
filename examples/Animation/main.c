@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
   data->target = target;
   data->frame = 0;
   
-  gp_timer* timer = gp_system_timer_new(system);
+  gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, TimerCallback);
   gp_timer_set_userdata(timer, data);
   gp_timer_arm(timer, TIMEOUT);

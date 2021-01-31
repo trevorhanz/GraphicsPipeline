@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
   uniform.SetVec2(o);
   
   int frame = 0;
-  Timer* timer = system.CreateTimer();
-  timer->SetCallback([&](Timer* timer)
+  Timer timer(system);
+  timer.SetCallback([&](Timer* timer)
   {
     timer->Arm(TIMEOUT);
     
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     
     ++frame;
   });
-  timer->Arm(TIMEOUT);
+  timer.Arm(TIMEOUT);
   
   Pipeline pipeline = target.GetPipeline();
   
@@ -90,8 +90,6 @@ int main(int argc, char* argv[])
   pipeline.AddOperation(operation);
   
   system.Run();
-  
-  delete timer;
   
   return EXIT_SUCCESS;
 }
