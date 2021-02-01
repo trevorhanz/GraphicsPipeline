@@ -41,6 +41,10 @@ extern "C" {
  * \brief \ref Array object.
  * Graphics primative that stores an array of numerical data.
  * 
+ * \typedef gp_array_data
+ * \brief \ref ArrayData object.
+ * Storage class array objects.
+ * 
  * \typedef gp_texture
  * \brief \ref Texture object.
  * Graphics primative that stores multi-dimensional texture data.
