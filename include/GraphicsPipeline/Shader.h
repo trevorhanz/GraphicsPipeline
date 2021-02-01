@@ -35,6 +35,32 @@ extern "C" {
  */
 
 /*!
+ * Create a new gp_shader_source object.
+ * \return Newly created shader source.
+ */
+GP_EXPORT gp_shader_source* gp_shader_source_new();
+
+/*!
+ * Increase shader source ref count.
+ * \param shader Shader source to have its ref count increased.
+ */
+GP_EXPORT void gp_shader_source_ref(gp_shader_source* source);
+
+/*!
+ * Decreate shader source ref count.
+ * \param shader Shader source to have its ref count decreased.
+ */
+GP_EXPORT void gp_shader_source_unref(gp_shader_source* source);
+
+/*!
+ * Store a shader source string in this shader source obect.
+ * \param source The shader source object for which to add the source code.
+ * \param type The type shader stage for which the string should be compiled.
+ * \param str Text containing shader source code.
+ */
+GP_EXPORT void gp_shader_source_add_from_string(gp_shader_source* source, GP_SHADER_SOURCE_TYPE type, const char* str);
+
+/*!
  * Create a new gp_shader object tied to a context.
  * \param context Context object used to create shader.
  * \return Newly created shader.
@@ -56,10 +82,9 @@ GP_EXPORT void gp_shader_unref(gp_shader* shader);
 /*!
  * Compile a gp_shader object with a vertext and fragment source code.
  * \param shader Shader object to be compiled.
- * \param vertex Vertex shader source code.
- * \param fragment Fragment shader source code.
+ * \param source Object containing source code.
  */
-GP_EXPORT void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment);
+GP_EXPORT void gp_shader_compile(gp_shader* shader, gp_shader_source* source);
 
 /*!
  * Create a new gp_uniform for a gp_shader object.
@@ -142,6 +167,37 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_shader.
    */
+  class ShaderSource
+  {
+  public:
+    //! Constructor
+    inline ShaderSource();
+    
+    //! Copy Constructor
+    inline ShaderSource(const ShaderSource& other);
+    
+    //! Destructor
+    inline ~ShaderSource();
+    
+    /*!
+     * Store a shader source string in this shader source obect.
+     * \param type The type shader stage for which the string should be compiled.
+     * \param str Text containing shader source code.
+     */
+    inline void AddString(GP_SHADER_SOURCE_TYPE type, const char* str);
+    
+    //! Equal operator
+    inline const ShaderSource& operator = (const ShaderSource& other);
+    
+  private:
+    gp_shader_source* mSource;
+    
+    friend class Shader;
+  };
+  
+  /*!
+   * \brief Wrapper class for ::gp_shader.
+   */
   class Shader
   {
   public:
@@ -156,10 +212,9 @@ namespace GP
     
     /*!
      * Compile this shader program with vertex and fragment source code.
-     * \param vertex Vertex shader source code.
-     * \param fragment Fragment shader source code.
+     * \param source The shader source object to be compiled.
      */
-    inline void Compile(const char* vertex, const char* fragment);
+    inline void Compile(const ShaderSource& source);
     
     /*!
      * Create a new Uniform for a Shader object.
@@ -249,6 +304,22 @@ namespace GP
   //
   // Implementation
   //
+  ShaderSource::ShaderSource() : mSource(gp_shader_source_new()) {}
+  ShaderSource::ShaderSource(const ShaderSource& other)
+  {
+    mSource = other.mSource;
+    gp_shader_source_ref(mSource);
+  }
+  ShaderSource::~ShaderSource() {gp_shader_source_unref(mSource);}
+  void ShaderSource::AddString(GP_SHADER_SOURCE_TYPE type, const char* str) {gp_shader_source_add_from_string(mSource, type, str);}
+  const ShaderSource& ShaderSource::operator = (const ShaderSource& other)
+  {
+    gp_shader_source_unref(mSource);
+    mSource = other.mSource;
+    gp_shader_source_ref(mSource);
+    return *this;
+  }
+  
   Shader::Shader(const Context& context) : mShader(gp_shader_new(context.mContext)) {}
   Shader::Shader(const Shader& other)
   {
@@ -256,7 +327,7 @@ namespace GP
     gp_shader_ref(mShader);
   }
   Shader::~Shader() {gp_shader_unref(mShader);}
-  void Shader::Compile(const char* vertex, const char* fragment) {gp_shader_compile(mShader, vertex, fragment);}
+  void Shader::Compile(const ShaderSource& source) {gp_shader_compile(mShader, source.mSource);}
   Uniform Shader::CreateUniform(const char* name) {return Uniform(gp_shader_uniform_new_by_name(mShader, name));}
   const Shader& Shader::operator = (const Shader& other)
   {

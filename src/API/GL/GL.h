@@ -56,6 +56,12 @@ struct _gp_texture
   gp_refcounter           mRef;
 };
 
+struct _gp_shader_source
+{
+  gp_list                 mSource;
+  gp_refcounter           mRef;
+};
+
 struct _gp_shader
 {
   GLuint                  mProgram;

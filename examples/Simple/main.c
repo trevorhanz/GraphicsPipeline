@@ -68,7 +68,11 @@ int main(int argc, char* argv[])
   gp_array_set_data(array, ad);
   gp_array_data_unref(ad);
   
-  gp_shader_compile(shader, vertexSource, fragmentSource);
+  gp_shader_source* source = gp_shader_source_new();
+  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
+  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
+  gp_shader_compile(shader, source);
+  gp_shader_source_unref(source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
   gp_uniform* color = gp_shader_uniform_new_by_name(shader, "Color");

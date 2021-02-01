@@ -26,7 +26,58 @@
 #include "GL.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
+typedef struct
+{
+  gp_list_node                mNode;
+  GP_SHADER_SOURCE_TYPE       mType;
+  const char*                 mText;
+} _gp_shader_source_node;
+
+gp_shader_source* gp_shader_source_new()
+{
+  gp_shader_source* source = malloc(sizeof(gp_shader_source));
+  
+  gp_list_init(&source->mSource);
+  gp_ref_init(&source->mRef);
+  
+  return source;
+}
+
+void gp_shader_source_ref(gp_shader_source* source)
+{
+  gp_ref_inc(&source->mRef);
+}
+
+void gp_shader_source_unref(gp_shader_source* source)
+{
+  if(gp_ref_dec(&source->mRef))
+  {
+    gp_list_node* node = gp_list_front(&source->mSource);
+    while(node != NULL)
+    {
+      _gp_shader_source_node* s = (_gp_shader_source_node*)node;
+      free((char*)s->mText);
+      
+      node = gp_list_node_next(node);
+      
+      free(s);
+    }
+    
+    free(source);
+  }
+}
+
+void gp_shader_source_add_from_string(gp_shader_source* source, GP_SHADER_SOURCE_TYPE type, const char* str)
+{
+  _gp_shader_source_node* node = malloc(sizeof(_gp_shader_source_node));
+  node->mType = type;
+  node->mText = strdup(str);
+  
+  gp_list_push_front(&source->mSource, (gp_list_node*)node);
+}
 
 gp_shader* gp_shader_new(gp_context* context)
 {
@@ -53,7 +104,7 @@ void gp_shader_unref(gp_shader* shader)
   }
 }
 
-int _check_shader_status(unsigned int shader, const char* type)
+int _check_shader_status(unsigned int shader, GP_SHADER_SOURCE_TYPE type)
 {
   GLint isCompiled = 0;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
@@ -69,7 +120,15 @@ int _check_shader_status(unsigned int shader, const char* type)
     // Provide the infolog in whatever manor you deem best.
     // Exit with failure.
     glDeleteShader(shader); // Don't leak the shader.
-    gp_log_error("%s Error: %s\n", type, errorLog);
+    switch(type)
+    {
+      case GP_SHADER_SOURCE_VERTEX:
+        gp_log_error("Vertex Error: %s\n", errorLog);
+        break;
+      case GP_SHADER_SOURCE_FRAGMENT:
+        gp_log_error("Fragment Error: %s\n", errorLog);
+        break;
+    }
     free(errorLog);
 
     return 0;
@@ -78,26 +137,34 @@ int _check_shader_status(unsigned int shader, const char* type)
   return 1;
 }
 
-void gp_shader_compile(gp_shader* shader, const char* vertex, const char* fragment)
+void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
 {
-  // Create and compile the vertex shader
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertex, 0);
-  glCompileShader(vertexShader);
-  
-  if(!_check_shader_status(vertexShader, "Vertex")) return;
-  
-  // Create and compile the fragment shader
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragment, 0);
-  glCompileShader(fragmentShader);
-  
-  if(!_check_shader_status(fragmentShader, "Fragment")) return;
-  
-  // Link the vertex and fragment shader into a shader program
   shader->mProgram = glCreateProgram();
-  glAttachShader(shader->mProgram, vertexShader);
-  glAttachShader(shader->mProgram, fragmentShader);
+  
+  _gp_shader_source_node* node = (_gp_shader_source_node*)gp_list_front(&source->mSource);
+  while(node != NULL)
+  {
+    int gl_type;
+    switch(node->mType)
+    {
+      case GP_SHADER_SOURCE_VERTEX:
+        gl_type = GL_VERTEX_SHADER;
+        break;
+      case GP_SHADER_SOURCE_FRAGMENT:
+        gl_type = GL_FRAGMENT_SHADER;
+        break;
+    }
+    GLuint s = glCreateShader(gl_type);
+    glShaderSource(s, 1, &node->mText, 0);
+    glCompileShader(s);
+    
+    if(!_check_shader_status(s, node->mType)) return;
+    
+    glAttachShader(shader->mProgram, s);
+    
+    node = (_gp_shader_source_node*)gp_list_node_next((gp_list_node*)node);
+  }
+  
   glLinkProgram(shader->mProgram);
   glUseProgram(shader->mProgram);
   

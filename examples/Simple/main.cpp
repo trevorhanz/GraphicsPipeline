@@ -54,7 +54,10 @@ int main(int argc, char* argv[])
   ad.Set(vertexData, 6);
   array.SetData(ad);
   
-  shader.Compile(vertexSource, fragmentSource);
+  ShaderSource source;
+  source.AddString(GP_SHADER_SOURCE_VERTEX, vertexSource);
+  source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
+  shader.Compile(source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
   Uniform color = shader.CreateUniform("Color");

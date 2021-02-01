@@ -50,7 +50,10 @@ int main(int argv, char* argc[])
   ad.Set(vertexData, 6);
   array.SetData(ad);
   
-  shader.Compile(vertexSource, fragmentSource);
+  ShaderSource source;
+  source.AddString(GP_SHADER_SOURCE_VERTEX, vertexSource);
+  source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
+  shader.Compile(source);
   
   Pipeline pipeline = target.GetPipeline();
   

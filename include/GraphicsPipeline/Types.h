@@ -49,6 +49,10 @@ extern "C" {
  * \brief \ref Shader object.
  * Graphics primative that contains a shader program.
  * 
+ * \typedef gp_shader_source
+ * \brief \ref ShaderSource object
+ * Storage class for shader source code yet to be compiled.
+ * 
  * \typedef gp_uniform
  * \brief \ref Uniform object.
  * Graphics primative that stores data for a shader object's uniform variable.
@@ -73,11 +77,18 @@ typedef struct _gp_array gp_array;
 typedef struct _gp_array_data gp_array_data;
 typedef struct _gp_texture gp_texture;
 typedef struct _gp_shader gp_shader;
+typedef struct _gp_shader_source gp_shader_source;
 typedef struct _gp_uniform gp_uniform;
 typedef struct _gp_pipeline gp_pipeline;
 typedef struct _gp_operation gp_operation;
 typedef struct _gp_timer gp_timer;
 typedef struct _gp_io gp_io;
+
+typedef enum
+{
+  GP_SHADER_SOURCE_VERTEX,
+  GP_SHADER_SOURCE_FRAGMENT
+} GP_SHADER_SOURCE_TYPE;
 
 /*!
  * \brief Callback function to be used by gp_timer objects.

@@ -50,7 +50,11 @@ int main(int argc, char* argv[])
   gp_array_set_data(array, ad);
   gp_array_data_unref(ad);
   
-  gp_shader_compile(shader, vertexSource, fragmentSource);
+  gp_shader_source* source = gp_shader_source_new();
+  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
+  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
+  gp_shader_compile(shader, source);
+  gp_shader_source_unref(source);
   
   gp_pipeline* pipeline = gp_target_get_pipeline(target1);
   gp_operation* draw = gp_operation_draw_new();
