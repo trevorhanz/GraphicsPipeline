@@ -37,6 +37,15 @@
 #include <GLES3/gl3.h>
 #endif // GP_GL
 
+struct _gp_frame_buffer
+{
+  GLuint                  mFBO;
+  GLuint                  mRBO;
+  gp_texture*             mTexture;
+  gp_pipeline*            mPipeline;
+  gp_refcounter           mRef;
+};
+
 struct _gp_array_data
 {
   float*                  mData;

@@ -37,6 +37,10 @@ extern "C" {
  * \brief \ref Target object.
  * Graphics primative that provides a surface to which can be rendered.
  * 
+ * \typedef gp_frame_buffer
+ * \brief \ref FrameBuffer object.
+ * Graphics primative  that provides an offscreen surface to which can be rendered.
+ * 
  * \typedef gp_array
  * \brief \ref Array object.
  * Graphics primative that stores an array of numerical data.
@@ -77,6 +81,7 @@ extern "C" {
 typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
 typedef struct _gp_target gp_target;
+typedef struct _gp_frame_buffer gp_frame_buffer;
 typedef struct _gp_array gp_array;
 typedef struct _gp_array_data gp_array_data;
 typedef struct _gp_texture gp_texture;
