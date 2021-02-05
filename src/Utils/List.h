@@ -34,6 +34,10 @@ struct _gp_list_node
   gp_list_node*             mNext;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void gp_list_init(gp_list* l);
 
 void gp_list_push_front(gp_list* list, gp_list_node* node);
@@ -46,5 +50,9 @@ gp_list_node* gp_list_front(gp_list* list);
 gp_list_node* gp_list_back(gp_list* list);
 gp_list_node* gp_list_node_next(gp_list_node* node);
 gp_list_node* gp_list_node_prev(gp_list_node* node);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __GP_LIST_H__
