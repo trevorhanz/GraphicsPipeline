@@ -122,6 +122,7 @@ unit_test:
   script:
     - xvfb-run -a ./build/tests/TestC --gtest_output=xml:ReportC.xml
     - xvfb-run -a ./build/tests/TestCPP --gtest_output=xml:ReportCPP.xml
+    - ./build/tests/TestUtils --gtest_output=xml:ReportUtils.xml
   dependencies:
     - build_ubuntu_20
   artifacts:
