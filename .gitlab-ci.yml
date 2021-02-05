@@ -130,6 +130,7 @@ unit_test:
       junit:
         - ReportC.xml
         - ReportCPP.xml
+        - ReportUtils.xml
 
 pages:
   stage: deploy
