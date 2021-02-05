@@ -36,6 +36,47 @@
   }\
 }
 
+void _gp_check_frame_buffer()
+{
+  int ret = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if(ret != GL_FRAMEBUFFER_COMPLETE)
+  {
+    gp_log_debug("Ret: %x", ret);
+    switch(ret)
+    {
+      case GL_FRAMEBUFFER_UNDEFINED:
+        gp_log_warn("FrameBuffer is undefined");
+        break;
+      case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        gp_log_warn("FrameBuffer has incomplete attachment");
+        break;
+      case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        gp_log_warn("FrameBuffer has incomplete missing attachment");
+        break;
+      case GL_FRAMEBUFFER_UNSUPPORTED:
+        gp_log_warn("FrameBuffer is not supported");
+        break;
+      case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+        gp_log_warn("FrameBuffer has incomplete multisample setup");
+        break;
+#ifdef GP_GL
+      case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+        gp_log_warn("FrameBuffer has incomplete draw buffer");
+        break;
+      case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+        gp_log_warn("FrameBuffer has incomplete layer targets");
+        break;
+#else
+      case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+        gp_log_warn("FrameBuffer has incomplete dimensions");
+        break;
+#endif
+      default:
+        gp_log_warn("FrameBuffer is not complete");
+    }
+  }
+}
+
 gp_frame_buffer* gp_frame_buffer_new(gp_context* context)
 {
   gp_frame_buffer* fb = malloc(sizeof(gp_frame_buffer));
@@ -52,8 +93,7 @@ gp_frame_buffer* gp_frame_buffer_new(gp_context* context)
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fb->mRBO);
   
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    gp_log_warn("FrameBuffer is not complete");
+  _gp_check_frame_buffer();
   
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   CHECK_GL_ERROR()
