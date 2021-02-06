@@ -17,6 +17,7 @@
 
 #include <GraphicsPipeline/GP.h>
 #include "../src/Utils/List.h"
+#include "../src/Utils/RefCounter.h"
 
 #include "gtest/gtest.h"
 
@@ -94,6 +95,27 @@ TEST(List, empty)
   
   ASSERT_EQ(gp_list_front(&l), nullptr);
   ASSERT_EQ(gp_list_back(&l), nullptr);
+}
+
+TEST(RefCounter, init)
+{
+  gp_refcounter counter;
+  gp_ref_init(&counter);
+  ASSERT_EQ(counter.mRefCount, 1);
+}
+
+TEST(RefCounter, decrement)
+{
+  gp_refcounter counter;
+  gp_ref_init(&counter);
+  
+  for(int i=0; i<100; ++i)
+    gp_ref_inc(&counter);
+  
+  for(int i=0; i<100; ++i)
+    ASSERT_EQ(gp_ref_dec(&counter), 0);
+  
+  ASSERT_EQ(gp_ref_dec(&counter), 1);
 }
 
 int main(int argc, char* argv[])
