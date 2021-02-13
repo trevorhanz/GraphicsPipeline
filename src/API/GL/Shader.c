@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 typedef struct
 {
@@ -186,17 +187,6 @@ void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
   shader->mAttribute = glGetAttribLocation(shader->mProgram, "position");
 }
 
-gp_uniform* gp_uniform_new_by_name(gp_shader* shader, const char* name)
-{
-  gp_uniform* uniform = malloc(sizeof(gp_uniform));
-  uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
-  uniform->mOperation = 0;
-  uniform->mData = 0;
-  gp_ref_init(&uniform->mRef);
-  
-  return uniform;
-}
-
 void gp_uniform_ref(gp_uniform* uniform)
 {
   gp_ref_inc(&uniform->mRef);
@@ -243,53 +233,51 @@ void _gp_uniform_load_mat4(gp_uniform* uniform)
   glUniformMatrix4fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
 }
 
-#define UNIFORM_SET(op, size)\
-  if(uniform->mOperation != op)\
+#define UNIFORM_NEW_BY_NAME(type, size)\
+  gp_uniform* gp_uniform_##type##_new_by_name(gp_shader* shader, const char* name)\
   {\
-    if(uniform->mOperation)\
-      free(uniform->mData);\
+    gp_uniform* uniform = malloc(sizeof(gp_uniform));\
+    uniform->mLocation = glGetUniformLocation(shader->mProgram, name);\
+    uniform->mOperation = _gp_uniform_load_##type;\
     uniform->mData = malloc(size);\
-  }\
-  uniform->mOperation = op;
+    memset(uniform->mData, 0, size);\
+    gp_ref_init(&uniform->mRef);\
+    return uniform;\
+  }
 
-void gp_uniform_set_texture(gp_uniform* uniform, gp_texture* texture)
+UNIFORM_NEW_BY_NAME(texture, sizeof(GLuint))
+UNIFORM_NEW_BY_NAME(float, sizeof(float))
+UNIFORM_NEW_BY_NAME(vec2, sizeof(float)*2)
+UNIFORM_NEW_BY_NAME(vec3, sizeof(float)*3)
+UNIFORM_NEW_BY_NAME(vec4, sizeof(float)*4)
+UNIFORM_NEW_BY_NAME(mat3, sizeof(float)*9)
+UNIFORM_NEW_BY_NAME(mat4, sizeof(float)*16)
+
+#undef UNIFORM_NEW_BY_NAME
+
+#define UNIFORM_SET_FLOATPTR(type, size)\
+  void gp_uniform_##type##_set(gp_uniform* uniform, float* data)\
+  {\
+    assert(uniform->mOperation == _gp_uniform_load_##type);\
+    memcpy(uniform->mData, data, size);\
+  }
+
+void gp_uniform_texture_set(gp_uniform* uniform, gp_texture* texture)
 {
-  UNIFORM_SET(_gp_uniform_load_texture, sizeof(GLuint));
+  assert(uniform->mOperation == _gp_uniform_load_texture);
   memcpy(uniform->mData, &texture->mTexture, sizeof(GLuint));
 }
 
-void gp_uniform_set_float(gp_uniform* uniform, float data)
+void gp_uniform_float_set(gp_uniform* uniform, float data)
 {
-  UNIFORM_SET(_gp_uniform_load_float, sizeof(float)*1);
+  assert(uniform->mOperation == _gp_uniform_load_float);
   memcpy(uniform->mData, &data, sizeof(float));
 }
 
-void gp_uniform_set_vec2(gp_uniform* uniform, float* data)
-{
-  UNIFORM_SET(_gp_uniform_load_vec2, sizeof(float)*2);
-  memcpy(uniform->mData, data, sizeof(float)*2);
-}
+UNIFORM_SET_FLOATPTR(vec2, sizeof(float)*2)
+UNIFORM_SET_FLOATPTR(vec3, sizeof(float)*3)
+UNIFORM_SET_FLOATPTR(vec4, sizeof(float)*4)
+UNIFORM_SET_FLOATPTR(mat3, sizeof(float)*9)
+UNIFORM_SET_FLOATPTR(mat4, sizeof(float)*16)
 
-void gp_uniform_set_vec3(gp_uniform* uniform, float* data)
-{
-  UNIFORM_SET(_gp_uniform_load_vec3, sizeof(float)*3);
-  memcpy(uniform->mData, data, sizeof(float)*3);
-}
-
-void gp_uniform_set_vec4(gp_uniform* uniform, float* data)
-{
-  UNIFORM_SET(_gp_uniform_load_vec4, sizeof(float)*4);
-  memcpy(uniform->mData, data, sizeof(float)*4);
-}
-
-void gp_uniform_set_mat3(gp_uniform* uniform, float* data)
-{
-  UNIFORM_SET(_gp_uniform_load_mat3, sizeof(float)*9);
-  memcpy(uniform->mData, data, sizeof(float)*9);
-}
-
-void gp_uniform_set_mat4(gp_uniform* uniform, float* data)
-{
-  UNIFORM_SET(_gp_uniform_load_mat4, sizeof(float)*16);
-  memcpy(uniform->mData, data, sizeof(float)*16);
-}
+#undef UNIFORM_SET_FLOATPTR

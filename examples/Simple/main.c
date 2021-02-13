@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
   gp_shader_source_unref(source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
-  gp_uniform* color = gp_uniform_new_by_name(shader, "Color");
-  gp_uniform_set_vec4(color, c);
+  gp_uniform* color = gp_uniform_vec4_new_by_name(shader, "Color");
+  gp_uniform_vec4_set(color, c);
   
   gp_pipeline* pipeline = gp_target_get_pipeline(target);
   
