@@ -88,8 +88,8 @@ gp_frame_buffer* gp_frame_buffer_new(gp_context* context)
   gp_ref_init(&fb->mRef);
   
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
-  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);  
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 768);  
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fb->mRBO);
   
@@ -123,7 +123,15 @@ gp_pipeline* gp_frame_buffer_get_pipeline(gp_frame_buffer* fb)
 
 void gp_frame_buffer_redraw(gp_frame_buffer* fb)
 {
+  int width, height;
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO);
+  glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
+  glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  gp_log_debug("redraw: %d, %d", width, height);
+  
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
+  glViewport(0, 0, width, height);
   _gp_pipeline_execute(fb->mPipeline);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   CHECK_GL_ERROR()
@@ -135,8 +143,29 @@ void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture)
     gp_texture_unref(fb->mTexture);
   fb->mTexture = texture;
   gp_texture_ref(texture);
+  
+  int width, height;
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO);
+  glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
+  glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  
+  gp_texture_set_data(fb->mTexture, 0, width, height);
+  
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->mTexture, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   CHECK_GL_ERROR()
 }
+
+void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);  
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  
+  if(fb->mTexture)
+    gp_texture_set_data(fb->mTexture, 0, width, height);
+}
+

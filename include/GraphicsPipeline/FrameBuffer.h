@@ -71,6 +71,14 @@ GP_EXPORT void gp_frame_buffer_redraw(gp_frame_buffer* fb);
  */
 GP_EXPORT void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture);
 
+/*!
+ * Set the size of the frame buffer in pixels.
+ * \param fb Pointer to frame buffer object.
+ * \param width Number of pixels wide.
+ * \param height Number of pixels high.
+ */
+GP_EXPORT void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height);
+
 //! \} // FrameBuffer
 
 #ifdef __cplusplus
