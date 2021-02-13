@@ -259,12 +259,18 @@ namespace GP
     friend class System;
   };
   
+  /*!
+   * \brief IO class extended for read operations
+   */
   class ReadIO : public IO
   {
   public:
     inline ReadIO(const System& system, int fd);
   };
   
+  /*!
+   * \brief IO class extended for write operations
+   */
   class WriteIO : public IO
   {
   public:
