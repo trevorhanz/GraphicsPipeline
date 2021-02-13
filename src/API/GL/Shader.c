@@ -204,7 +204,7 @@ void gp_uniform_unref(gp_uniform* uniform)
 
 void _gp_uniform_load_texture(gp_uniform* uniform)
 {
-  glBindTexture(GL_TEXTURE_2D, *(int*)uniform->mData);
+  glBindTexture(GL_TEXTURE_2D, ((gp_texture*)uniform->mData)->mTexture);
   glUniform1i(uniform->mLocation, 0);
 }
 void _gp_uniform_load_int(gp_uniform* uniform) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
@@ -245,7 +245,16 @@ void _gp_uniform_load_mat4(gp_uniform* uniform)
     return uniform;\
   }
 
-UNIFORM_NEW_BY_NAME(texture, sizeof(GLuint))
+gp_uniform* gp_uniform_texture_new_by_name(gp_shader* shader, const char* name)
+{
+  gp_uniform* uniform = malloc(sizeof(gp_uniform));
+  uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
+  uniform->mOperation = _gp_uniform_load_texture;
+  uniform->mData = 0;
+  gp_ref_init(&uniform->mRef);
+  return uniform;
+}
+
 UNIFORM_NEW_BY_NAME(float, sizeof(float))
 UNIFORM_NEW_BY_NAME(vec2, sizeof(float)*2)
 UNIFORM_NEW_BY_NAME(vec3, sizeof(float)*3)
@@ -265,7 +274,10 @@ UNIFORM_NEW_BY_NAME(mat4, sizeof(float)*16)
 void gp_uniform_texture_set(gp_uniform* uniform, gp_texture* texture)
 {
   assert(uniform->mOperation == _gp_uniform_load_texture);
-  memcpy(uniform->mData, &texture->mTexture, sizeof(GLuint));
+  
+  if(uniform->mData) gp_texture_unref((gp_texture*)uniform->mData);
+  uniform->mData = texture;
+  if(uniform->mData) gp_texture_ref((gp_texture*)uniform->mData);
 }
 
 void gp_uniform_float_set(gp_uniform* uniform, float data)
