@@ -95,13 +95,14 @@ void gp_operation_unref(gp_operation* operation)
 typedef struct
 {
   _gp_operation_data      mData;
+  float                   mColor[4]; // RGBA
 } _gp_operation_clear_data;
 
 void _gp_operation_clear(_gp_operation_data* data)
 {
   _gp_operation_clear_data* d = (_gp_operation_clear_data*)data;
   
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(d->mColor[0], d->mColor[1], d->mColor[2], d->mColor[3]);
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 }
 
@@ -113,7 +114,22 @@ gp_operation* gp_operation_clear_new()
   operation->mData->free = (void(*)(_gp_operation_data*))free;
   gp_ref_init(&operation->mRef);
   
+  _gp_operation_clear_data* d = (_gp_operation_clear_data*)operation->mData;
+  d->mColor[0] = 0;
+  d->mColor[1] = 0;
+  d->mColor[2] = 0;
+  d->mColor[3] = 1;
+  
   return operation;
+}
+
+void gp_operation_clear_set_color(gp_operation* operation, float r, float g, float b, float a)
+{
+  _gp_operation_clear_data* d = (_gp_operation_clear_data*)operation->mData;
+  d->mColor[0] = r;
+  d->mColor[1] = g;
+  d->mColor[2] = b;
+  d->mColor[3] = a;
 }
 
 typedef struct _gp_array_list gp_array_list;

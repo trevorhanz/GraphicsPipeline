@@ -57,6 +57,16 @@ GP_EXPORT void gp_operation_unref(gp_operation* operation);
 GP_EXPORT gp_operation* gp_operation_clear_new();
 
 /*!
+ * Sets the color to be used for the clear operation.
+ * \param operation Clear operation for which to set the new color.
+ * \param r Red channel.
+ * \param g Green channel.
+ * \param b Blue channel.
+ * \param a Alpha channel.
+ */
+GP_EXPORT void gp_operation_clear_set_color(gp_operation* operation, float r, float g, float b, float a);
+
+/*!
  * Creates a new draw operation.
  * \return Pointer to new operation.
  */
