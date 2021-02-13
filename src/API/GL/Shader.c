@@ -271,6 +271,13 @@ UNIFORM_NEW_BY_NAME(mat4, sizeof(float)*16)
     memcpy(uniform->mData, data, size);\
   }
 
+#define UNIFORM_GET(type, datatype)\
+  datatype gp_uniform_##type##_get(gp_uniform* uniform)\
+  {\
+    assert(uniform->mOperation == _gp_uniform_load_##type);\
+    return (datatype)uniform->mData;\
+  }
+
 void gp_uniform_texture_set(gp_uniform* uniform, gp_texture* texture)
 {
   assert(uniform->mOperation == _gp_uniform_load_texture);
@@ -286,10 +293,23 @@ void gp_uniform_float_set(gp_uniform* uniform, float data)
   memcpy(uniform->mData, &data, sizeof(float));
 }
 
+float gp_uniform_float_get(gp_uniform* uniform)
+{
+  assert(uniform->mOperation == _gp_uniform_load_float);
+  return *(float*)uniform->mData;
+}
+
 UNIFORM_SET_FLOATPTR(vec2, sizeof(float)*2)
 UNIFORM_SET_FLOATPTR(vec3, sizeof(float)*3)
 UNIFORM_SET_FLOATPTR(vec4, sizeof(float)*4)
 UNIFORM_SET_FLOATPTR(mat3, sizeof(float)*9)
 UNIFORM_SET_FLOATPTR(mat4, sizeof(float)*16)
+
+UNIFORM_GET(texture, gp_texture*)
+UNIFORM_GET(vec2, float*)
+UNIFORM_GET(vec3, float*)
+UNIFORM_GET(vec4, float*)
+UNIFORM_GET(mat3, float*)
+UNIFORM_GET(mat4, float*)
 
 #undef UNIFORM_SET_FLOATPTR

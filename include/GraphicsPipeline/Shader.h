@@ -203,6 +203,48 @@ GP_EXPORT void gp_uniform_mat3_set(gp_uniform* uniform, float* data);
  */
 GP_EXPORT void gp_uniform_mat4_set(gp_uniform* uniform, float* data);
 
+/*!
+ * Get texture object from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT gp_texture* gp_uniform_texture_get(gp_uniform* uniform);
+
+/*!
+ * Get float data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float gp_uniform_float_get(gp_uniform* uniform);
+
+/*!
+ * Get float[2] data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float* gp_uniform_vec2_get(gp_uniform* uniform);
+
+/*!
+ * Get float[3] data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float* gp_uniform_vec3_get(gp_uniform* uniform);
+
+/*!
+ * Get float[4] data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float* gp_uniform_vec4_get(gp_uniform* uniform);
+
+/*!
+ * Get float[3][3] data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float* gp_uniform_mat3_get(gp_uniform* uniform);
+
+/*!
+ * Get float[4][4] data from a gp_uniform object.
+ * \param uniform Uniform object of type float.
+ */
+GP_EXPORT float* gp_uniform_mat4_get(gp_uniform* uniform);
+
 //! \} // Shader
 
 #ifdef __cplusplus
@@ -324,9 +366,15 @@ namespace GP
      * Set Cname data into Uniform object\
      */\
     inline void Set(type data);\
+    \
+    /*!\
+     * Get Cname data into Uniform object\
+     */\
+    inline type Get();\
   };\
   Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform(gp_uniform_##Cname##_new_by_name(GetShader(shader), name)) {}\
-  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set(mUniform, data);}
+  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set(mUniform, data);}\
+  type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get(mUniform);}
   
   CXX_UNIFORM(Texture, texture, gp_texture*)
   CXX_UNIFORM(Float, float, float)
