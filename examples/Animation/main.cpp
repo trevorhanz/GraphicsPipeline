@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
   shader.Compile(source);
   
   float o[] = {0.0f, 0.0f};
-  Uniform uniform = shader.CreateUniform("Offset");
-  uniform.SetVec2(o);
+  UniformVec2 uniform(shader, "Offset");
+  uniform.Set(o);
   
   int frame = 0;
   Timer timer(system);
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     offset -= .25;
     
     float o[] = {offset, 0.0f};
-    uniform.SetVec2(o);
+    uniform.Set(o);
     
     target.Redraw();
     

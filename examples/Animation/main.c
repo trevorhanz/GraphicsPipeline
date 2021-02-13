@@ -55,7 +55,7 @@ void TimerCallback(gp_timer* timer)
   offset -= .25;
   
   float o[] = {offset, 0.0f};
-  gp_uniform_set_vec2(data->offset, o);
+  gp_uniform_vec2_set(data->offset, o);
   
   gp_target_redraw(data->target);
   
@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
   gp_shader_source_unref(source);
   
   float o[] = {0.0f, 0.0f};
-  data->offset = gp_shader_uniform_new_by_name(shader, "Offset");
-  gp_uniform_set_vec2(data->offset, o);
+  data->offset = gp_uniform_vec2_new_by_name(shader, "Offset");
+  gp_uniform_vec2_set(data->offset, o);
   
   gp_pipeline* pipeline = gp_target_get_pipeline(target);
   
