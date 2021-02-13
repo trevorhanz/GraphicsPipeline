@@ -92,7 +92,7 @@ GP_EXPORT void gp_shader_compile(gp_shader* shader, gp_shader_source* source);
  * \param name Name of the uniform variable in the shader code.
  * \return Newly created gp_uniform object.
  */
-GP_EXPORT gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name);
+GP_EXPORT gp_uniform* gp_uniform_new_by_name(gp_shader* shader, const char* name);
 
 /*!
  * Increase uniform ref count.
@@ -231,6 +231,7 @@ namespace GP
     
     friend class Pipeline;
     friend class DrawOperation;
+    friend class Uniform;
   };
   
   /*!
@@ -238,11 +239,10 @@ namespace GP
    */
   class Uniform
   {
-  private:
-    //! Constructor
-    inline Uniform(gp_uniform* uniform);
-    
   public:
+    //! Constructor
+    inline Uniform(const Shader& shader, const char* name);
+    
     //! Copy Constructor
     inline Uniform(const Uniform& other);
     
@@ -328,7 +328,6 @@ namespace GP
   }
   Shader::~Shader() {gp_shader_unref(mShader);}
   void Shader::Compile(const ShaderSource& source) {gp_shader_compile(mShader, source.mSource);}
-  Uniform Shader::CreateUniform(const char* name) {return Uniform(gp_shader_uniform_new_by_name(mShader, name));}
   const Shader& Shader::operator = (const Shader& other)
   {
     gp_shader_unref(mShader);
@@ -337,7 +336,7 @@ namespace GP
     return *this;
   }
   
-  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {}
+  Uniform::Uniform(const Shader& shader, const char* name) : mUniform(gp_uniform_new_by_name(shader.mShader, name)) {}
   Uniform::Uniform(const Uniform& other)
   {
     mUniform = other.mUniform;

@@ -186,7 +186,7 @@ void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
   shader->mAttribute = glGetAttribLocation(shader->mProgram, "position");
 }
 
-gp_uniform* gp_shader_uniform_new_by_name(gp_shader* shader, const char* name)
+gp_uniform* gp_uniform_new_by_name(gp_shader* shader, const char* name)
 {
   gp_uniform* uniform = malloc(sizeof(gp_uniform));
   uniform->mLocation = glGetUniformLocation(shader->mProgram, name);

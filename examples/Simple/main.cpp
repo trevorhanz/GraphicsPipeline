@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   shader.Compile(source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
-  Uniform color = shader.CreateUniform("Color");
+  Uniform color(shader, "Color");
   color.SetVec4(c);
   
   Pipeline pipeline = target.GetPipeline();
