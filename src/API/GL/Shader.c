@@ -212,6 +212,11 @@ void gp_uniform_unref(gp_uniform* uniform)
   }
 }
 
+void _gp_uniform_load_texture(gp_uniform* uniform)
+{
+  glBindTexture(GL_TEXTURE_2D, *(int*)uniform->mData);
+  glUniform1i(uniform->mLocation, 0);
+}
 void _gp_uniform_load_int(gp_uniform* uniform) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
 void _gp_uniform_load_float(gp_uniform* uniform) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}
 void _gp_uniform_load_vec2(gp_uniform* uniform)
@@ -249,7 +254,7 @@ void _gp_uniform_load_mat4(gp_uniform* uniform)
 
 void gp_uniform_set_texture(gp_uniform* uniform, gp_texture* texture)
 {
-  UNIFORM_SET(_gp_uniform_load_int, sizeof(GLuint));
+  UNIFORM_SET(_gp_uniform_load_texture, sizeof(GLuint));
   memcpy(uniform->mData, &texture->mTexture, sizeof(GLuint));
 }
 
