@@ -128,7 +128,6 @@ void gp_frame_buffer_redraw(gp_frame_buffer* fb)
   glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
   glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
-  gp_log_debug("redraw: %d, %d", width, height);
   
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
   glViewport(0, 0, width, height);
