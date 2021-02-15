@@ -1,6 +1,7 @@
 
 add_subdirectory(Animation)
 add_subdirectory(IO)
+add_subdirectory(PostProcessing)
 add_subdirectory(Simple)
 add_subdirectory(Timer)
 add_subdirectory(Windows)
