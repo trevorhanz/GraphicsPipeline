@@ -93,7 +93,7 @@ namespace GP
     
     /*!
      * Retrieve GP::Pipeline object.
-     * \return Pointer to GP::Pipeline.
+     * \return GP::Pipeline used by this target.
      */
     inline Pipeline GetPipeline();
     
