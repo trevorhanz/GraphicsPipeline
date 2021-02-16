@@ -98,6 +98,7 @@ namespace GP
     
     friend class Context;
     friend class Uniform;
+    friend class FrameBuffer;
   };
   
   //

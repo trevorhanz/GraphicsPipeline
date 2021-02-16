@@ -22,6 +22,8 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Pipeline.h"
+#include "Texture.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,6 +84,70 @@ GP_EXPORT void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int heig
 //! \} // FrameBuffer
 
 #ifdef __cplusplus
+}
+
+namespace GP
+{
+  /*!
+   * \brief Wrapper class for ::gp_frame_buffer
+   */
+  class FrameBuffer
+  {
+  public:
+    //! Constructor
+    inline FrameBuffer(const Context& context);
+    
+    //! Copy Constructor
+    inline FrameBuffer(const FrameBuffer& other);
+    
+    //! Destructor
+    inline ~FrameBuffer();
+    
+    /*!
+     * Get the gp_pipeline tied to a gp_frame_buffer.
+     * \return GP::Pipeline used by this frame buffer.
+     */
+    inline Pipeline GetPipeline();
+    
+    /*!
+     * Schedule the frame buffer to be redrawn.
+     */
+    inline void Redraw();
+    
+    /*!
+     * Attach a GP::Texture to output of frame buffer.
+     * \param texture Texture object to be attached.
+     */
+    inline void Attach(const Texture& texture);
+    
+    /*!
+     * Set the size of the frame buffer in pixels.
+     * \param width Number of pixels wide.
+     * \param height Number of pixels high.
+     */
+    inline void SetSize(int width, int height);
+    
+    //! Equal operator
+    inline const FrameBuffer& operator = (const FrameBuffer& other);
+    
+  private:
+    gp_frame_buffer*                mFrameBuffer;
+  };
+  
+  //
+  // Implementation
+  //
+  FrameBuffer::FrameBuffer(const Context& context) : mFrameBuffer(gp_frame_buffer_new(context.mContext)) {}
+  FrameBuffer::FrameBuffer(const FrameBuffer& other)
+  {
+    mFrameBuffer = other.mFrameBuffer;
+    gp_frame_buffer_ref(mFrameBuffer);
+  }
+  FrameBuffer::~FrameBuffer() {gp_frame_buffer_unref(mFrameBuffer);}
+  Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline(mFrameBuffer));}
+  void FrameBuffer::Redraw() {gp_frame_buffer_redraw(mFrameBuffer);}
+  void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach(mFrameBuffer, texture.mTexture);}
+  void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size(mFrameBuffer, width, height);}
 }
 
 #endif // __cplusplus
