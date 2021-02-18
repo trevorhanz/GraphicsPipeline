@@ -26,6 +26,7 @@
 #include <windows.h>
 
 #define WM_SOCKET WM_USER + 1
+#define WM_WORK_DONE WM_USER + 2
 
 struct _gp_system
 {
@@ -39,6 +40,14 @@ struct _gp_context
   HWND                  mWindow;
   unsigned int          mPixelFormat;
   gp_refcounter         mRef;
+
+  HGLRC                 mWorkContext;
+  HWND                  mWorkWindow;
+  HANDLE                mWorkThread;
+  CRITICAL_SECTION      mWorkMutex;
+  CONDITION_VARIABLE    mWorkCV;
+  gp_list               mWork;
+  gp_list               mFinished;
 };
 
 struct _gp_target
@@ -63,5 +72,7 @@ struct _gp_io
   gp_io_callback        mCallback;
   void*                 mUserData;
 };
+
+void _gp_work_done(void* data);
 
 #endif // __GP_WINDOWS_COMMON_H__

@@ -69,6 +69,10 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
   case WM_SOCKET:
     return 0;
 
+  case WM_WORK_DONE:
+    _gp_work_done(lParam);
+    return 0;
+
   default:
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
   }

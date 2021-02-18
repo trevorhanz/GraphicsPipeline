@@ -26,6 +26,74 @@
 #include "Windows.h"
 #include "Platforms/Defaults.h"
 
+gp_context* sContext = NULL;
+
+typedef struct
+{
+  gp_list_node        mNode;
+  void(*mWork)(void*);
+  void(*mJoin)(void*);
+  void*               mData;
+} _gp_work_node;
+
+void _gp_work_thread(void* data)
+{
+  gp_context* context = (gp_context*)data;
+
+  if(!wglMakeCurrent(GetDC(context->mWorkWindow), context->mWorkContext))
+  {
+    gp_log_error("Work Queue: unable to make context current.");
+  }
+  
+  EnterCriticalSection(&context->mWorkMutex);
+
+  while (1)
+  {
+    while (gp_list_front(&context->mWork) != NULL)
+    {
+      _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mWork);
+      gp_list_remove(&context->mWork, (gp_list_node*)node);
+      LeaveCriticalSection(&context->mWorkMutex);
+
+      node->mWork(node->mData);
+
+      // Wait for transfer to complete
+      GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+      glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 5000000000);
+      glDeleteSync(fence);
+
+      EnterCriticalSection(&context->mWorkMutex);
+      gp_list_push_back(&context->mFinished, (gp_list_node*)node);
+      LeaveCriticalSection(&context->mWorkMutex);
+      SendMessage(context->mWindow, WM_WORK_DONE, 0, context);
+      EnterCriticalSection(&context->mWorkMutex);
+    }
+
+    SleepConditionVariableCS(&context->mWorkCV, &context->mWorkMutex, INFINITE);
+  }
+
+  LeaveCriticalSection(&context->mWorkMutex);
+}
+
+void _gp_work_done(void* data)
+{
+  gp_context* context = (gp_context*)data;
+
+  EnterCriticalSection(&context->mWorkMutex);
+
+  while(gp_list_front(&context->mFinished) != NULL)
+  {
+    _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mFinished);
+    gp_list_remove(&context->mFinished, (gp_list_node*)node);
+
+    LeaveCriticalSection(&context->mWorkMutex);
+    node->mJoin(node->mData);
+    EnterCriticalSection(&context->mWorkMutex);
+  }
+
+  LeaveCriticalSection(&context->mWorkMutex);
+}
+
 gp_context* gp_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
@@ -307,6 +375,69 @@ gp_context* gp_context_new(gp_system* system)
   
   _gp_api_init();
   
+  sContext = context;
+
+  //
+  // Setup work queue
+  //
+  DWORD                 dwExStyle;                                  // Window Extended Style
+  DWORD                 dwStyle;                                    // Window Style
+  RECT                  WindowRect;                                 // Grabs Rectangle Upper Left / Lower Right Values
+  WindowRect.left = (long)0;                                        // Set Left Value To 0
+  WindowRect.right = (long)720;                                     // Set Right Value To Requested Width
+  WindowRect.top = (long)0;                                         // Set Top Value To 0
+  WindowRect.bottom = (long)480;                                    // Set Bottom Value To Requested Height
+
+  if (0) // fullscreen                                              // Are We Still In Fullscreen Mode?
+  {
+    dwExStyle = WS_EX_APPWINDOW;                                    // Window Extended Style
+    dwStyle = WS_POPUP;                                             // Windows Style
+  }
+  else
+  {
+    dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;                 // Window Extended Style
+    dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+  }
+
+  AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);       // Adjust Window To True Requested Size
+  // Create The Window
+  if (!(hWnd = CreateWindowEx(dwExStyle,                            // Extended Style For The Window
+    "GraphicsPipeline",                                           // Class Name
+    "Title",                                                      // Window Title
+    dwStyle |                                                     // Defined Window Style
+    WS_CLIPSIBLINGS |                                             // Required Window Style
+    WS_CLIPCHILDREN,                                              // Required Window Style
+    0, 0,                                                         // Window Position
+    WindowRect.right - WindowRect.left,                           // Calculate Window Width
+    WindowRect.bottom - WindowRect.top,                           // Calculate Window Height
+    NULL,                                                         // No Parent Window
+    NULL,                                                         // No Menu
+    GetModuleHandle(NULL),                                        // Instance
+    NULL)))                                                       // Pass a pointer to this window
+  {
+    MessageBox(NULL, "Window Creation Error.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+    free(context);
+    return NULL;
+  }
+
+  if (context->mPixelFormat > 0)
+    if (!SetPixelFormat(GetDC(hWnd), context->mPixelFormat, &pfd))  // Are We Able To Set The Pixel Format?
+    {
+      MessageBox(NULL, "Can't Set The PixelFormat.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+      free(context);
+      return NULL;
+    }
+  context->mWorkWindow = hWnd;
+
+  context->mWorkContext = wglCreateContext(GetDC(context->mWorkWindow));
+  wglShareLists(context->mWorkContext, context->mShare);
+
+  gp_list_init(&context->mWork);
+  gp_list_init(&context->mFinished);
+  InitializeCriticalSection(&context->mWorkMutex);
+  InitializeConditionVariable(&context->mWorkCV);
+  _beginthread(_gp_work_thread, 0, context);
+
   return context;
 }
 
@@ -448,4 +579,15 @@ void gp_target_redraw(gp_target* target)
   RedrawWindow(target->mWindow, 0, 0, RDW_INVALIDATE);
 }
 
+void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
+{
+  _gp_work_node* node = malloc(sizeof(_gp_work_node));
+  node->mWork = work;
+  node->mJoin = join;
+  node->mData = data;
 
+  EnterCriticalSection(&sContext->mWorkMutex);
+  gp_list_push_back(&sContext->mWork, (gp_list_node*)node);
+  WakeConditionVariable(&sContext->mWorkCV);
+  LeaveCriticalSection(&sContext->mWorkMutex);
+}

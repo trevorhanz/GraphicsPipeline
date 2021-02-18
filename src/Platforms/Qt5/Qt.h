@@ -25,10 +25,12 @@
 #include <QOffscreenSurface>
 #include <QTimer>
 #include <QSocketNotifier>
+#include <QThread>
 
 #include "Target.h"
 #include "TimerCallback.h"
 #include "IOCallback.h"
+#include "WorkQueue.h"
 
 #include "../../Utils/RefCounter.h"
 
@@ -42,6 +44,8 @@ struct _gp_context
   QOpenGLContext*         mShare;
   QOffscreenSurface*      mSurface;
   gp_refcounter           mRef;
+  
+  WorkQueue*             mWorkQueue;
 };
 
 struct _gp_target

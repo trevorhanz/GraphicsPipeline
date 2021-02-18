@@ -30,6 +30,8 @@
 #include <GL/glew.h>
 #include <GL/glx.h>
 
+#include <pthread.h>
+
 typedef struct __gp_event _gp_event;
 
 struct _gp_system
@@ -49,6 +51,15 @@ struct _gp_context
   Colormap                mColorMap;
   GLXContext              mShare;
   gp_refcounter           mRef;
+  
+  GLXContext              mWorkCtx;
+  pthread_t               mWorkThread;
+  pthread_mutex_t         mWorkMutex;
+  pthread_cond_t          mWorkCV;
+  gp_list                 mWork;
+  gp_list                 mFinished;
+  gp_io*                  mWorkIO;
+  int                     mWorkPipe[2];
 };
 
 struct _gp_target

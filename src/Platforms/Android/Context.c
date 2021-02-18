@@ -154,3 +154,9 @@ gp_target* gp_target_new_from_native(gp_context* context, ANativeWindow* window)
   
   return target;
 }
+
+void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
+{
+  work(data);
+  join(data);
+}

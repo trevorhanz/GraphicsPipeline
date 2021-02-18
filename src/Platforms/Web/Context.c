@@ -24,6 +24,8 @@
 #include <string.h>
 #include <assert.h>
 
+gp_context* sContext = 0;
+
 void gp_target_redraw(gp_target* target);
 
 EM_JS(int, _gp_canvas_get_width, (const char* id), {
@@ -42,11 +44,52 @@ EM_JS(void, _gp_canvas_set_height, (const char* id, int value), {
   document.getElementById(UTF8ToString(id)).height = value;
 });
 
+typedef struct
+{
+  gp_list_node  mNode;
+  GLsync        mFence;
+  void(*mJoin)(void*);
+  void*         mData;
+} _gp_work_item;
+
+void _gp_work_timeout(gp_timer* timer)
+{
+  gp_context* context = (gp_context*)gp_timer_get_userdata(timer);
+  
+  _gp_work_item* work = (_gp_work_item*)gp_list_front(&context->mWork);
+  if(work != NULL)
+  {
+    GLenum ret = glClientWaitSync(work->mFence, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+    if(ret == GL_TIMEOUT_EXPIRED)
+    {
+      if(timer->mTimerID < 0)
+        gp_timer_arm(timer, .01);
+    }
+    else
+    {
+      gp_list_remove(&context->mWork, (gp_list_node*)work);
+      work->mJoin(work->mData);
+      glDeleteSync(work->mFence);
+      free(work);
+      if(gp_list_front(&context->mWork) != NULL
+         && timer->mTimerID < 0)
+        gp_timer_arm(timer, .01);
+    }
+  }
+}
+
 gp_context* gp_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
   context->mParent = system;
   gp_ref_init(&context->mRef);
+  
+  context->mWorkTimer = gp_timer_new(system);
+  gp_timer_set_callback(context->mWorkTimer, _gp_work_timeout);
+  gp_timer_set_userdata(context->mWorkTimer, context);
+  gp_list_init(&context->mWork);
+  
+  sContext = context;
   
   return context;
 }
@@ -158,4 +201,18 @@ void _gp_target_redraw_callback(void* data)
 void gp_target_redraw(gp_target* target)
 {
   emscripten_async_call(_gp_target_redraw_callback, target, -1);
+}
+
+void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
+{
+  work(data);
+  
+  _gp_work_item* node = malloc(sizeof(_gp_work_item));
+  node->mFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+  node->mJoin = join;
+  node->mData = data;
+  gp_list_push_back(&sContext->mWork, (gp_list_node*)node);
+  
+  if(sContext->mWorkTimer->mTimerID<0)
+    gp_timer_arm(sContext->mWorkTimer, .1);
 }

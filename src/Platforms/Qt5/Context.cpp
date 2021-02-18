@@ -22,10 +22,13 @@
 
 #include "GL.h"
 
+gp_context* sContext = 0;
+
 extern "C" gp_context* gp_qt_context_new()
 {
   gp_context* context = new gp_context;
   gp_ref_init(&context->mRef);
+  sContext = context;
   
   QSurfaceFormat format;
   format.setMajorVersion(4);
@@ -33,6 +36,7 @@ extern "C" gp_context* gp_qt_context_new()
   format.setRenderableType(QSurfaceFormat::OpenGL);
   format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
   format.setSamples(4);
+  format.setOption(QSurfaceFormat::DebugContext);
   
   context->mSurface = new QOffscreenSurface();
   context->mSurface->setFormat(format);
@@ -60,6 +64,10 @@ extern "C" gp_context* gp_qt_context_new()
   gp_log_info("GLSL Version: %s", glslVersion);
   
   _gp_api_init();
+  
+  context->mWorkQueue = new WorkQueue(context->mShare);
+  QObject::connect(context->mWorkQueue, &WorkQueue::workFinished, context->mWorkQueue, &WorkQueue::Finalize);
+  context->mWorkQueue->start();
   
   return context;
 }
@@ -117,4 +125,9 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 void gp_target_redraw(gp_target* target)
 {
   target->mTarget->Draw();
+}
+
+extern "C" void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
+{
+  sContext->mWorkQueue->AddWork(work, join, data);
 }

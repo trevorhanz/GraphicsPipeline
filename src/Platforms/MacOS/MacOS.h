@@ -28,6 +28,7 @@
 #include <API/GL/GL.h>
 
 #import <Cocoa/Cocoa.h>
+#include <pthread.h>
 
 #include "View.h"
 #include "Timer.h"
@@ -44,6 +45,15 @@ struct _gp_context
   NSOpenGLContext*        mShare;
   NSOpenGLPixelFormat*    mPixelFormat;
   gp_refcounter           mRef;
+  
+  NSOpenGLContext*        mWorkContext;
+  pthread_t               mWorkThread;
+  pthread_mutex_t         mWorkMutex;
+  pthread_cond_t          mWorkCV;
+  int                     mWorkPipe[2];
+  gp_io*                  mWorkIO;
+  gp_list                 mWork;
+  gp_list                 mFinished;
 };
 
 struct _gp_target

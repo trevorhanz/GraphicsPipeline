@@ -135,8 +135,10 @@ else(ANDROID)
   elseif(APPLE)
     set(GP_MACOS ON)
     
+    find_package(Threads REQUIRED)
+    
     find_library(COCOA_LIBRARY Cocoa)
-    list(APPEND LIB ${COCOA_LIBRARY})
+    list(APPEND LIB ${COCOA_LIBRARY} Threads::Threads)
     list(APPEND SRC
       Platforms/MacOS/Context.m
       Platforms/MacOS/Event.m
@@ -156,8 +158,10 @@ else(ANDROID)
       Platforms/X11/Logging.c
       Platforms/X11/System.c)
     
+    find_package(Threads REQUIRED)
+    
     find_package(X11 REQUIRED)
-    list(APPEND LIB ${X11_LIBRARIES})
+    list(APPEND LIB ${X11_LIBRARIES} Threads::Threads)
   else()
     message("Configured for unknown OS")
   endif()
@@ -182,7 +186,8 @@ else(ANDROID)
       Platforms/Qt5/Logging.c
       Platforms/Qt5/System.cpp
       Platforms/Qt5/Target.cpp
-      Platforms/Qt5/TimerCallback.cpp)
+      Platforms/Qt5/TimerCallback.cpp
+      Platforms/Qt5/WorkQueue.cpp)
     
     add_library(GP_Qt5 ${Qt5_SRC})
     target_include_directories(GP_Qt5 PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR} API/GL/)

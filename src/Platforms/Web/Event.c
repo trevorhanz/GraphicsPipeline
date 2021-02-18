@@ -39,17 +39,16 @@ void* gp_timer_get_userdata(gp_timer* timer)
   return timer->mUserData;
 }
 
-void EMSCRIPTEN_KEEPALIVE _gp_timeout_handler(int timer_ptr)
+void _gp_timer_timeout(void* userdata)
 {
-  gp_timer* timer = (gp_timer*)timer_ptr;
+  gp_timer* timer = (gp_timer*)userdata;
+  timer->mTimerID = -1;
   timer->mCallback(timer);
 }
 
 void gp_timer_arm(gp_timer* timer, double timeout)
 {
-  timer->mTimerID = EM_ASM_INT({
-    return setTimeout(function() {ccall("_gp_timeout_handler", "void", ["number"], [$0]);}, $1);
-  }, timer, timeout*1000);
+  timer->mTimerID = emscripten_set_timeout(_gp_timer_timeout, timeout*1000, timer);
 }
 
 void gp_timer_disarm(gp_timer* timer)

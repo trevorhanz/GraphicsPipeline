@@ -24,6 +24,74 @@
 #include "../../API/GL/GL.h"
 #include "Platforms/Defaults.h"
 
+gp_context* sContext = NULL;
+
+typedef struct
+{
+  gp_list_node      mNode;
+  void(*mWork)(void*);
+  void(*mJoin)(void*);
+  void*             mData;
+} _gp_work_node;
+
+void* _gp_work_thread(void* data)
+{
+  gp_context* context = (gp_context*)data;
+  
+  glXMakeCurrent(context->mDisplay, context->mWindow, context->mWorkCtx);
+  
+  pthread_mutex_lock(&context->mWorkMutex);
+  
+  // Signal main thread that initialization is complete
+  pthread_cond_signal(&context->mWorkCV);
+  
+  while(1)
+  {
+    while(gp_list_front(&context->mWork) != NULL)
+    {
+      _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mWork);
+      gp_list_remove(&context->mWork, (gp_list_node*)node);
+      pthread_mutex_unlock(&context->mWorkMutex);
+      
+      node->mWork(node->mData);
+      
+      pthread_mutex_lock(&context->mWorkMutex);
+      gp_list_push_back(&context->mFinished, (gp_list_node*)node);
+      size_t r = write(context->mWorkPipe[1], "x", 1);
+    }
+    
+    pthread_cond_wait(&context->mWorkCV, &context->mWorkMutex);
+  }
+  
+  return 0;
+}
+
+void _gp_work_done(gp_io* io)
+{
+  gp_context* context = (gp_context*)gp_io_get_userdata(io);
+  
+  for(;;)
+  {
+    char ch;
+    if(read(context->mWorkPipe[0], &ch, 1) == -1)
+      break;
+  }
+  
+  pthread_mutex_lock(&context->mWorkMutex);
+  
+  while(gp_list_front(&context->mFinished) != NULL)
+  {
+    _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mFinished);
+    gp_list_remove(&context->mFinished, (gp_list_node*)node);
+    
+    pthread_mutex_unlock(&context->mWorkMutex);
+    node->mJoin(node->mData);
+    pthread_mutex_lock(&context->mWorkMutex);
+  }
+  
+  pthread_mutex_unlock(&context->mWorkMutex);
+}
+
 void _gp_target_wake_callback(gp_io* io)
 {
   gp_target* target = (gp_target*)gp_io_get_userdata(io);
@@ -50,6 +118,9 @@ gp_context* gp_context_new(gp_system* system)
   context->mDisplay = system->mDisplay;
   context->mWindow = 0;
   gp_ref_init(&context->mRef);
+  
+  gp_list_init(&context->mWork);
+  gp_list_init(&context->mFinished);
   
   // Get a matching FB config
   static int attrList[] =
@@ -113,6 +184,29 @@ gp_context* gp_context_new(gp_system* system)
   gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
   
   _gp_api_init();
+  
+  _gp_event_pipe_new(system->mEvent, context->mWorkPipe);
+  
+  context->mWorkCtx = glXCreateContext(context->mDisplay, context->mVisualInfo, context->mShare, True);
+  
+  glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
+  
+  context->mWorkIO = gp_io_read_new(system, context->mWorkPipe[0]);
+  gp_io_set_callback(context->mWorkIO, _gp_work_done);
+  gp_io_set_userdata(context->mWorkIO, context);
+  
+  pthread_mutex_lock(&context->mWorkMutex);
+  
+  pthread_mutex_init(&context->mWorkMutex, NULL);
+  pthread_cond_init(&context->mWorkCV, NULL);
+  pthread_create(&context->mWorkThread, NULL, _gp_work_thread, context);
+  
+  // Wait for work thread to finish initializing before continuing.
+  // X11 has trouble using the display connection in multiple threads.
+  pthread_cond_wait(&context->mWorkCV, &context->mWorkMutex);
+  pthread_mutex_unlock(&context->mWorkMutex);
+  
+  sContext = context;
   
   return context;
 }
@@ -214,4 +308,15 @@ void _gp_target_draw(gp_target* target)
   target->mDirty = 0;
 }
 
-
+void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
+{
+  _gp_work_node* node = malloc(sizeof(_gp_work_node));
+  node->mWork = work;
+  node->mJoin = join;
+  node->mData = data;
+  
+  pthread_mutex_lock(&sContext->mWorkMutex);
+  gp_list_push_back(&sContext->mWork, (gp_list_node*)node);
+  pthread_cond_signal(&sContext->mWorkCV);
+  pthread_mutex_unlock(&sContext->mWorkMutex);
+}
