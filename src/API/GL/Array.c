@@ -93,3 +93,43 @@ void gp_array_set_data(gp_array* array, gp_array_data* data)
   
   glBufferData(GL_ARRAY_BUFFER, sizeof(float)*data->mCount, data->mData, GL_STATIC_DRAW);
 }
+
+typedef struct
+{
+  gp_array*       mArray;
+  gp_array_data*  mData;
+  void(*mCallback)(void*);
+  void*           mUserData;
+} _gp_array_async;
+
+void _gp_array_async_func(void* userdata)
+{
+  _gp_array_async* async = (_gp_array_async*)userdata;
+  
+  glBindBuffer(GL_ARRAY_BUFFER, async->mArray->mVBO);
+  
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*async->mData->mCount, async->mData->mData, GL_STATIC_DRAW);
+}
+
+void _gp_array_join_func(void* userdata)
+{
+  _gp_array_async* async = (_gp_array_async*)userdata;
+  
+  if(async->mCallback)
+  {
+    async->mCallback(async->mUserData);
+  }
+  
+  free(async);
+}
+
+void gp_array_set_data_async(gp_array* array, gp_array_data* data, void (*callback)(void*), void* userdata)
+{
+  _gp_array_async* async = malloc(sizeof(_gp_array_async));
+  async->mArray = array;
+  async->mData = data;
+  async->mCallback = callback;
+  async->mUserData = userdata;
+  
+  _gp_api_work(_gp_array_async_func, _gp_array_join_func, async);
+}

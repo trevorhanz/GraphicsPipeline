@@ -62,6 +62,7 @@ struct _gp_array
 struct _gp_texture
 {
   GLuint                  mTexture;
+  GLuint                  mPBO;
   gp_refcounter           mRef;
 };
 

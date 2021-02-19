@@ -85,6 +85,13 @@ GP_EXPORT void gp_array_unref(gp_array* array);
  */
 GP_EXPORT void gp_array_set_data(gp_array* array, gp_array_data* data);
 
+/*!
+ * Upload data to an array object asynchronously.
+ * \param array Pointer to array object.
+ * \param data Pointer to array data object to be uploaded.
+ */
+GP_EXPORT void gp_array_set_data_async(gp_array* array, gp_array_data* data, void (*callback)(void*), void* userdata);
+
 //! \} // Array
 
 #ifdef __cplusplus
@@ -144,10 +151,23 @@ namespace GP
      */
     inline void SetData(const ArrayData& ad);
     
+    /*!
+     * Uploads data to %Array object asynchronously.
+     * \param data %ArrayData to be uploaded.
+     */
+    inline void SetDataAsync(const ArrayData& ad, std::function<void(Array*)> callback);
+    
     //! Equal operator
     inline const Array& operator = (const Array& other);
     
   private:
+    struct AsyncData
+    {
+      Array* mArray;
+      std::function<void(Array*)> mCallback;
+    };
+    inline static void AsyncCallback(void* data);
+    
     gp_array*           mArray;     //!< Internal array object
     
     friend class Pipeline;
@@ -181,12 +201,25 @@ namespace GP
   }
   Array::~Array() {gp_array_unref(mArray);}
   void Array::SetData(const ArrayData& ad) {gp_array_set_data(mArray, ad.mData);}
+  void Array::SetDataAsync(const ArrayData& ad, std::function<void(Array*)> callback)
+  {
+    AsyncData* async = new AsyncData();
+    async->mArray = this;
+    async->mCallback = callback;
+    gp_array_set_data_async(mArray, ad.mData, &Array::AsyncCallback, async);
+  }
   const Array& Array::operator = (const Array& other)
   {
     gp_array_unref(mArray);
     mArray = other.mArray;
     gp_array_ref(mArray);
     return *this;
+  }
+  void Array::AsyncCallback(void* data)
+  {
+    AsyncData* async = (AsyncData*)data;
+    async->mCallback(async->mArray);
+    delete async;
   }
 }
 

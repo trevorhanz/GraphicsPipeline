@@ -82,6 +82,7 @@ namespace GP
     
     friend class Target;
     friend class Array;
+    friend class Texture;
     friend class Shader;
     friend class FrameBuffer;
   };
