@@ -376,7 +376,30 @@ namespace GP
   void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set(mUniform, data);}\
   type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get(mUniform);}
   
-  CXX_UNIFORM(Texture, texture, gp_texture*)
+  /*!
+   * \brief Uniform specialized for Texture
+   */
+  class UniformTexture : public Uniform
+  {
+  public:
+    /*! Constructor */
+    inline UniformTexture(const Shader& shader, const char* name);
+    
+    /*!
+     * Set texture data into Uniform object
+     */
+    inline void Set(const Texture& texture);
+    
+    /*!
+     * Get texture data into Uniform object
+     */
+    inline gp_texture* Get();
+  };\
+  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform(gp_uniform_texture_new_by_name(GetShader(shader), name)) {}
+  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set(mUniform, texture.mTexture);}
+  gp_texture* UniformTexture::Get() {return 0;}
+  
+//   CXX_UNIFORM(Texture, texture, gp_texture*)
   CXX_UNIFORM(Float, float, float)
   CXX_UNIFORM(Vec2, vec2, float*)
   CXX_UNIFORM(Vec3, vec3, float*)
