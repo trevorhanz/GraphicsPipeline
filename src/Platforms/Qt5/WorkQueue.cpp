@@ -17,36 +17,9 @@
 
 #include "WorkQueue.h"
 #include <GraphicsPipeline/Logging.h>
+#include "GL.h"
 
 #include <QOpenGLFunctions>
-#include <QOpenGLDebugLogger>
-
-// #if !defined(__APPLE__) && defined(GP_GL)
-void _DebugCallbackFunction(GLenum source,
-                           GLenum type,
-                           GLuint id,
-                           GLenum severity,
-                           GLsizei length,
-                           const GLchar* message,
-                           const void* userParam)
-{
-  switch(type)
-  {
-  case GL_DEBUG_TYPE_ERROR:
-    gp_log_error(message);
-    break;
-  case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-  case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-  case GL_DEBUG_TYPE_PORTABILITY:
-    gp_log_warn(message);
-    break;
-  case GL_DEBUG_TYPE_PERFORMANCE:
-  case GL_DEBUG_TYPE_OTHER:
-    gp_log_debug(message);
-    break;
-  }
-}
-// #endif
 
 struct _gp_work_node
 {
@@ -83,24 +56,12 @@ void WorkQueue::run()
     gp_log_error("WorkQueue context failed to be made current.");
   }
   
-  glEnable(GL_DEBUG_OUTPUT);
-  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-  
-  QOpenGLDebugLogger logger;
-  if(!logger.initialize())
-  {
-    gp_log_warn("QOpenGLDebugLogger failed to initialize.");
-  }
-  logger.disableMessages(QOpenGLDebugMessage::AnySource, QOpenGLDebugMessage::OtherType);
+  _gp_api_init_context();
   
   mMutex.lock();
   
   while(1)
   {
-    const QList<QOpenGLDebugMessage> messages = logger.loggedMessages();
-    for (const QOpenGLDebugMessage &message : messages)
-        qDebug() << message;
-    
     while(gp_list_front(&mWork) != NULL)
     {
       _gp_work_node* node = (_gp_work_node*)gp_list_front(&mWork);

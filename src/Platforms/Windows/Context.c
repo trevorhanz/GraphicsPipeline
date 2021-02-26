@@ -44,6 +44,8 @@ void _gp_work_thread(void* data)
   {
     gp_log_error("Work Queue: unable to make context current.");
   }
+
+  _gp_api_init_context();
   
   EnterCriticalSection(&context->mWorkMutex);
 
@@ -374,6 +376,8 @@ gp_context* gp_context_new(gp_system* system)
   gp_log_info("OpenGL Version: %d.%d", major, minor);
   
   _gp_api_init();
+
+  _gp_api_init_context();
   
   sContext = context;
 
@@ -544,6 +548,8 @@ gp_target* gp_target_new(gp_context* context)
     MessageBox(NULL, "Can't Activate The GL Rendering Context.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
     return NULL;
   }
+
+  _gp_api_init_context();
 
   wglShareLists(context->mShare, hRC);
 

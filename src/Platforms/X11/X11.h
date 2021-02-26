@@ -47,6 +47,7 @@ struct _gp_context
   gp_system*              mParent;
   Display*                mDisplay;
   XVisualInfo*            mVisualInfo;
+  GLXFBConfig             mConfig;
   Window                  mWindow;
   Colormap                mColorMap;
   GLXContext              mShare;

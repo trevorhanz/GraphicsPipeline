@@ -128,6 +128,8 @@ void _gp_pipeline_execute(gp_pipeline* pipeline);
 
 void _gp_api_init();
 
+void _gp_api_init_context();
+
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data);
 
 #ifdef __cplusplus

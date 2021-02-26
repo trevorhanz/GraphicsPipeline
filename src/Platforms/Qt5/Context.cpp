@@ -65,6 +65,8 @@ extern "C" gp_context* gp_qt_context_new()
   
   _gp_api_init();
   
+  _gp_api_init_context();
+  
   context->mWorkQueue = new WorkQueue(context->mShare);
   QObject::connect(context->mWorkQueue, &WorkQueue::workFinished, context->mWorkQueue, &WorkQueue::Finalize);
   context->mWorkQueue->start();

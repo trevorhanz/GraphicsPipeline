@@ -36,6 +36,8 @@ Target::Target(QOpenGLContext* share)
   mContainer->show();
   
   mContext->makeCurrent(this);
+  
+  _gp_api_init_context();
 }
 
 Target::~Target()

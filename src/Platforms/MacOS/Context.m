@@ -40,6 +40,8 @@ void* _gp_work_thread(void* data)
   
   [context->mWorkContext makeCurrentContext];
   
+  _gp_api_init_context();
+  
   pthread_mutex_lock(&context->mWorkMutex);
   
   while(1)
@@ -115,7 +117,9 @@ gp_context* gp_context_new(gp_system* system)
 
   context->mShare = [[NSOpenGLContext alloc] initWithFormat:context->mPixelFormat shareContext:NULL];
   [context->mShare makeCurrentContext];
-
+  
+  _gp_api_init_context();
+  
   // NOTE: GL functions need a context to be bound to get information from
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -190,7 +194,9 @@ gp_target* gp_target_new(gp_context* context)
   [target->mView display];
 
   [[target->mView openGLContext] makeCurrentContext];
-
+  
+  _gp_api_init_context();
+  
   return target;
 }
 

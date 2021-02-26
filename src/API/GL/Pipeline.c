@@ -448,16 +448,26 @@ void _gp_api_init()
   }
   gp_log_info("GLEW Version: %s", glewGetString(GLEW_VERSION));
 #endif // __APPLE__
-  
-#if GP_DEBUG
+#endif // GP_GL
+}
+
+void _gp_api_init_context()
+{
   // Apple doesn't seem to have support for debug callbacks
-#ifndef __APPLE__
+#if defined(GP_GL) && defined(GP_DEBUG) && !defined(__APPLE__)
   if(glDebugMessageCallback)
   {
+    int flags = 0;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if(!(flags & GL_CONTEXT_FLAG_DEBUG_BIT))
+    {
+      gp_log_warn("Context doesn't have debug support");
+    }
+    
     glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
     glDebugMessageCallback((GLDEBUGPROC)DebugCallbackFunction, 0);
+    glDebugMessageControl(GL_DONT_CARE, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, 0, GL_FALSE);
   }
-#endif // __APPLE__
-#endif // GP_DEBUG
-#endif // GP_GL
+#endif // defined(GP_GL) && defined(GP_DEBUG) && !defined(__APPLE__)
 }

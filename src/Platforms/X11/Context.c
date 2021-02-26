@@ -24,6 +24,8 @@
 #include "../../API/GL/GL.h"
 #include "Platforms/Defaults.h"
 
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
+
 gp_context* sContext = NULL;
 
 typedef struct
@@ -145,8 +147,9 @@ gp_context* gp_context_new(gp_system* system)
 //     cerr << "Failed to retrieve a framebuffer config" << endl;
 //     return;
   }
-  int samp_buf, samples, best_samples;
+  int samp_buf, samples, best_samples, best_fbc;
   best_samples = -1;
+  best_fbc = 0;
   for(int i=0; i<fbcount; i++)
   {
     XVisualInfo *vi;
@@ -157,23 +160,48 @@ gp_context* gp_context_new(gp_system* system)
       glXGetFBConfigAttrib(context->mDisplay, fbc[i], GLX_SAMPLES       , &samples  );
       if(samples > best_samples)
       {
+        best_fbc = i;
         best_samples = samples;
         context->mVisualInfo = vi;
         break;
       }
     }
   }
+  context->mConfig = fbc[best_fbc];
   XFree(fbc);
   
   context->mColorMap = XCreateColormap(context->mDisplay, RootWindow(context->mDisplay, context->mVisualInfo->screen), context->mVisualInfo->visual, AllocNone);
   
-  context->mShare = glXCreateContext(context->mDisplay, context->mVisualInfo, NULL, True);
+  //
+  // Create dummy context to read OpenGL version.
+  //
+  GLXContext dummy = glXCreateNewContext(context->mDisplay, context->mConfig, GLX_RGBA_TYPE, NULL, True);
+  glXMakeCurrent(context->mDisplay, context->mWindow, dummy);
+  int major, minor;
+  glGetIntegerv(GL_MAJOR_VERSION, &major);
+  glGetIntegerv(GL_MINOR_VERSION, &minor);
+  glXDestroyContext(context->mDisplay, dummy);
+  
+  //
+  // Create the real OpenGL context.
+  //
+  int context_attribs[] =
+  {
+    GLX_CONTEXT_MAJOR_VERSION_ARB, major,
+    GLX_CONTEXT_MINOR_VERSION_ARB, minor,
+    GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+    None
+  };
+  
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
+  GLXContext ctx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, 0, True, context_attribs);
+  context->mShare = ctx;
   
   // NOTE: Context needs window first time it is made current.
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
   // NOTE: GL functions need a context to be bound to get information from
-  int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
@@ -184,12 +212,14 @@ gp_context* gp_context_new(gp_system* system)
   gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
   
   _gp_api_init();
+  _gp_api_init_context();
   
   _gp_event_pipe_new(system->mEvent, context->mWorkPipe);
   
-  context->mWorkCtx = glXCreateContext(context->mDisplay, context->mVisualInfo, context->mShare, True);
-  
+  context->mWorkCtx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare, True, context_attribs);
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
+  
+  _gp_api_init_context();
   
   context->mWorkIO = gp_io_read_new(system, context->mWorkPipe[0]);
   gp_io_set_callback(context->mWorkIO, _gp_work_done);
@@ -252,7 +282,18 @@ gp_target* gp_target_new(gp_context* context)
                                   0, context->mVisualInfo->depth, InputOutput, context->mVisualInfo->visual,
                                   CWBorderPixel | CWColormap | CWEventMask, &attr);
   
-  target->mContext = glXCreateContext(context->mDisplay, context->mVisualInfo, context->mShare, True);
+  int context_attribs[] =
+  {
+    GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+    GLX_CONTEXT_MINOR_VERSION_ARB, 4,
+    GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+    None
+  };
+  
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
+  target->mContext = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare,
+                                              True, context_attribs );
   XStoreName(context->mDisplay, target->mWindow, "GraphicsPipeline");
   XFlush(context->mDisplay);
   glXMakeCurrent(context->mDisplay, target->mWindow, target->mContext);
@@ -261,6 +302,8 @@ gp_target* gp_target_new(gp_context* context)
   XFlush(context->mDisplay);
   
   XSetWMProtocols(context->mDisplay, target->mWindow, &context->mParent->mDeleteMessage, 1);
+  
+  _gp_api_init_context();
   
   return target;
 }
