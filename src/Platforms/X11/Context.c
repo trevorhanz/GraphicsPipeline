@@ -42,6 +42,8 @@ void* _gp_work_thread(void* data)
   
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mWorkCtx);
   
+  _gp_api_init_context();
+  
   pthread_mutex_lock(&context->mWorkMutex);
   
   // Signal main thread that initialization is complete
@@ -180,6 +182,9 @@ gp_context* gp_context_new(gp_system* system)
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
+  
+  _gp_api_init();
+  
   glXDestroyContext(context->mDisplay, dummy);
   
   //
@@ -211,15 +216,12 @@ gp_context* gp_context_new(gp_system* system)
   
   gp_log_info("Direct Rendering: %s", ((glXIsDirect(context->mDisplay, context->mShare)) ? "YES" : "NO"));
   
-  _gp_api_init();
   _gp_api_init_context();
   
   _gp_event_pipe_new(system->mEvent, context->mWorkPipe);
   
   context->mWorkCtx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare, True, context_attribs);
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
-  
-  _gp_api_init_context();
   
   context->mWorkIO = gp_io_read_new(system, context->mWorkPipe[0]);
   gp_io_set_callback(context->mWorkIO, _gp_work_done);
