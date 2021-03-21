@@ -11,8 +11,6 @@ add_executable(TestCPP TestCPP.cpp)
 target_link_libraries(TestCPP GTest::GTest GP::Interface GP::Native)
 gtest_discover_tests(TestCPP XML_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-message(GP::Native)
-
 add_executable(TestUtils Utils.cpp)
 target_link_libraries(TestUtils GTest::GTest GP::Interface GP::Native)
 gtest_discover_tests(TestUtils XML_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
