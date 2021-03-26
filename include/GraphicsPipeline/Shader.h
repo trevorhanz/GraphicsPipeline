@@ -344,7 +344,7 @@ namespace GP
     inline const Uniform& operator = (const Uniform& other);
     
   protected:
-    inline gp_shader* GetShader(const Shader& shader);
+    inline static gp_shader* GetShader(const Shader& shader);
     
     gp_uniform*       mUniform;
     
