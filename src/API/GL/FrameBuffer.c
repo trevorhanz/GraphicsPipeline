@@ -149,7 +149,10 @@ void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture)
   glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   
-  gp_texture_set_data(fb->mTexture, 0, width, height);
+  gp_texture_data* data = gp_texture_data_new();
+  gp_texture_data_set(data, 0, width, height);
+  gp_texture_set_data(fb->mTexture, data);
+  gp_texture_data_unref(data);
   
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->mTexture, 0);
@@ -165,6 +168,11 @@ void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   
   if(fb->mTexture)
-    gp_texture_set_data(fb->mTexture, 0, width, height);
+  {
+    gp_texture_data* data = gp_texture_data_new();
+    gp_texture_data_set(data, 0, width, height);
+    gp_texture_set_data(fb->mTexture, data);
+    gp_texture_data_unref(data);
+  }
 }
 

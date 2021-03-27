@@ -59,6 +59,14 @@ struct _gp_array
   gp_refcounter           mRef;
 };
 
+struct _gp_texture_data
+{
+  float*                  mData;
+  unsigned int            mWidth;
+  unsigned int            mHeight;
+  gp_refcounter           mRef;
+};
+
 struct _gp_texture
 {
   GLuint                  mTexture;

@@ -260,7 +260,6 @@ int main(int argc, char* argv[])
   gp_shader_compile(shaderGH, source);
   gp_shader_source_unref(source);
   
-  gp_texture_set_data(texture, 0, 1024, 768);
   gp_frame_buffer_attach(fb, texture);
   gp_pipeline* pipeline = gp_frame_buffer_get_pipeline(fb);
   
@@ -308,7 +307,7 @@ int main(int argc, char* argv[])
   gp_pipeline_add_operation(pipeline, view);
   view_pipeline = gp_operation_viewport_get_pipeline(view);
   
-  gp_texture_set_data(textureG, 0, 1024, 768);
+
   gp_frame_buffer_attach(fbG, textureG);
   gp_pipeline* pipelineG = gp_frame_buffer_get_pipeline(fbG);
   

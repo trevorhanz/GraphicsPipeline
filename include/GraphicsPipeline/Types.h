@@ -49,6 +49,10 @@ extern "C" {
  * \brief \ref ArrayData object.
  * Storage class array objects.
  * 
+ * \typedef gp_texture_data
+ * \brief \ref Texture data object.
+ * Storage class texture objects.
+ * 
  * \typedef gp_texture
  * \brief \ref Texture object.
  * Graphics primative that stores multi-dimensional texture data.
@@ -85,6 +89,7 @@ typedef struct _gp_frame_buffer gp_frame_buffer;
 typedef struct _gp_array gp_array;
 typedef struct _gp_array_data gp_array_data;
 typedef struct _gp_texture gp_texture;
+typedef struct _gp_texture_data gp_texture_data;
 typedef struct _gp_shader gp_shader;
 typedef struct _gp_shader_source gp_shader_source;
 typedef struct _gp_uniform gp_uniform;

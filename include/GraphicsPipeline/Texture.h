@@ -33,6 +33,33 @@ extern "C" {
  */
 
 /*!
+ * Create a new gp_texture_data object.
+ * \return Newly created texture data object
+ */
+GP_EXPORT gp_texture_data* gp_texture_data_new();
+
+/*!
+ * Increase texture data object reference count.
+ * \param data Texture data object for which to increase the ref count.
+ */
+GP_EXPORT void gp_texture_data_ref(gp_texture_data* data);
+
+/*!
+ * Decrease texture data object reference count.
+ * \param data Texture data object for which to decrease the ref count.
+ */
+GP_EXPORT void gp_texture_data_unref(gp_texture_data* data);
+
+/*!
+ * Store float data in texture data object.
+ * \param td Texture data object to be used.
+ * \param data Pointer to an array of floats.
+ * \param width Number of elements in data width.
+ * \param height Number of elements in data height.
+ */
+GP_EXPORT void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, unsigned int height);
+
+/*!
  * Create a new gp_texture object tied to a context.
  * \param context Context object used to create texture.
  * \return Newly created texture.
@@ -54,20 +81,17 @@ GP_EXPORT void gp_texture_unref(gp_texture* texture);
 /*!
  * Upload data to a texture object.
  * \param texture Pointer to texture object.
- * \param data Pointer to data to be uploaded.
- * \param width Number of elements in data width.
- * \param height Number of elements in data height.
+ * \param data Pointer to texture data object to be uploaded.
  */
-GP_EXPORT void gp_texture_set_data(gp_texture* texture, float* data, unsigned int width, unsigned int height);
+GP_EXPORT void gp_texture_set_data(gp_texture* texture, gp_texture_data* data);
 
 /*!
  * Upload data to a texture object asynchronously.
  * \param texture Pointer to texture object.
- * \param data Pointer to data to be uploaded.
- * \param width Number of elements in data width.
- * \param height Number of elements in data height.
+ * \param data Pointer to texture data object to be uploaded.
+ * \param callback Callback function to be called upon completion.  Set to NULL to igore.
  */
-GP_EXPORT void gp_texture_set_data_async(gp_texture* texture, float* data, unsigned int width, unsigned int height, void (*callback)(void*), void* userdata);
+GP_EXPORT void gp_texture_set_data_async(gp_texture* texture, gp_texture_data* data, void (*callback)(void*), void* userdata);
 
 //! \} // Texture
 
@@ -76,6 +100,39 @@ GP_EXPORT void gp_texture_set_data_async(gp_texture* texture, float* data, unsig
 
 namespace GP
 {
+  /*!
+   * \brief Wrapper class for ::gp_texture_data
+   */
+  class TextureData
+  {
+  public:
+    //! Constructor
+    inline TextureData();
+    
+    //! Copy Constructor
+    inline TextureData(const TextureData& other);
+    
+    //! Destructor
+    inline ~TextureData();
+    
+    /*!
+     * Store float data in texture data object.
+     * \param data Pointer to an array of floats.
+     * \param width Number of elements in data width.
+     * \param height Number of elements in data height.
+     */
+    inline void Set(float* data, unsigned int width, unsigned int height);
+    
+    
+    //! Equal operator
+    inline const TextureData& operator = (const TextureData& other);
+    
+  private:
+    gp_texture_data*      mData;      //!< Internal texture data object
+    
+    friend class Texture;
+  };
+  
   /*!
    * \brief Wrapper class for ::gp_texture.
    */
@@ -93,19 +150,16 @@ namespace GP
     
     /*!
      * Uploads texture to %Texture object.
-     * \param data %Texture of data to be uploaded.
-     * \param width Number of elements in data width.
-     * \param height Number of elements in data height.
+     * \param data %TextureData to be uploaded.
      */
-    inline void SetData(float* data, unsigned int width, unsigned int height);
+    inline void SetData(const TextureData& data);
     
     /*!
      * Uploads texture to %Texture object asynchronously.
-     * \param data %Texture of data to be uploaded.
-     * \param width Number of elements in data width.
-     * \param height Number of elements in data height.
+     * \param data %TextureData to be uploaded.
+     * \param callback Callback function to be called when upload is complete.
      */
-    inline void SetDataAsync(float* data, unsigned int width, unsigned int height, std::function<void(Texture*)> callback);
+    inline void SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback);
     
     //! Equal operator
     inline const Texture& operator = (const Texture& other);
@@ -128,6 +182,22 @@ namespace GP
   //
   // Implementation
   //
+  TextureData::TextureData() : mData(gp_texture_data_new()) {}
+  TextureData::TextureData(const TextureData& other)
+  {
+    mData = other.mData;
+    gp_texture_data_ref(mData);
+  }
+  TextureData::~TextureData() {gp_texture_data_unref(mData);}
+  void TextureData::Set(float* data, unsigned int width, unsigned int height) {gp_texture_data_set(mData, data, width, height);}
+  const TextureData& TextureData::operator = (const TextureData& other)
+  {
+    gp_texture_data_unref(mData);
+    mData = other.mData;
+    gp_texture_data_ref(mData);
+    return *this;
+  }
+  
   Texture::Texture(const Context& context) : mTexture(gp_texture_new(context.mContext)) {}
   Texture::Texture(const Texture& other)
   {
@@ -135,13 +205,13 @@ namespace GP
     gp_texture_ref(mTexture);
   }
   Texture::~Texture() {gp_texture_unref(mTexture);}
-  void Texture::SetData(float* data, unsigned int width, unsigned int height) {gp_texture_set_data(mTexture, data, width, height);}
-  void Texture::SetDataAsync(float* data, unsigned int width, unsigned int height, std::function<void(Texture*)> callback)
+  void Texture::SetData(const TextureData& data) {gp_texture_set_data(mTexture, data.mData);}
+  void Texture::SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback)
   {
     AsyncData* async = new AsyncData();
     async->mTexture = this;
     async->mCallback = callback;
-    gp_texture_set_data_async(mTexture, data, width, height, &Texture::AsyncCallback, async);
+    gp_texture_set_data_async(mTexture, data.mData, &Texture::AsyncCallback, async);
   }
   const Texture& Texture::operator = (const Texture& other)
   {

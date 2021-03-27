@@ -109,7 +109,7 @@ UniformTexture* sTex;
 DrawOperation sOperation;
 
 ArrayData sAD[2];
-std::vector<float> sTexData[2];
+TextureData sTD[2];
 int currentArray = 0;
 int currentTexture = 0;
 
@@ -145,7 +145,7 @@ void ReloadTexture(Texture* texture)
   currentTexture += 1;
   if(currentTexture>1) currentTexture = 0;
   
-  sTexture[currentTexture]->SetDataAsync(&sTexData[currentTexture][0], TEX_WIDTH, TEX_HEIGHT, ReloadTexture);
+  sTexture[currentTexture]->SetDataAsync(sTD[currentTexture], ReloadTexture);
 }
 
 int main(int argc, char* argv[])
@@ -196,23 +196,24 @@ int main(int argc, char* argv[])
 #endif
   
 #if BUILD_TEXTURE || RENDER_TEXTURE
+  std::vector<float> data(TEX_WIDTH*TEX_HEIGHT*4);
   for(int t=0; t<2; ++t)
   {
-    sTexData[t].resize(TEX_WIDTH*TEX_HEIGHT*4);
     for(int i=0; i<TEX_WIDTH*TEX_HEIGHT; ++i)
     {
-      sTexData[t][i*4+0] = (rand()%1000)/1000.0f;
-      sTexData[t][i*4+1] = (rand()%1000)/1000.0f;
-      sTexData[t][i*4+2] = (rand()%1000)/1000.0f;
-      sTexData[t][i*4+3] = 1.0f;
+      data[i*4+0] = (rand()%1000)/1000.0f;
+      data[i*4+1] = (rand()%1000)/1000.0f;
+      data[i*4+2] = (rand()%1000)/1000.0f;
+      data[i*4+3] = 1.0f;
     }
+    sTD[t].Set(&data[0], TEX_WIDTH, TEX_HEIGHT);
   }
 #endif
   
 #if BUILD_TEXTURE
-  sTexture[0]->SetDataAsync(&sTexData[0][0], TEX_WIDTH, TEX_HEIGHT, ReloadTexture);
+  sTexture[0]->SetDataAsync(sTD[0], ReloadTexture);
 #elif RENDER_TEXTURE
-  sTexture[0]->SetData(&sTexData[0][0], TEX_WIDTH, TEX_HEIGHT);
+  sTexture[0]->SetData(&sTD[0]);
 #endif
   
   Pipeline pipeline = sTarget->GetPipeline();

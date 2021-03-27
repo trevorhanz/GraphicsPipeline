@@ -53,19 +53,6 @@ float vertexData[] = {
   0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
 };
 
-const char* vertexSource2 =
-    "attribute vec4 position;                     \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_Position = position;                    \n"
-    "}                                            \n";
-const char* fragmentSource2 =
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
-    "}                                            \n";
-float vertexData2[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
-
 #define TIMEOUT .01
 
 typedef struct
@@ -116,12 +103,9 @@ int main(int argc, char* argv[])
   gp_context* context = gp_context_new(system);
   
   gp_target* target = gp_target_new(context);
-  gp_frame_buffer* fb = gp_frame_buffer_new(context);
   gp_array* array = gp_array_new(context);
-  gp_array* array2 = gp_array_new(context);
   gp_texture* texture = gp_texture_new(context);
   gp_shader* shader = gp_shader_new(context);
-  gp_shader* shader2 = gp_shader_new(context);
   
   animation_data* data = malloc(sizeof(animation_data));
   data->target = target;
@@ -142,24 +126,21 @@ int main(int argc, char* argv[])
   gp_array_set_data(array, ad);
   gp_array_data_unref(ad);
   
-  ad = gp_array_data_new();
-  gp_array_data_set(ad, vertexData2, 6);
-  gp_array_set_data(array2, ad);
-  gp_array_data_unref(ad);
-  
-  gp_frame_buffer_attach(fb, texture);
-  gp_frame_buffer_set_size(fb, 1024, 768);
+  float textureData[] = {
+    1.0f, 0.0f, 0.0f, 1.0f,
+    0.0f, 1.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f
+  };
+  gp_texture_data* td = gp_texture_data_new();
+  gp_texture_data_set(td, textureData, 2, 2);
+  gp_texture_set_data(texture, td);
+  gp_texture_data_unref(td);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   gp_shader_compile(shader, source);
-  gp_shader_source_unref(source);
-  
-  source = gp_shader_source_new();
-  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource2);
-  gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource2);
-  gp_shader_compile(shader2, source);
   gp_shader_source_unref(source);
   
   gp_uniform* tex = gp_uniform_texture_new_by_name(shader, "Texture");
@@ -182,19 +163,6 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 6);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
   gp_pipeline_add_operation(pipeline, draw);
-  
-  pipeline = gp_frame_buffer_get_pipeline(fb);
-  clear = gp_operation_clear_new();
-  gp_pipeline_add_operation(pipeline, clear);
-  
-  draw = gp_operation_draw_new();
-  gp_operation_draw_set_shader(draw, shader2);
-  gp_operation_draw_add_array_by_index(draw, array2, 0, 2, 0, 0);
-  gp_operation_draw_set_verticies(draw, 3);
-  gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
-  gp_pipeline_add_operation(pipeline, draw);
-  
-  gp_frame_buffer_redraw(fb);
   
   gp_system_run(system);
   
