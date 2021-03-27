@@ -136,7 +136,7 @@ typedef struct _gp_array_list gp_array_list;
 
 struct _gp_array_list
 {
-  gp_array_list*          mNext;
+  gp_list_node            mNode;
   gp_array*               mArray;
   int                     mIndex;
   int                     mComponents;
@@ -148,7 +148,7 @@ typedef struct _gp_uniform_list gp_uniform_list;
 
 struct _gp_uniform_list
 {
-  gp_uniform_list*        mNext;
+  gp_list_node            mNode;
   gp_uniform*             mUniform;
 };
 
@@ -160,8 +160,8 @@ typedef struct
   uint8_t                 mDirty;
 #endif
   gp_shader*              mShader;
-  gp_array_list*          mArrays;
-  gp_uniform_list*        mUniforms;
+  gp_list                 mArrays;
+  gp_list                 mUniforms;
   unsigned int            mVerticies;
   gp_draw_mode            mMode;
 } _gp_operation_draw_data;
@@ -174,12 +174,13 @@ void _gp_operation_draw(_gp_operation_data* data)
   
   glUseProgram(d->mShader->mProgram);
   
-  gp_uniform_list* uniform = d->mUniforms;
-  while(uniform != NULL)
+  gp_list_node* node = gp_list_front(&d->mUniforms);
+  while(node != NULL)
   {
+    gp_uniform_list* uniform = (gp_uniform_list*)node;
     uniform->mUniform->mOperation(uniform->mUniform);
     
-    uniform = uniform->mNext;
+    node = gp_list_node_next(node);
   }
   
 #ifndef GP_GLES2
@@ -190,9 +191,10 @@ void _gp_operation_draw(_gp_operation_data* data)
   if(d->mDirty == 1)
   {
 #endif
-  gp_array_list* array = d->mArrays;
-  while(array != NULL)
+  node = gp_list_front(&d->mArrays);
+  while(node != NULL)
   {
+    gp_array_list* array = (gp_array_list*)node;
     glBindBuffer(GL_ARRAY_BUFFER, array->mArray->mVBO);
     
     CHECK_GL_ERROR();
@@ -201,7 +203,7 @@ void _gp_operation_draw(_gp_operation_data* data)
     glEnableVertexAttribArray(array->mIndex);
     glVertexAttribPointer(array->mIndex, array->mComponents, GL_FLOAT, GL_FALSE, array->mStride, (void*)array->mOffset);
     
-    array = array->mNext;
+    node = gp_list_node_next(node);
   }
 #ifndef GP_GLES2
   d->mDirty = 0;
@@ -209,33 +211,35 @@ void _gp_operation_draw(_gp_operation_data* data)
 #endif
   
   glDrawArrays(d->mMode, 0, d->mVerticies);
+  CHECK_GL_ERROR();
 }
 
 void _gp_operation_draw_free(_gp_operation_data* data)
 {
   _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
   
-  gp_shader_unref(d->mShader);
+  if(d->mShader)
+    gp_shader_unref(d->mShader);
   
   // TODO - free VAO
-  gp_array_list* array = d->mArrays;
-  while(array != NULL)
+  gp_list_node* node = gp_list_front(&d->mArrays);
+  while(node != NULL)
   {
-    gp_array_list* temp = array;
+    gp_array_list* array = (gp_array_list*)node;
     gp_array_unref(array->mArray);
     
-    array = array->mNext;
-    free(temp);
+    node = gp_list_node_next(node);
+    free(array);
   }
   
-  gp_uniform_list* uniform = d->mUniforms;
-  while(uniform != NULL)
+  node = gp_list_front(&d->mUniforms);
+  while(node != NULL)
   {
-    gp_uniform_list* temp = uniform;
+    gp_uniform_list* uniform = (gp_uniform_list*)node;
     gp_uniform_unref(uniform->mUniform);
     
-    uniform = uniform->mNext;
-    free(temp);
+    node = gp_list_node_next(node);
+    free(uniform);
   }
   
   free(d);
@@ -249,8 +253,8 @@ gp_operation* gp_operation_draw_new()
   operation->mData = malloc(sizeof(_gp_operation_draw_data));
   operation->mData->free = _gp_operation_draw_free;
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  data->mUniforms = NULL;
-  data->mArrays = NULL;
+  gp_list_init(&data->mUniforms);
+  gp_list_init(&data->mArrays);
   data->mShader = NULL;
 #ifndef GP_GLES2
   data->mVAO = 0;
@@ -280,13 +284,12 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   
   gp_array_list* a = malloc(sizeof(gp_array_list));
-  a->mNext = data->mArrays;
   a->mArray = array;
   a->mIndex = index;
   a->mComponents = components;
   a->mStride = stride;
   a->mOffset = offset;
-  data->mArrays = a;
+  gp_list_push_back(&data->mArrays, (gp_list_node*)a);
   
   gp_array_ref(array);
   
@@ -300,9 +303,8 @@ void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   
   gp_uniform_list* u = malloc(sizeof(gp_uniform_list));
-  u->mNext = data->mUniforms;
   u->mUniform = uniform;
-  data->mUniforms = u;
+  gp_list_push_back(&data->mUniforms, (gp_list_node*)u);
   
   gp_uniform_ref(uniform);
   
