@@ -141,6 +141,10 @@ pages:
     - mkdir -p build/doxygen/
     - doxygen doxygen/Doxyfile
     - mv build/doxygen/html/ public
+    - cd build
+    - find examples/ -name "*.html" | cpio -pdm ../public
+    - find examples/ -name "*.js" | cpio -pdm ../public
+    - find examples/ -name "*.wasm" | cpio -pdm ../public
   artifacts:
     paths:
       - public

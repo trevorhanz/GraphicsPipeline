@@ -6,7 +6,7 @@ FROM ubuntu:20.04
 
 RUN apt-get update -qq && \
     apt install -y wget python3 cmake && \
-    apt install -y doxygen graphviz && \
+    apt install -y doxygen graphviz cpio && \
     apt-get clean
 
 RUN cd /opt/ && \
