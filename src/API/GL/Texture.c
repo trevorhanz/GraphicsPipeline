@@ -57,9 +57,17 @@ void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, u
 {
   const size_t size = sizeof(float)*4*width*height;
   
-  if(td->mData == NULL) td->mData = malloc(size);
-  
-  memcpy(td->mData, data, size);
+  if(data == NULL)
+  {
+    if(td->mData != NULL) free(td->mData);
+    td->mData = NULL;
+  }
+  else
+  {
+    if(td->mData == NULL) td->mData = malloc(size);
+    
+    memcpy(td->mData, data, size);
+  }
   td->mWidth = width;
   td->mHeight = height;
 }
