@@ -61,6 +61,7 @@ struct _gp_context
   gp_list                 mFinished;
   gp_io*                  mWorkIO;
   int                     mWorkPipe[2];
+  int                     mState;
 };
 
 struct _gp_target

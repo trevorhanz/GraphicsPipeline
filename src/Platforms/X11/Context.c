@@ -28,6 +28,8 @@ typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXC
 
 gp_context* sContext = NULL;
 
+#define GP_STATE_RUNNING 0x01
+
 typedef struct
 {
   gp_list_node      mNode;
@@ -49,7 +51,7 @@ void* _gp_work_thread(void* data)
   // Signal main thread that initialization is complete
   pthread_cond_signal(&context->mWorkCV);
   
-  while(1)
+  while(context->mState&GP_STATE_RUNNING)
   {
     while(gp_list_front(&context->mWork) != NULL)
     {
@@ -121,6 +123,7 @@ gp_context* gp_context_new(gp_system* system)
   context->mParent = system;
   context->mDisplay = system->mDisplay;
   context->mWindow = 0;
+  context->mState = GP_STATE_RUNNING;
   gp_ref_init(&context->mRef);
   
   gp_list_init(&context->mWork);
@@ -227,10 +230,10 @@ gp_context* gp_context_new(gp_system* system)
   gp_io_set_callback(context->mWorkIO, _gp_work_done);
   gp_io_set_userdata(context->mWorkIO, context);
   
-  pthread_mutex_lock(&context->mWorkMutex);
-  
   pthread_mutex_init(&context->mWorkMutex, NULL);
   pthread_cond_init(&context->mWorkCV, NULL);
+  
+  pthread_mutex_lock(&context->mWorkMutex);
   pthread_create(&context->mWorkThread, NULL, _gp_work_thread, context);
   
   // Wait for work thread to finish initializing before continuing.
@@ -255,6 +258,13 @@ void gp_context_unref(gp_context* context)
     glXDestroyContext(context->mDisplay, context->mShare);
     XFreeColormap(context->mDisplay, context->mColorMap);
     XFree(context->mVisualInfo);
+    gp_io_free(context->mWorkIO);
+    
+    pthread_mutex_lock(&context->mWorkMutex);
+    context->mState &= ~GP_STATE_RUNNING;
+    pthread_cond_signal(&sContext->mWorkCV);
+    pthread_mutex_unlock(&context->mWorkMutex);
+    pthread_join(context->mWorkThread, NULL);
     free(context);
   }
 }
