@@ -55,6 +55,8 @@ extern "C" gp_context* gp_qt_context_new()
   
   QOpenGLFunctions* functions = context->mShare->functions();
   
+  gp_log_info("Qt Version: %s", qVersion());
+  
   int major, minor;
   functions->glGetIntegerv(GL_MAJOR_VERSION, &major);
   functions->glGetIntegerv(GL_MINOR_VERSION, &minor);
