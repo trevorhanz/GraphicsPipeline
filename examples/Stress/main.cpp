@@ -138,7 +138,7 @@ public:
       {
         data[i] = (rand()%1000)/500.0-1.0;
       }
-      ads[a].Set(&data[0], data.size()*sizeof(float));
+      mADs[a].Set(&data[0], data.size()*sizeof(float));
     }
 #endif
 
@@ -176,9 +176,9 @@ public:
     
 #if RENDER_ARRAY
     mOperation.SetShader(shader);
-    mOperation.AddArrayByIndex(*sArray[0], 0, 2);
+    mOperation.AddArrayByIndex(mArrays[0], 0, 2);
     mOperation.SetVerticies(100);
-    mOperation.SetMode(GP_MODE_TRIANGLE_STRIP);
+    mOperation.SetMode(GP_MODE_LINE_STRIP);
     pipeline.AddOperation(mOperation);
 #endif
   
@@ -239,7 +239,7 @@ private:
     mThroughput += ((double)(ARRAY_SIZE*sizeof(float)))/(1024.0*1024.0);
     
 #if RENDER_ARRAY
-    mOperation.AddArrayByIndex(*sArray[currentArray], 0, 2);
+    mOperation.AddArrayByIndex(mArrays[mCurrentArray], 0, 2);
 #endif
     
     mCurrentArray += 1;

@@ -54,28 +54,28 @@ int main(int argc, char* argv[])
   Shader shader(context);
   
   window.SetClickCallback([&](const gp_event_click_t* click){
-    gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
+    gp_log("Click: button:%d, state:%d, (%d, %d)", click->button, click->state, click->x, click->y);
   });
   window.SetScrollCallback([&](const gp_event_scroll_t* scroll){
     gp_log("Scroll: %f", scroll->scroll);
   });
   window.SetTrackCallback([&](const gp_event_track_t* track){
-    gp_log("Track: %d, %d", track->x, track->y);
+    gp_log("Track: (%d, %d)", track->x, track->y);
   });
   window.SetEnterCallback([&](const gp_event_enter_t* enter){
     if(enter->enter) gp_log("Enter");
     else gp_log("Leave");
   });
   window.SetKeyCallback([&](const gp_event_key_t* key){
-    if(key->state) gp_log("Press: %d", key->key);
-    else gp_log("Release: %d", key->key);
+    if(key->state) gp_log("Press: key:%d", key->key);
+    else gp_log("Release: key:%d", key->key);
   });
   window.SetResizeCallback([&](const gp_event_resize_t* resize){
-    gp_log("Resize: %dx%d", resize->width, resize->height);
+    gp_log("Resize: width:%d, height:%d", resize->width, resize->height);
     window.Redraw();
   });
   window.SetMoveCallback([&](const gp_event_move_t* move){
-    gp_log("Move: %d, %d", move->x, move->y);
+    gp_log("Move: (%d, %d)", move->x, move->y);
   });
   
   ArrayData ad;

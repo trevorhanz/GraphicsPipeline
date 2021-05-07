@@ -43,7 +43,7 @@ float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 void mouse_click_callback(const gp_event_click_t* click, gp_pointer* userData)
 {
-  gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
+  gp_log("Click: button:%d, state:%d, (%d, %d)", click->button, click->state, click->x, click->y);
 }
 
 void mouse_scroll_callback(const gp_event_scroll_t* scroll, gp_pointer* userData)
@@ -53,7 +53,7 @@ void mouse_scroll_callback(const gp_event_scroll_t* scroll, gp_pointer* userData
 
 void mouse_track_callback(const gp_event_track_t* track, gp_pointer* userData)
 {
-  gp_log("Track: %d, %d", track->x, track->y);
+  gp_log("Track: (%d, %d)", track->x, track->y);
 }
 
 void mouse_enter_callback(const gp_event_enter_t* enter, gp_pointer* userData)
@@ -64,18 +64,18 @@ void mouse_enter_callback(const gp_event_enter_t* enter, gp_pointer* userData)
 
 void key_callback(const gp_event_key_t* key, gp_pointer* userData)
 {
-  if(key->state) gp_log("Press: %d", key->key);
-  else gp_log("Release: %d", key->key);
+  if(key->state) gp_log("Press: key:%d", key->key);
+  else gp_log("Release: key:%d", key->key);
 }
 
 void window_resize_callback(const gp_event_resize_t* resize, gp_pointer* userData)
 {
-  gp_log("Resize: %d, %d", resize->width, resize->height);
+  gp_log("Resize: width:%d, height:%d", resize->width, resize->height);
 }
 
 void window_move_callback(const gp_event_move_t* move, gp_pointer* userData)
 {
-  gp_log("Move: %dx%d", move->x, move->y);
+  gp_log("Move: (%d, %d)", move->x, move->y);
 }
 
 int main(int argc, char* argv[])

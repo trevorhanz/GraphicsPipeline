@@ -21,23 +21,52 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Time between two consecutive timers
+#define TIMER_DELAY 0.1
+
+int num_timers;
+
+typedef struct
+{
+  int index;
+} timeout_data;
+
 void TimerCallback(gp_timer* timer, gp_pointer* userdata)
 {
-  printf("Timeout\n");
-  gp_timer_arm(timer, 1.0);
+  timeout_data* data = (timeout_data*)gp_pointer_get_pointer(userdata);
+  
+  gp_log("Timeout: %d", data->index);
+  gp_timer_arm(timer, TIMER_DELAY*num_timers);
 }
 
 int main(int argc, char* argv[])
 {
-  gp_system* system = gp_system_new();
+  num_timers = 1;
+  if(argc == 2)
+    num_timers = atoi(argv[1]);
   
-  gp_timer* timer = gp_timer_new(system);
-  gp_timer_set_callback(timer, TimerCallback, 0);
-  gp_timer_arm(timer, 1.0);
+  gp_system* system = gp_system_new();
+  gp_timer** timers = malloc(sizeof(gp_timer*)*num_timers);
+  
+  for(int i=0; i<num_timers; ++i)
+  {
+    timeout_data* data = malloc(sizeof(timeout_data));
+    data->index = i;
+    
+    gp_pointer* pointer = gp_pointer_new(data, free);
+    timers[i] = gp_timer_new(system);
+    gp_timer_set_callback(timers[i], TimerCallback, pointer);
+    gp_timer_arm(timers[i], TIMER_DELAY*(i+1));
+    gp_object_unref((gp_object*)pointer);
+  }
   
   gp_system_run(system);
   
-  gp_object_unref((gp_object*)timer);
+  for(int i=0; i<num_timers; ++i)
+  {
+    gp_object_unref((gp_object*)timers[i]);
+  }
+  free(timers);
   gp_object_unref((gp_object*)system);
   
   return EXIT_SUCCESS;

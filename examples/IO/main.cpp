@@ -23,14 +23,27 @@ using namespace GP;
 
 int main(int argc, char* argv[])
 {
+  gp_log_info("IO example");
+  gp_log("Type 'exit' to quit.\n");
+  
+  std::cout << "Input: ";
+  std::cout.flush();
+  
   System system;
   
   ReadIO io(system, 0); // STDIN;
-  io.SetCallback([](IO&)
+  io.SetCallback([&](IO&)
   {
     std::string in;
     std::cin >> in;
-    std::cout << "IO: " << in << std::endl;
+    if(in == "exit")
+    {
+      system.Stop();
+      return;
+    }
+    std::cout << "Read: " << in << std::endl << std::endl;
+    std::cout << "Input: ";
+    std::cout.flush();
   });
   
   system.Run();

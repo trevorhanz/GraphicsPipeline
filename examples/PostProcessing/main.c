@@ -419,7 +419,6 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)context);
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);
-  free(data);
   
   return EXIT_SUCCESS;
 }
