@@ -31,6 +31,7 @@
 struct _gp_system
 {
   int                                   mCanvasIndex;
+  int                                   mState;
 };
 
 struct _gp_context

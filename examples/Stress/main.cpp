@@ -100,172 +100,190 @@ float vertexDataQuad[] = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
 #define TEX_WIDTH 4096
 #define TEX_HEIGHT 4096
 
-Target* sTarget;
-Array* sArray[2];
-Texture* sTexture[2];
-Timer* sTimer;
-UniformTexture* sTex;
-
-DrawOperation sOperation;
-
-ArrayData sAD[2];
-TextureData sTD[2];
-int currentArray = 0;
-int currentTexture = 0;
-
-struct timeval beginFrame;
-int frame;
-
-double throughput = 0;
-
-// Async array callback
-void ReloadArray(Array* array)
+class App
 {
-  throughput += ((double)(ARRAY_SIZE*sizeof(float)))/(1024.0*1024.0);
-  
-#if RENDER_ARRAY
-  sOperation.AddArrayByIndex(*sArray[currentArray], 0, 2);
-#endif
-  
-  currentArray += 1;
-  if(currentArray>1) currentArray = 0;
-  
-  sArray[currentArray]->SetDataAsync(sAD[currentArray], ReloadArray);
-}
-
-// Async texture callback
-void ReloadTexture(Texture* texture)
-{
-  throughput += ((double)(TEX_WIDTH*TEX_HEIGHT*sizeof(float)*4))/(1024.0*1024.0);
-  
-#if RENDER_TEXTURE
-  sTex->Set(*sTexture[currentTexture]);
-#endif
-  
-  currentTexture += 1;
-  if(currentTexture>1) currentTexture = 0;
-  
-  sTexture[currentTexture]->SetDataAsync(sTD[currentTexture], ReloadTexture);
-}
-
-int main(int argc, char* argv[])
-{
-  System* system = new System();
-  
-  Context* context = new Context(*system);
-  
-  sTarget = new Target(*context);
-  sArray[0] = new Array(*context);
-  sArray[1] = new Array(*context);
-  sTexture[0] = new Texture(*context);
-  sTexture[1] = new Texture(*context);
-  Shader shader(*context);
-  Shader shaderQuad(*context);
-  Array arrayQuad(*context);
-  
-  ArrayData ad;
-  ad.Set(vertexDataQuad, 8);
-  arrayQuad.SetData(ad);
-  
-  ShaderSource source;
-  source.AddString(GP_SHADER_SOURCE_VERTEX, vertexSource);
-  source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
-  shader.Compile(source);
-  
-  ShaderSource sourceQuad;
-  sourceQuad.AddString(GP_SHADER_SOURCE_VERTEX, vertexSourceQuad);
-  sourceQuad.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSourceQuad);
-  shaderQuad.Compile(sourceQuad);
-  
-#if BUILD_ARRAY || RENDER_ARRAY
-  std::vector<float> data(ARRAY_SIZE);
-  for(int a=0; a<2; ++a)
+public:
+  App()
+    : mSystem(),
+    mContext(mSystem),
+    mTarget(mContext),
+    mArrays{Array(mContext), Array(mContext)},
+    mTextures{Texture(mContext), Texture(mContext)},
+    mThroughput(0),
+    mCurrentArray(0),
+    mCurrentTexture(0), 
+    mFrame(0)
   {
-    for(int i=0; i<data.size(); ++i)
+    Shader shader(mContext);
+    Shader shaderQuad(mContext);
+    Array arrayQuad(mContext);
+    
+    ArrayData ad;
+    ad.Set(vertexDataQuad, 8);
+    arrayQuad.SetData(ad);
+    
+    ShaderSource source;
+    source.AddString(GP_SHADER_SOURCE_VERTEX, vertexSource);
+    source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
+    shader.Compile(source);
+    
+    ShaderSource sourceQuad;
+    sourceQuad.AddString(GP_SHADER_SOURCE_VERTEX, vertexSourceQuad);
+    sourceQuad.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSourceQuad);
+    shaderQuad.Compile(sourceQuad);
+    
+#if BUILD_ARRAY || RENDER_ARRAY
+    std::vector<float> data(ARRAY_SIZE);
+    for(int a=0; a<2; ++a)
     {
-      data[i] = (rand()%1000)/500.0-1.0;
+      for(int i=0; i<data.size(); ++i)
+      {
+        data[i] = (rand()%1000)/500.0-1.0;
+      }
+      ads[a].Set(&data[0], data.size());
     }
-    sAD[a].Set(&data[0], data.size());
-  }
 #endif
 
 #if BUILD_ARRAY
-  sArray[0]->SetDataAsync(sAD[0], ReloadArray);
+    mArrays[0].SetDataAsync(mADs[0], std::bind(&App::ReloadArray, this));
 #elif RENDER_ARRAY
-  sArray[0]->SetData(sAD[0]);
+    mArrays[0].SetData(mADs[0]);
 #endif
   
 #if BUILD_TEXTURE || RENDER_TEXTURE
-  std::vector<float> data(TEX_WIDTH*TEX_HEIGHT*4);
-  for(int t=0; t<2; ++t)
-  {
-    for(int i=0; i<TEX_WIDTH*TEX_HEIGHT; ++i)
+    std::vector<float> data(TEX_WIDTH*TEX_HEIGHT*4);
+    for(int t=0; t<2; ++t)
     {
-      data[i*4+0] = (rand()%1000)/1000.0f;
-      data[i*4+1] = (rand()%1000)/1000.0f;
-      data[i*4+2] = (rand()%1000)/1000.0f;
-      data[i*4+3] = 1.0f;
+      for(int i=0; i<TEX_WIDTH*TEX_HEIGHT; ++i)
+      {
+        data[i*4+0] = (rand()%1000)/1000.0f;
+        data[i*4+1] = (rand()%1000)/1000.0f;
+        data[i*4+2] = (rand()%1000)/1000.0f;
+        data[i*4+3] = 1.0f;
+      }
+      mTDs[t].Set(&data[0], TEX_WIDTH, TEX_HEIGHT);
     }
-    sTD[t].Set(&data[0], TEX_WIDTH, TEX_HEIGHT);
-  }
 #endif
   
 #if BUILD_TEXTURE
-  sTexture[0]->SetDataAsync(sTD[0], ReloadTexture);
+    mTextures[0].SetDataAsync(mTDs[0], std::bind(&App::ReloadTexture, this));
 #elif RENDER_TEXTURE
-  sTexture[0]->SetData(&sTD[0]);
+    mTextures[0]->SetData(&mTDs[0]);
 #endif
-  
-  Pipeline pipeline = sTarget->GetPipeline();
-  
-  ClearOperation clear;
-  pipeline.AddOperation(clear);
-  
+    
+    Pipeline pipeline = mTarget.GetPipeline();
+    
+    ClearOperation clear;
+    pipeline.AddOperation(clear);
+    
 #if RENDER_ARRAY
-  sOperation.SetShader(shader);
-  sOperation.AddArrayByIndex(*sArray[0], 0, 2);
-  sOperation.SetVerticies(100);
-  sOperation.SetMode(GP_MODE_TRIANGLE_STRIP);
-  pipeline.AddOperation(sOperation);
+    mOperation.SetShader(shader);
+    mOperation.AddArrayByIndex(*sArray[0], 0, 2);
+    mOperation.SetVerticies(100);
+    mOperation.SetMode(GP_MODE_TRIANGLE_STRIP);
+    pipeline.AddOperation(mOperation);
 #endif
   
 #if RENDER_TEXTURE
-  sTex = new UniformTexture(shaderQuad, "Texture");
-  sTex->Set(*sTexture[0]);
+    mTex = new UniformTexture(shaderQuad, "Texture");
+    mTex->Set(mTextures[0]);
+    
+    DrawOperation operation;
+    operation.SetShader(shaderQuad);
+    operation.AddArrayByIndex(arrayQuad, 0, 2);
+    operation.SetUniform(*mTex);
+    operation.SetVerticies(4);
+    operation.SetMode(GP_MODE_TRIANGLE_STRIP);
+    pipeline.AddOperation(operation);
+#endif
+  }
   
-  DrawOperation operation;
-  operation.SetShader(shaderQuad);
-  operation.AddArrayByIndex(arrayQuad, 0, 2);
-  operation.SetUniform(*sTex);
-  operation.SetVerticies(4);
-  operation.SetMode(GP_MODE_TRIANGLE_STRIP);
-  pipeline.AddOperation(operation);
+  ~App()
+  {
+    delete mTex;
+  }
+  
+  void Run()
+  {
+    gettimeofday(&mBeginFrame, NULL);
+    
+    Timer timer(mSystem);
+    timer.SetCallback(std::function<void(Timer*)>([&](Timer* timer){
+      // Redraw Target
+      mTarget.Redraw();
+      
+      // Calculate FPS at 1Hz
+      struct timeval endFrame;
+      gettimeofday(&endFrame, NULL);
+      double delta = (endFrame.tv_sec-mBeginFrame.tv_sec) * 1000000 + (endFrame.tv_usec-mBeginFrame.tv_usec);
+      if(delta > 1000000)
+      {
+        gp_log("FPS: %.2f - Throughput %.2fMB/s", mFrame/(delta/1000000.0), mThroughput/(delta/1000000.0));
+        mBeginFrame = endFrame;
+        mFrame = 0;
+        mThroughput = 0;
+      }
+      
+      ++mFrame;
+      timer->Arm(.01);
+    }));
+    timer.Arm(.01);
+    
+    mSystem.Run();
+  }
+  
+private:
+  // Async array callback
+  void ReloadArray()
+  {
+    mThroughput += ((double)(ARRAY_SIZE*sizeof(float)))/(1024.0*1024.0);
+    
+#if RENDER_ARRAY
+    mOperation.AddArrayByIndex(*sArray[currentArray], 0, 2);
+#endif
+    
+    mCurrentArray += 1;
+    if(mCurrentArray>1) mCurrentArray = 0;
+    
+    mArrays[mCurrentArray].SetDataAsync(mADs[mCurrentArray], std::bind(&App::ReloadArray, this));
+  }
+  
+  // Async texture callback
+  void ReloadTexture()
+  {
+    mThroughput += ((double)(TEX_WIDTH*TEX_HEIGHT*sizeof(float)*4))/(1024.0*1024.0);
+  
+#if RENDER_TEXTURE
+    mTex->Set(mTextures[mCurrentTexture]);
 #endif
   
-  gettimeofday(&beginFrame, NULL);
-  
-  sTimer = new Timer(*system);
-  sTimer->SetCallback(std::function<void(Timer*)>([](Timer* timer){
-    // Redraw Target
-    sTarget->Redraw();
+    mCurrentTexture += 1;
+    if(mCurrentTexture>1) mCurrentTexture = 0;
     
-    // Calculate FPS at 1Hz
-    struct timeval endFrame;
-    gettimeofday(&endFrame, NULL);
-    double delta = (endFrame.tv_sec-beginFrame.tv_sec) * 1000000 + (endFrame.tv_usec-beginFrame.tv_usec);
-    if(delta > 1000000)
-    {
-      gp_log("FPS: %.2f - Throughput %.2fMB/s", frame/(delta/1000000.0), throughput/(delta/1000000.0));
-      beginFrame = endFrame;
-      frame = 0;
-      throughput = 0;
-    }
-    
-    ++frame;
-    timer->Arm(.01);
-  }));
-  sTimer->Arm(.01);
+    mTextures[mCurrentTexture].SetDataAsync(mTDs[mCurrentTexture], std::bind(&App::ReloadTexture, this));
+  }
   
-  system->Run();
+  System                        mSystem;
+  Context                       mContext;
+  Target                        mTarget;
+  Array                         mArrays[2];
+  Texture                       mTextures[2];
+  ArrayData                     mADs[2];
+  TextureData                   mTDs[2];
+  DrawOperation                 mOperation;
+  UniformTexture*               mTex;
+  
+  double                        mThroughput;
+  int                           mCurrentArray;
+  int                           mCurrentTexture;
+
+  struct timeval                mBeginFrame;
+  int                           mFrame;
+};
+
+int main(int argc, char* argv[])
+{
+  App app;
+  app.Run();
 }
 

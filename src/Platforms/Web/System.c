@@ -22,10 +22,13 @@
 
 #include <stdlib.h>
 
+#define GP_STATE_RUNNING          0x01
+
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
   system->mCanvasIndex = 0;
+  system->mState = 0;
   
   return system;
 }
@@ -37,7 +40,17 @@ void gp_system_free(gp_system* system)
 
 void gp_system_run(gp_system* system)
 {
+  system->mState |= GP_STATE_RUNNING;
   
+  while(system->mState&GP_STATE_RUNNING)
+  {
+    emscripten_sleep(1000);
+  }
+}
+
+void gp_system_stop(gp_system* system)
+{
+  system->mState &= ~GP_STATE_RUNNING;
 }
 
 gp_timer* gp_timer_new(gp_system* system)

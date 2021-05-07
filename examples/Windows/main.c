@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
-  
+  gp_operation_unref(draw);
   
   pipeline = gp_target_get_pipeline(target2);
   draw = gp_operation_draw_new();
@@ -70,8 +70,17 @@ int main(int argc, char* argv[])
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
+  gp_operation_unref(draw);
+  
+  gp_shader_unref(shader);
+  gp_array_unref(array);
   
   gp_system_run(system);
+  
+  gp_target_unref(target1);
+  gp_target_unref(target2);
+  gp_context_unref(context);
+  gp_system_free(system);
   
   return EXIT_SUCCESS;
 }

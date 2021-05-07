@@ -331,6 +331,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(pipelineG, draw);
+  gp_operation_unref(draw);
   gp_uniform_unref(texGV);
   
   gp_uniform* texGH = gp_uniform_texture_new_by_name(shaderGH, "Texture");
@@ -370,6 +371,7 @@ int main(int argc, char* argv[])
   gp_pipeline_add_operation(view_pipeline, draw);
   gp_operation_unref(draw);
   gp_uniform_unref(texWave);
+  gp_uniform_unref(offsetWave);
   
   //
   // Lower Right
@@ -409,9 +411,12 @@ int main(int argc, char* argv[])
   gp_system_run(system);
   
   gp_frame_buffer_unref(fb);
-//   gp_target_unref(target);   // Can't unref target for WebAssembly builds
+  gp_frame_buffer_unref(fbG);
+  gp_target_unref(target);
   gp_context_unref(context);
+  gp_timer_free(timer);
   gp_system_free(system);
+  free(data);
   
   return EXIT_SUCCESS;
 }

@@ -154,17 +154,33 @@ int main(int argc, char* argv[])
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
+  gp_operation_unref(clear);
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_set_uniform(draw, data->offset);
+  gp_operation_draw_set_uniform(draw, tex);
   gp_operation_draw_add_array_by_index(draw, array, 0, 3, sizeof(float)*5, 0);
   gp_operation_draw_add_array_by_index(draw, array, 1, 2, sizeof(float)*5, sizeof(float)*3);
   gp_operation_draw_set_verticies(draw, 6);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
   gp_pipeline_add_operation(pipeline, draw);
+  gp_operation_unref(draw);
+  gp_uniform_unref(tex);
+  
+  gp_shader_unref(shader);
+  gp_array_unref(array);
+  gp_texture_unref(texture);
   
   gp_system_run(system);
+  
+  gp_target_unref(target);
+  gp_context_unref(context);
+  gp_timer_free(timer);
+  gp_system_free(system);
+  
+  gp_uniform_unref(data->offset);
+  free(data);
   
   return EXIT_SUCCESS;
 }
