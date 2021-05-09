@@ -23,6 +23,7 @@
 #include <GraphicsPipeline/Logging.h>
 
 #include "../../Utils/List.h"
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 #include <X11/Xlib.h>
@@ -36,6 +37,7 @@ typedef struct __gp_event _gp_event;
 
 struct _gp_system
 {
+  gp_object               mObject;
   Display*                mDisplay;
   gp_list                 mTargets;
   _gp_event*              mEvent;

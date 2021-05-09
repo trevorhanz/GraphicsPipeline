@@ -32,10 +32,12 @@
 #include "IOCallback.h"
 #include "WorkQueue.h"
 
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 struct _gp_system
 {
+  gp_object               mObject;
   QApplication*           mApp;
 };
 
@@ -56,6 +58,7 @@ struct _gp_target
 
 struct _gp_timer
 {
+  gp_object               mObject;
   QTimer*                 mTimer;
   TimerCallback*          mTimerCallback;
   void*                   mUserData;
@@ -63,6 +66,7 @@ struct _gp_timer
 
 struct _gp_io
 {
+  gp_object               mObject;
   QSocketNotifier*        mSocketNotifier;
   IOCallback*             mIOCallback;
   void*                   mUserData;

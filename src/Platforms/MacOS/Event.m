@@ -17,11 +17,6 @@
 
 #include "MacOS.h"
 
-void gp_timer_free(gp_timer* timer)
-{
-  free(timer);
-}
-
 void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
 {
   [timer->mTimer SetCallback:callback];
@@ -45,11 +40,6 @@ void gp_timer_arm(gp_timer* timer, double seconds)
 void gp_timer_disarm(gp_timer* timer)
 {
   [timer->mTimer Disarm];
-}
-
-void gp_io_free(gp_io* io)
-{
-  free(io);
 }
 
 void gp_io_set_callback(gp_io* io, gp_io_callback callback)

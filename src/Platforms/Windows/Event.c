@@ -25,11 +25,6 @@
 
 #include "Windows.h"
 
-void gp_timer_free(gp_timer* timer)
-{
-  free(timer);
-}
-
 void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
 {
   timer->mCallback = callback;
@@ -61,11 +56,6 @@ void gp_timer_arm(gp_timer* timer, double timeout)
 void gp_timer_disarm(gp_timer* timer)
 {
   KillTimer(timer->mSystem->mInternalWindow, (UINT_PTR)timer);
-}
-
-void gp_io_free(gp_io* io)
-{
-  free(io);
 }
 
 void gp_io_set_callback(gp_io* io, gp_io_callback callback)

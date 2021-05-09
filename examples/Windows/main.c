@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   gp_target_unref(target1);
   gp_target_unref(target2);
   gp_context_unref(context);
-  gp_system_free(system);
+  gp_object_unref((gp_object*)system);
   
   return EXIT_SUCCESS;
 }

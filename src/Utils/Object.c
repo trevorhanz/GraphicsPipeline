@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2020 Trevor Hanz
+* Copyright (C) 2021 Trevor Hanz
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -15,35 +15,25 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline/GP.h>
+#include "Object.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#ifdef GP_WINDOWS
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
-void IOCallback(gp_io* io)
+void gp_object_ref(gp_object* object)
 {
-  char buffer[256];
-  read(0, buffer, 256);
-  printf("IO: %s\n", buffer);
+  gp_ref_inc(&object->mRef);
 }
 
-int main(int argc, char* argv[])
+void gp_object_unref(gp_object* object)
 {
-  gp_system* system = gp_system_new();
-  
-  gp_io* io = gp_io_read_new(system, 0); // STDIN
-  gp_io_set_callback(io, IOCallback);
-  
-  gp_system_run(system);
-  
-  gp_object_unref((gp_object*)io);
-  gp_object_unref((gp_object*)system);
-  
-  return EXIT_SUCCESS;
+  if(gp_ref_dec(&object->mRef))
+  {
+    object->mFree(object);
+  }
 }
+
+void _gp_object_init(gp_object* object, gp_object_free func)
+{
+  gp_ref_init(&object->mRef);
+  object->mFree = func;
+}
+
+

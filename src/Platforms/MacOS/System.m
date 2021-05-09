@@ -22,16 +22,19 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
+void _gp_system_free(gp_object* object)
+{
+  gp_system* system = (gp_system*)object;
+  
+  free(system);
+}
+
 gp_system* gp_system_new()
 {
   gp_system* system = malloc(sizeof(gp_system));
+  _gp_object_init(&system->mObject, _gp_system_free);
   
   return system;
-}
-
-void gp_system_free(gp_system* system)
-{
-  free(system);
 }
 
 void gp_system_run(gp_system* system)
@@ -40,17 +43,38 @@ void gp_system_run(gp_system* system)
   [NSApp run];
 }
 
+void gp_system_stop(gp_system* system)
+{
+  
+}
+
+void _gp_timer_free(gp_object* object)
+{
+  gp_timer* timer = (gp_timer*)object;
+  
+  free(timer);
+}
+
 gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = malloc(sizeof(gp_timer));
+  _gp_object_init(&timer->mObject, _gp_timer_free);
   timer->mTimer = [[Timer alloc] init:timer];
   
   return timer;
 }
 
+void _gp_io_free(gp_object* object)
+{
+  gp_io* io = (gp_io*)object;
+  
+  free(io);
+}
+
 gp_io* gp_io_read_new(gp_system*  system, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  _gp_object_init(&io->mObject, _gp_io_free);
   io->mHandle = [[NSFileHandle alloc] initWithFileDescriptor:fd];
   io->mHandle.readabilityHandler = ^(NSFileHandle* fh){
     io->mCallback(io);

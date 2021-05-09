@@ -258,7 +258,10 @@ void gp_context_unref(gp_context* context)
     glXDestroyContext(context->mDisplay, context->mShare);
     XFreeColormap(context->mDisplay, context->mColorMap);
     XFree(context->mVisualInfo);
-    gp_io_free(context->mWorkIO);
+    gp_object_unref((gp_object*)context->mWorkIO);
+    
+    close(context->mWorkPipe[0]);
+    close(context->mWorkPipe[1]);
     
     pthread_mutex_lock(&context->mWorkMutex);
     context->mState &= ~GP_STATE_RUNNING;
@@ -334,7 +337,10 @@ void gp_target_unref(gp_target* target)
     gp_list_remove(&target->mParent->mParent->mTargets, (gp_list_node*)target);
     _gp_pipeline_free(target->mPipeline);
     
-    gp_io_free(target->mWake);
+    gp_object_unref((gp_object*)target->mWake);
+    
+    close(target->mPipe[0]);
+    close(target->mPipe[1]);
     
     free(target);
   }

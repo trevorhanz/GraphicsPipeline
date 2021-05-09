@@ -25,6 +25,10 @@ extern "C" {
 #endif
 
 /*!
+ * \typedef gp_object
+ * \brief \ref Object object.
+ * Default base class for all objects.
+ * 
  * \typedef gp_system
  * \brief \ref System object.
  * Controls the main event loop and creates system specific rendering contexts.
@@ -82,6 +86,7 @@ extern "C" {
  * \typedef gp_io
  * \brief Event io object.
  */
+typedef struct _gp_object gp_object;
 typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
 typedef struct _gp_target gp_target;
@@ -122,6 +127,7 @@ typedef void(*gp_io_callback)(gp_io* io);
 
 namespace GP
 {
+  class Object;
   class System;
   class Context;
   class Target;

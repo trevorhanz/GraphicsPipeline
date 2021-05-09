@@ -17,6 +17,7 @@
 
 #include "X11.h"
 #include "../../Utils/List.h"
+#include "../../Utils/Object.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -49,13 +50,19 @@ struct __gp_event
   gp_list                 mTimer;
 };
 
-struct _gp_timer
+typedef struct
 {
   gp_list_node            mNode;
   _gp_event*              mEvent;
   int                     mFD;
   gp_timer_callback       mCallback;
   void*                   mUserData;
+} _gp_timer_data;
+
+struct _gp_timer
+{
+  gp_object               mObject;
+  _gp_timer_data          mTimer;
 };
 
 struct _gp_io
@@ -160,12 +167,12 @@ void _gp_event_run(_gp_event* event)
       node = gp_list_front(&event->mTimer);
       while(node != NULL)
       {
-        gp_timer* timer = (gp_timer*)node;
+        _gp_timer_data* timer = (_gp_timer_data*)node;
         if(FD_ISSET(timer->mFD, &readfds))
         {
           uint64_t buff;
           size_t r = read(timer->mFD, &buff, sizeof(uint64_t));
-          timer->mCallback(timer);
+          timer->mCallback((gp_timer*)(((char*)timer)-sizeof(gp_object)));
         }
         node = gp_list_node_next(node);
       }
@@ -188,42 +195,45 @@ void _gp_event_wake(_gp_event* event)
   }
 }
 
-gp_timer* _gp_event_timer_new(_gp_event* event)
+void _gp_timer_free(gp_object* object)
 {
-  gp_timer* timer = malloc(sizeof(gp_timer));
-  timer->mEvent = event;
-  timer->mFD = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-  timer->mCallback = NULL;
+  gp_timer* timer = (gp_timer*)object;
   
-  _gp_event_fd_set(timer->mFD, &event->mReadFDs, &event->mReadFDMax);
+  _gp_event_fd_clr(timer->mTimer.mFD, &timer->mTimer.mEvent->mReadFDs, &timer->mTimer.mEvent->mReadFDMax);
   
-  gp_list_push_back(&event->mTimer, (gp_list_node*)timer);
-  
-  return timer;
-}
-
-void gp_timer_free(gp_timer* timer)
-{
-  _gp_event_fd_clr(timer->mFD, &timer->mEvent->mReadFDs, &timer->mEvent->mReadFDMax);
-  
-  gp_list_remove(&timer->mEvent->mTimer, (gp_list_node*)timer);
+  gp_list_remove(&timer->mTimer.mEvent->mTimer, (gp_list_node*)&timer->mTimer);
   
   free(timer);
 }
 
+gp_timer* _gp_event_timer_new(_gp_event* event)
+{
+  gp_timer* timer = malloc(sizeof(gp_timer));
+  _gp_object_init(&timer->mObject, _gp_timer_free);
+  timer->mTimer.mEvent = event;
+  timer->mTimer.mFD = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+  timer->mTimer.mCallback = NULL;
+  
+  _gp_event_fd_set(timer->mTimer.mFD, &event->mReadFDs, &event->mReadFDMax);
+  
+  gp_list_push_back(&event->mTimer, (gp_list_node*)&timer->mTimer);
+  
+  return timer;
+}
+
 void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
 {
-  timer->mCallback = callback;
+  timer->mTimer.mCallback = callback;
 }
 
 void gp_timer_set_userdata(gp_timer* timer, void* userdata)
 {
-  timer->mUserData = userdata;
+  timer->mTimer.mUserData = userdata;
 }
 
 void* gp_timer_get_userdata(gp_timer* timer)
 {
-  return timer->mUserData;
+  return timer->mTimer.mUserData;
 }
 
 void gp_timer_arm(gp_timer* timer, double timeout)
@@ -234,7 +244,7 @@ void gp_timer_arm(gp_timer* timer, double timeout)
   it.it_value.tv_sec = timeout;
   it.it_value.tv_nsec = (timeout-((int)timeout))*1000000000;
   
-  timerfd_settime(timer->mFD, 0, &it, NULL);
+  timerfd_settime(timer->mTimer.mFD, 0, &it, NULL);
 }
 
 void gp_timer_disarm(gp_timer* timer)
@@ -245,7 +255,7 @@ void gp_timer_disarm(gp_timer* timer)
   it.it_value.tv_sec = 0;
   it.it_value.tv_nsec = 0;
   
-  timerfd_settime(timer->mFD, 0, &it, NULL);
+  timerfd_settime(timer->mTimer.mFD, 0, &it, NULL);
 }
 
 gp_io* _gp_event_io_read_new(_gp_event* event, int fd)

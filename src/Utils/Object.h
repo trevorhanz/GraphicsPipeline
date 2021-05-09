@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2020 Trevor Hanz
+* Copyright (C) 2021 Trevor Hanz
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -15,35 +15,28 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#include <GraphicsPipeline/GP.h>
+#ifndef __GP_UTILS_OBJECT_H__
+#define __GP_UTILS_OBJECT_H__
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <GraphicsPipeline/Object.h>
+#include "RefCounter.h"
 
-#ifdef GP_WINDOWS
-#include <io.h>
-#else
-#include <unistd.h>
+typedef void(*gp_object_free)(gp_object*);
+
+struct _gp_object
+{
+  gp_refcounter           mRef;
+  gp_object_free          mFree;
+};
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-void IOCallback(gp_io* io)
-{
-  char buffer[256];
-  read(0, buffer, 256);
-  printf("IO: %s\n", buffer);
-}
+void _gp_object_init(gp_object* object, gp_object_free func);
 
-int main(int argc, char* argv[])
-{
-  gp_system* system = gp_system_new();
-  
-  gp_io* io = gp_io_read_new(system, 0); // STDIN
-  gp_io_set_callback(io, IOCallback);
-  
-  gp_system_run(system);
-  
-  gp_object_unref((gp_object*)io);
-  gp_object_unref((gp_object*)system);
-  
-  return EXIT_SUCCESS;
+#ifdef __cplusplus
 }
+#endif
+
+#endif // __GP_UTILS_OBJECT_H__

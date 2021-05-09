@@ -17,13 +17,6 @@
 
 #include "Qt.h"
 
-extern "C" void gp_timer_free(gp_timer* timer)
-{
-  delete timer->mTimer;
-  delete timer->mTimerCallback;
-  delete timer;
-}
-
 extern "C" void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
 {
   timer->mTimerCallback->mCallback = callback;
@@ -47,13 +40,6 @@ extern "C" void gp_timer_arm(gp_timer* timer, double timeout)
 extern "C" void gp_timer_disarm(gp_timer* timer)
 {
   timer->mTimer->stop();
-}
-
-extern "C" void gp_io_free(gp_io* io)
-{
-    delete io->mSocketNotifier;
-    delete io->mIOCallback;
-    delete io;
 }
 
 extern "C" void gp_io_set_callback(gp_io* io, gp_io_callback callback)

@@ -30,7 +30,7 @@ TEST(C, Init)
   gp_context_ref(context);
   gp_context_unref(context);
   
-  gp_system_free(system);
+  gp_object_unref((gp_object*)system);
 }
 
 int main(int argc, char* argv[])

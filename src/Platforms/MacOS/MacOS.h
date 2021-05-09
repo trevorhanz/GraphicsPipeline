@@ -32,10 +32,12 @@
 
 #include "View.h"
 #include "Timer.h"
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 struct _gp_system
 {
+  gp_object               mObject;
   gp_target*              mTarget;
 };
 
@@ -67,11 +69,13 @@ struct _gp_target
 
 struct _gp_timer
 {
+  gp_object               mObject;
   Timer*                  mTimer;
 };
 
 struct _gp_io
 {
+  gp_object               mObject;
   NSFileHandle*           mHandle;
   gp_io_callback          mCallback;
   void*                   mUserData;

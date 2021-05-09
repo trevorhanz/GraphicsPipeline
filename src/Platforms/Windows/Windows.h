@@ -21,6 +21,7 @@
 #include <GraphicsPipeline/Types.h>
 #include <API/GL/GL.h>
 
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 #include <windows.h>
@@ -30,6 +31,7 @@
 
 struct _gp_system
 {
+  gp_object             mObject;
   HWND                  mInternalWindow;
 };
 
@@ -61,6 +63,7 @@ struct _gp_target
 
 struct _gp_timer
 {
+  gp_object             mObject;
   gp_system*            mSystem;
   gp_timer_callback     mCallback;
   void*                 mUserData;
@@ -68,6 +71,7 @@ struct _gp_timer
 
 struct _gp_io
 {
+  gp_object             mObject;
   gp_system*            mSystem;
   gp_io_callback        mCallback;
   void*                 mUserData;

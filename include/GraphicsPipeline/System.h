@@ -22,6 +22,7 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 #include <functional>
@@ -39,12 +40,6 @@ extern "C" {
  * \return Pointer to new system object.
  */
 GP_EXPORT gp_system* gp_system_new();
-
-/*!
- * Free system object.
- * \param system Pointer to system object to be freed.
- */
-GP_EXPORT void gp_system_free(gp_system* system);
 
 /*!
  * Runs the main event loop for a system obect.
@@ -66,12 +61,6 @@ GP_EXPORT void gp_system_stop(gp_system* system);
  * \return Pointer to Newly created gp_target object.
  */
 GP_EXPORT gp_timer* gp_timer_new(gp_system* system);
-
-/*!
- * Free a gp_timer object.
- * \param timer Pointer to timer object to be freed.
- */
-GP_EXPORT void gp_timer_free(gp_timer* timer);
 
 /*!
  * Set the callback to be used when the gp_timer timesout.
@@ -129,12 +118,6 @@ GP_EXPORT gp_io* gp_io_read_new(gp_system* system, int fd);
 GP_EXPORT gp_io* gp_io_write_new(gp_system* system, int fd);
 
 /*!
- * Free a gp_io object.
- * \param io Pointer to io object to be freed.
- */
-GP_EXPORT void gp_io_free(gp_io* io);
-
-/*!
  * Set the callback to be used for gp_io events.
  * \param io Pointer to io object.
  * \param callback Callback function to be called for events.
@@ -171,7 +154,7 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_system.
    */
-  class System
+  class System : public Object
   {
   public:
     //! Constructor
@@ -185,8 +168,12 @@ namespace GP
      */
     inline void Run();
     
+    /*!
+     * Stop the main loop.
+     */
+    inline void Stop();
+    
   private:
-    gp_system*            mSystem;
     
     friend class Context;
     friend class Timer;
@@ -198,11 +185,17 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_timer.
    */
-  class Timer
+  class Timer : public Object
   {
   public:
     //! Constructor
+    inline Timer(gp_timer* timer);
+    
+    //! Constructor
     inline Timer(const System& system);
+    
+     //! Copy Constructor
+    inline Timer(const Object& other);
     
     //! Destructor
     inline ~Timer();
@@ -227,14 +220,16 @@ namespace GP
   private:
     inline static void HandleTimeout(gp_timer* timer);
     
-    gp_timer*                           mTimer;
-    std::function<void(Timer*)>         mCallback;
+    struct CallbackData
+    {
+      std::function<void(Timer*)>           mCallback;
+    };
   };
   
   /*!
    * \brief Wapper class for ::gp_io.
    */
-  class IO
+  class IO : public Object
   {
   protected:
     //! Constructor
@@ -253,8 +248,10 @@ namespace GP
   private:
     inline static void HandleUpdate(gp_io* io);
     
-    gp_io*                              mIO;
-    std::function<void(IO*)>            mCallback;
+    struct CallbackData
+    {
+      std::function<void(IO*)>              mCallback;
+    };
     
     friend class System;
   };
@@ -280,43 +277,50 @@ namespace GP
   //
   // Implementation
   //
-  System::System() {mSystem = gp_system_new();}
-  System::~System() {gp_system_free(mSystem);}
-  void System::Run() {gp_system_run(mSystem);}
+  System::System() : Object((gp_object*)gp_system_new()) {}
+  System::~System() {}
+  void System::Run() {gp_system_run((gp_system*)mObject);}
+  void System::Stop() {gp_system_stop((gp_system*)mObject);}
   
-  Timer::Timer(const System& system) : mTimer(gp_timer_new(system.mSystem)) {}
-  Timer::~Timer() {gp_timer_free(mTimer);}
+  Timer::Timer(gp_timer* timer) : Object((gp_object*)timer) {gp_object_ref((gp_object*)timer);}
+  Timer::Timer(const System& system) : Object((gp_object*)gp_timer_new((gp_system*)system.mObject)) {}
+  Timer::Timer(const Object& other) : Object(other) {}
+  Timer::~Timer() {}
   void Timer::SetCallback(std::function<void(Timer*)> callback)
   {
-    gp_timer_set_callback(mTimer, HandleTimeout);
-    gp_timer_set_userdata(mTimer, (void*)this);
-    mCallback = callback;
+    CallbackData* data = new CallbackData();
+    data->mCallback = callback;
+    gp_timer_set_callback((gp_timer*)mObject, HandleTimeout);
+    gp_timer_set_userdata((gp_timer*)mObject, (void*)data);
   }
   void Timer::HandleTimeout(gp_timer* timer)
   {
-    Timer* THIS = (Timer*)gp_timer_get_userdata(timer);
-    THIS->mCallback(THIS);
+    CallbackData* data = (CallbackData*)gp_timer_get_userdata(timer);
+    Timer t = timer;
+    data->mCallback(&t);
   }
-  void Timer::Arm(double seconds) {gp_timer_arm(mTimer, seconds);}
-  void Timer::Disarm() {gp_timer_disarm(mTimer);}
+  void Timer::Arm(double seconds) {gp_timer_arm((gp_timer*)mObject, seconds);}
+  void Timer::Disarm() {gp_timer_disarm((gp_timer*)mObject);}
   
-  IO::IO(gp_io* io) : mIO(io) {}
-  IO::~IO() {gp_io_free(mIO);}
+  IO::IO(gp_io* io) : Object((gp_object*)io) {}
+  IO::~IO() {}
   void IO::SetCallback(std::function<void(IO*)> callback)
   {
-    gp_io_set_callback(mIO, HandleUpdate);
-    gp_io_set_userdata(mIO, (void*)this);
-    mCallback = callback;
+    CallbackData* data = new CallbackData();
+    data->mCallback = callback;
+    gp_io_set_callback((gp_io*)mObject, HandleUpdate);
+    gp_io_set_userdata((gp_io*)mObject, (void*)data);
   }
   void IO::HandleUpdate(gp_io* io)
   {
-    IO* THIS = (IO*)gp_io_get_userdata(io);
-    THIS->mCallback(THIS);
+    CallbackData* data = (CallbackData*)gp_io_get_userdata(io);
+    IO i = io;
+    data->mCallback(&i);
   }
   
-  ReadIO::ReadIO(const System& system, int fd) : IO(gp_io_read_new(system.mSystem, fd)) {}
+  ReadIO::ReadIO(const System& system, int fd) : IO(gp_io_read_new((gp_system*)system.mObject, fd)) {}
   
-  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new(system.mSystem, fd)) {}
+  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)system.mObject, fd)) {}
 }
 #endif // __cplusplus
 

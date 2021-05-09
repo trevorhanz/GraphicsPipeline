@@ -30,9 +30,20 @@
 
 #include <sys/select.h>
 
+void _gp_system_free(gp_object* object)
+{
+  gp_system* system = (gp_system*)object;
+  
+  XCloseDisplay(system->mDisplay);
+  
+  _gp_event_free(system->mEvent);
+  free(system);
+}
+
 gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
+  _gp_object_init(&system->mObject, _gp_system_free);
   gp_list_init(&system->mTargets);
   system->mEvent = _gp_event_new();
   
@@ -48,16 +59,6 @@ gp_system* gp_system_new()
   system->mDeleteMessage = XInternAtom(system->mDisplay, "WM_DELETE_WINDOW", False);
   
   return system;
-}
-
-void gp_system_free(gp_system* system)
-{
-  assert(system != NULL);
-  
-  XCloseDisplay(system->mDisplay);
-  
-  _gp_event_free(system->mEvent);
-  free(system);
 }
 
 void _gp_system_process_events(gp_io* io)
@@ -106,7 +107,7 @@ void gp_system_run(gp_system* system)
   
   _gp_event_run(system->mEvent);
   
-  gp_io_free(io);
+  gp_object_unref((gp_object*)io);
 }
 
 void gp_system_stop(gp_system* system)

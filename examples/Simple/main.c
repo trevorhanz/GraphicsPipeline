@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   
   gp_target_unref(target);
   gp_context_unref(context);
-  gp_system_free(system);
+  gp_object_unref((gp_object*)system);
   
   return EXIT_SUCCESS;
 }

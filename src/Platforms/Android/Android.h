@@ -28,10 +28,12 @@
 #include <GraphicsPipeline/Logging.h>
 #include <API/GL/GL.h>
 
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 struct _gp_system
 {
+  gp_object                             mObject;
   EGLDisplay                            mDisplay;
   gp_target*                            mTarget;
 };
@@ -60,10 +62,12 @@ struct _gp_target
 
 struct _gp_timer
 {
+  gp_object                             mObject;
 };
 
 struct _gp_io
 {
+  gp_object                             mObject;
 };
 
 #endif // __GP_ANDROID_COMMON_H__

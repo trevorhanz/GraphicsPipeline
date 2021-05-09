@@ -90,7 +90,7 @@ namespace GP
   /*
    * Implementation
    */
-  Context::Context(const System& system) : mContext(gp_context_new(system.mSystem)) {}
+  Context::Context(const System& system) : mContext(gp_context_new((gp_system*)system.mObject)) {}
   Context::Context(const Context& other)
   {
     mContext = other.mContext;

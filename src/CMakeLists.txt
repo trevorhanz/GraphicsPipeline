@@ -54,6 +54,7 @@ set(UTILS_HEADERS
 set(UTILS_SRC
   ${UTILS_HEADERS}
   Utils/List.c
+  Utils/Object.c
   Utils/RefCounter.c
   )
 

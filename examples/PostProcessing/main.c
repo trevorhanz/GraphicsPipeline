@@ -414,8 +414,8 @@ int main(int argc, char* argv[])
   gp_frame_buffer_unref(fbG);
   gp_target_unref(target);
   gp_context_unref(context);
-  gp_timer_free(timer);
-  gp_system_free(system);
+  gp_object_unref((gp_object*)timer);
+  gp_object_unref((gp_object*)system);
   free(data);
   
   return EXIT_SUCCESS;

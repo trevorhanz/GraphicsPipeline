@@ -19,6 +19,14 @@
 
 #include "Qt.h"
 
+void _gp_system_free(gp_object* object)
+{
+  gp_system* system = (gp_system*)object;
+  
+  delete system->mApp;
+  delete system;
+}
+
 extern "C" gp_system* gp_system_new()
 {
   static int argc = 1;
@@ -30,15 +38,10 @@ extern "C" gp_system* gp_system_new()
 extern "C" gp_system* gp_qt_system_new(int* argc, char** argv)
 {
   gp_system* system = new gp_system();
+  _gp_object_init(&system->mObject, _gp_system_free);
   system->mApp = new QApplication(*argc, argv);
   
   return system;
-}
-
-extern "C" void gp_system_free(gp_system* system)
-{
-  delete system->mApp;
-  delete system;
 }
 
 extern "C" void gp_system_run(gp_system* system)
@@ -46,9 +49,24 @@ extern "C" void gp_system_run(gp_system* system)
   auto ret = system->mApp->exec();
 }
 
+extern "C" void gp_system_stop(gp_system* system)
+{
+  system->mApp->quit();
+}
+
+void _gp_timer_free(gp_object* object)
+{
+  gp_timer* timer = (gp_timer*)object;
+  
+  delete timer->mTimer;
+  delete timer->mTimerCallback;
+  delete timer;
+}
+
 extern "C" gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = new gp_timer();
+  _gp_object_init(&timer->mObject, _gp_timer_free);
   timer->mTimer = new QTimer();
   timer->mTimerCallback = new TimerCallback(timer);
   timer->mUserData = NULL;
@@ -58,9 +76,19 @@ extern "C" gp_timer* gp_timer_new(gp_system* system)
   return timer;
 }
 
+void _gp_io_free(gp_object* object)
+{
+  gp_io* io = (gp_io*)object;
+  
+  delete io->mSocketNotifier;
+  delete io->mIOCallback;
+  delete io;
+}
+
 extern "C" gp_io* gp_io_read_new(gp_system* system, int fd)
 {
   gp_io* io = new gp_io();
+  _gp_object_init(&io->mObject, _gp_io_free);
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Read);
   io->mIOCallback = new IOCallback(io);
   io->mUserData = NULL;
@@ -73,6 +101,7 @@ extern "C" gp_io* gp_io_read_new(gp_system* system, int fd)
 extern "C" gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   gp_io* io = new gp_io();
+  _gp_object_init(&io->mObject, _gp_io_free);
   io->mSocketNotifier = new QSocketNotifier(fd, QSocketNotifier::Write);
   io->mIOCallback = new IOCallback(io);
   io->mUserData = NULL;

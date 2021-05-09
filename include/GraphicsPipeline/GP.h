@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "FrameBuffer.h"
 #include "System.h"
+#include "Object.h"
 #include "Pipeline.h"
 #include "Shader.h"
 #include "Logging.h"

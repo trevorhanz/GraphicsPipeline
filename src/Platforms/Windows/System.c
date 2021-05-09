@@ -78,9 +78,17 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
   }
 }
 
+void _gp_system_free(gp_object* object)
+{
+  gp_system* system = (gp_object*)object;
+
+  free(system);
+}
+
 gp_system* gp_system_new()
 {
   gp_system* system = malloc(sizeof(gp_system));
+  _gp_object_init(&system->mObject, _gp_system_free);
 
   WNDCLASS wc;                                          // Windows Class Structure
   wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;        // Redraw On Size, And Own DC For Window.
@@ -125,11 +133,6 @@ gp_system* gp_system_new()
   return system;
 }
 
-void gp_system_free(gp_system* system)
-{
-  free(system);
-}
-
 void gp_system_run(gp_system* system)
 {
   MSG msg;                                                  // Windows Message Structure
@@ -146,9 +149,22 @@ void gp_system_run(gp_system* system)
   }
 }
 
+void gp_system_stop(gp_system* system)
+{
+
+}
+
+void _gp_timer_free(gp_object* object)
+{
+  gp_timer* timer = (gp_timer*)object;
+
+  free(timer);
+}
+
 gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = malloc(sizeof(gp_timer));
+  _gp_object_init(&timer->mObject, _gp_timer_free);
   timer->mSystem = system;
   timer->mCallback = NULL;
   timer->mUserData = NULL;
@@ -156,9 +172,17 @@ gp_timer* gp_timer_new(gp_system* system)
   return timer;
 }
 
+void _gp_io_free(gp_object* object)
+{
+  gp_io* io = (gp_io*)object;
+
+  free(io);
+}
+
 gp_io* gp_io_read_new(gp_system* system, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  _gp_object_init(&io->mObject, _gp_io_free);
 
   WSAAsyncSelect(fd, system->mInternalWindow, WM_SOCKET, FD_READ);
 
@@ -168,6 +192,7 @@ gp_io* gp_io_read_new(gp_system* system, int fd)
 gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  _gp_object_init(&io->mObject, _gp_io_free);
   
   WSAAsyncSelect(fd, system->mInternalWindow, WM_SOCKET, FD_WRITE);
 

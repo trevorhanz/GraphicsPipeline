@@ -21,9 +21,17 @@
 
 #include <stdlib.h>
 
+void _gp_system_free(gp_object* object)
+{
+  gp_system* system = (gp_system*)object;
+  
+  free(system);
+}
+
 gp_system* gp_system_new()
 {
   gp_system* system = malloc(sizeof(gp_system));
+  _gp_object_init(&system->mObject, _gp_system_free);
   
   if((system->mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY) {
     gp_log_error("eglGetDisplay() returned error %d", eglGetError());
@@ -39,12 +47,11 @@ gp_system* gp_system_new()
   return system;
 }
 
-void gp_system_free(gp_system* system)
+void gp_system_run(gp_system* system)
 {
-  free(system);
 }
 
-void gp_system_run(gp_system* system)
+void gp_system_stop(gp_system* system)
 {
 }
 
