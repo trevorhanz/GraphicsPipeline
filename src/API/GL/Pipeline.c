@@ -355,7 +355,7 @@ gp_operation* gp_operation_viewport_new()
 {
   gp_operation* operation = malloc(sizeof(gp_operation));
   operation->func = _gp_operation_viewport;
-  
+  gp_ref_init(&operation->mRef);
   operation->mData = malloc(sizeof(_gp_operation_viewport_data));
   operation->mData->free = _gp_operation_viewport_free;
   _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
