@@ -87,18 +87,6 @@ GP_EXPORT void gp_shader_unref(gp_shader* shader);
 GP_EXPORT void gp_shader_compile(gp_shader* shader, gp_shader_source* source);
 
 /*!
- * Increase uniform ref count.
- * \param uniform Uniform to have its ref count increased.
- */
-GP_EXPORT void gp_uniform_ref(gp_uniform* uniform);
-
-/*!
- * Decreate uniform ref count.
- * \param uniform Uniform to have its ref count decreased.
- */
-GP_EXPORT void gp_uniform_unref(gp_uniform* uniform);
-
-/*!
  * Create a new gp_uniform for a gp_shader object.
  * \param shader Shader object used to create the gp_uniform object.
  * \param name Name of the uniform variable in the shader code.
@@ -327,7 +315,7 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_uniform
    */
-  class Uniform
+  class Uniform : public Object
   {
   protected:
     //! Constructor
@@ -335,13 +323,10 @@ namespace GP
     
   public:
     //! Copy Constructor
-    inline Uniform(const Uniform& other);
+    inline Uniform(const Object& other);
     
     //! Destructor
     inline ~Uniform();
-    
-    //! Equal operator
-    inline const Uniform& operator = (const Uniform& other);
     
   protected:
     inline static gp_shader* GetShader(const Shader& shader);
@@ -399,7 +384,6 @@ namespace GP
   void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set(mUniform, texture.mTexture);}
   gp_texture* UniformTexture::Get() {return 0;}
   
-//   CXX_UNIFORM(Texture, texture, gp_texture*)
   CXX_UNIFORM(Float, float, float)
   CXX_UNIFORM(Vec2, vec2, float*)
   CXX_UNIFORM(Vec3, vec3, float*)
@@ -444,20 +428,9 @@ namespace GP
     return *this;
   }
   
-  Uniform::Uniform(gp_uniform* uniform) : mUniform(uniform) {}
-  Uniform::Uniform(const Uniform& other)
-  {
-    mUniform = other.mUniform;
-    gp_uniform_ref(mUniform);
-  }
-  Uniform::~Uniform() {gp_uniform_unref(mUniform);}
-  const Uniform& Uniform::operator = (const Uniform& other)
-  {
-    gp_uniform_unref(mUniform);
-    mUniform = other.mUniform;
-    gp_uniform_ref(mUniform);
-    return *this;
-  }
+  Uniform::Uniform(gp_uniform* uniform) : Object((gp_object*)uniform) {}
+  Uniform::Uniform(const Object& other) : Object(other) {}
+  Uniform::~Uniform() {}
   gp_shader* Uniform::GetShader(const Shader& shader) {return shader.mShader;}
 }
 #endif // __cplusplus

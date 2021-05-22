@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(color);
+  gp_object_unref((gp_object*)color);
   gp_shader_unref(shader);
   gp_array_unref(array);
   

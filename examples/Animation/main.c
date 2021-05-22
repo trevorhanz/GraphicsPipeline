@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
   gp_pipeline_add_operation(pipeline, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(tex);
+  gp_object_unref((gp_object*)tex);
   
   gp_shader_unref(shader);
   gp_array_unref(array);
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);
   
-  gp_uniform_unref(data->offset);
+  gp_object_unref((gp_object*)data->offset);
   free(data);
   
   return EXIT_SUCCESS;

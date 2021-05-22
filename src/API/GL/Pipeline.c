@@ -236,7 +236,7 @@ void _gp_operation_draw_free(_gp_operation_data* data)
   while(node != NULL)
   {
     gp_uniform_list* uniform = (gp_uniform_list*)node;
-    gp_uniform_unref(uniform->mUniform);
+    gp_object_unref((gp_object*)uniform->mUniform);
     
     node = gp_list_node_next(node);
     free(uniform);
@@ -306,7 +306,7 @@ void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
   u->mUniform = uniform;
   gp_list_push_back(&data->mUniforms, (gp_list_node*)u);
   
-  gp_uniform_ref(uniform);
+  gp_object_ref((gp_object*)uniform);
   
 #ifndef GP_GLES2
   data->mDirty = 1;

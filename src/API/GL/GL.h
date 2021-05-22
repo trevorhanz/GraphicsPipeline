@@ -22,6 +22,7 @@
 #include <GraphicsPipeline/Common.h>
 
 #include "../../Utils/List.h"
+#include "../../Utils/Object.h"
 #include "../../Utils/RefCounter.h"
 
 #ifdef GP_GL
@@ -91,10 +92,10 @@ typedef void(*LoadUniform)(gp_uniform* uniform);
 
 struct _gp_uniform
 {
+  gp_object               mObject;
   GLuint                  mLocation;
   LoadUniform             mOperation;
   void*                   mData;
-  gp_refcounter           mRef;
 };
 
 typedef struct __gp_operation_data _gp_operation_data;

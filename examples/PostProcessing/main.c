@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(texQuad);
+  gp_object_unref((gp_object*)texQuad);
   
   //
   // Upper Right
@@ -332,7 +332,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(pipelineG, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(texGV);
+  gp_object_unref((gp_object*)texGV);
   
   gp_uniform* texGH = gp_uniform_texture_new_by_name(shaderGH, "Texture");
   gp_uniform_texture_set(texGH, textureG);
@@ -345,7 +345,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(texGH);
+  gp_object_unref((gp_object*)texGH);
   
   //
   // Lower Left
@@ -370,8 +370,8 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
   gp_operation_unref(draw);
-  gp_uniform_unref(texWave);
-  gp_uniform_unref(offsetWave);
+  gp_object_unref((gp_object*)texWave);
+  gp_object_unref((gp_object*)offsetWave);
   
   //
   // Lower Right

@@ -187,21 +187,6 @@ void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
   shader->mAttribute = glGetAttribLocation(shader->mProgram, "position");
 }
 
-void gp_uniform_ref(gp_uniform* uniform)
-{
-  gp_ref_inc(&uniform->mRef);
-}
-
-void gp_uniform_unref(gp_uniform* uniform)
-{
-  if(gp_ref_dec(&uniform->mRef))
-  {
-    if(uniform->mData)
-      free(uniform->mData);
-    free(uniform);
-  }
-}
-
 void _gp_uniform_load_texture(gp_uniform* uniform)
 {
   glBindTexture(GL_TEXTURE_2D, ((gp_texture*)uniform->mData)->mTexture);
@@ -233,25 +218,43 @@ void _gp_uniform_load_mat4(gp_uniform* uniform)
   glUniformMatrix4fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
 }
 
+void _gp_uniform_default_free(gp_object* object)
+{
+  gp_uniform* uniform = (gp_uniform*)object;
+  
+  free(uniform->mData);
+  free(uniform);
+}
+
 #define UNIFORM_NEW_BY_NAME(type, size)\
   gp_uniform* gp_uniform_##type##_new_by_name(gp_shader* shader, const char* name)\
   {\
     gp_uniform* uniform = malloc(sizeof(gp_uniform));\
+    _gp_object_init(&uniform->mObject, _gp_uniform_default_free);\
     uniform->mLocation = glGetUniformLocation(shader->mProgram, name);\
     uniform->mOperation = _gp_uniform_load_##type;\
     uniform->mData = malloc(size);\
     memset(uniform->mData, 0, size);\
-    gp_ref_init(&uniform->mRef);\
     return uniform;\
   }
+
+void _gp_uniform_texture_free(gp_object* object)
+{
+  gp_uniform* uniform = (gp_uniform*)object;
+  
+  if(uniform->mData)
+    gp_texture_unref((gp_texture*)uniform->mData);
+  
+  free(uniform);
+}
 
 gp_uniform* gp_uniform_texture_new_by_name(gp_shader* shader, const char* name)
 {
   gp_uniform* uniform = malloc(sizeof(gp_uniform));
+  _gp_object_init(&uniform->mObject, _gp_uniform_texture_free);
   uniform->mLocation = glGetUniformLocation(shader->mProgram, name);
   uniform->mOperation = _gp_uniform_load_texture;
   uniform->mData = 0;
-  gp_ref_init(&uniform->mRef);
   return uniform;
 }
 
