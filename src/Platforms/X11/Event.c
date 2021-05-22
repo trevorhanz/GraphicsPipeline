@@ -67,6 +67,7 @@ struct _gp_timer
 
 struct _gp_io
 {
+  gp_object               mObject;
   gp_list_node            mNode;
   _gp_event*              mEvent;
   int                     mFD;
@@ -145,7 +146,7 @@ void _gp_event_run(_gp_event* event)
       gp_list_node* node = gp_list_front(&event->mIORead);
       while(node != NULL)
       {
-        gp_io* io = (gp_io*)node;
+        gp_io* io = (gp_io*)(((char*)node)-sizeof(gp_object));
         if(FD_ISSET(io->mFD, &readfds))
         {
           io->mCallback(io);
@@ -156,7 +157,7 @@ void _gp_event_run(_gp_event* event)
       node = gp_list_front(&event->mIOWrite);
       while(node != NULL)
       {
-        gp_io* io = (gp_io*)node;
+        gp_io* io = (gp_io*)(((char*)node)-sizeof(gp_object));
         if(FD_ISSET(io->mFD, &writefds))
         {
           io->mCallback(io);
@@ -258,15 +259,31 @@ void gp_timer_disarm(gp_timer* timer)
   timerfd_settime(timer->mTimer.mFD, 0, &it, NULL);
 }
 
+void _gp_io_free(gp_object* object)
+{
+  gp_io* io = (gp_io*)object;
+  
+  _gp_event_fd_clr(io->mFD, &io->mEvent->mReadFDs, &io->mEvent->mReadFDMax);
+  _gp_event_fd_clr(io->mFD, &io->mEvent->mWriteFDs, &io->mEvent->mWriteFDMax);
+  
+  gp_list_remove(&io->mEvent->mIORead, &io->mNode);
+  gp_list_remove(&io->mEvent->mIOWrite, &io->mNode);
+  
+  free(io);
+}
+
 gp_io* _gp_event_io_read_new(_gp_event* event, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  _gp_object_init(&io->mObject, _gp_io_free);
   io->mEvent = event;
   io->mFD = fd;
+  io->mCallback = NULL;
+  io->mUserData = 0;
   
   _gp_event_fd_set(fd, &event->mReadFDs, &event->mReadFDMax);
   
-  gp_list_push_back(&event->mIORead, (gp_list_node*)io);
+  gp_list_push_back(&event->mIORead, &io->mNode);
   
   return io;
 }
@@ -274,25 +291,17 @@ gp_io* _gp_event_io_read_new(_gp_event* event, int fd)
 gp_io* _gp_event_io_write_new(_gp_event* event, int fd)
 {
   gp_io* io = malloc(sizeof(gp_io));
+  _gp_object_init(&io->mObject, _gp_io_free);
   io->mEvent = event;
   io->mFD = fd;
+  io->mCallback = NULL;
+  io->mUserData = 0;
   
   _gp_event_fd_set(fd, &event->mWriteFDs, &event->mWriteFDMax);
   
-  gp_list_push_back(&event->mIOWrite, (gp_list_node*)io);
+  gp_list_push_back(&event->mIOWrite, &io->mNode);
   
   return io;
-}
-
-void gp_io_free(gp_io* io)
-{
-  _gp_event_fd_clr(io->mFD, &io->mEvent->mReadFDs, &io->mEvent->mReadFDMax);
-  _gp_event_fd_clr(io->mFD, &io->mEvent->mWriteFDs, &io->mEvent->mWriteFDMax);
-  
-  gp_list_remove(&io->mEvent->mIORead, (gp_list_node*)io);
-  gp_list_remove(&io->mEvent->mIOWrite, (gp_list_node*)io);
-  
-  free(io);
 }
 
 void gp_io_set_callback(gp_io* io, gp_io_callback callback)
