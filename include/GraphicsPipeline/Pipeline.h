@@ -279,6 +279,12 @@ namespace GP
      */
     inline void AddOperation(const Operation& operation);
     
+    /*!
+     * Remove an operation from the pipeline.
+     * \param operation operation to be removed.
+     */
+    inline void RemoveOperation(const Operation& operation);
+    
   private:
     gp_pipeline*          mPipeline;
   };
@@ -331,6 +337,10 @@ namespace GP
   void Pipeline::AddOperation(const Operation& operation)
   {
     gp_pipeline_add_operation(mPipeline, operation.mOperation);
+  }
+  void Pipeline::RemoveOperation(const Operation& operation)
+  {
+    gp_pipeline_remove_operation(mPipeline, operation.mOperation);
   }
 }
 #endif // __cplusplus
