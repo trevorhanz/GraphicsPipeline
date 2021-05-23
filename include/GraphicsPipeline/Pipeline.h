@@ -314,7 +314,7 @@ namespace GP
   }
   void DrawOperation::SetUniform(const Uniform& uniform)
   {
-    gp_operation_draw_set_uniform(mOperation, uniform.mUniform);
+    gp_operation_draw_set_uniform(mOperation, (gp_uniform*)uniform.mObject);
   }
   void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, int stride, int offset)
   {

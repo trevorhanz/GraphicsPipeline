@@ -331,8 +331,6 @@ namespace GP
   protected:
     inline static gp_shader* GetShader(const Shader& shader);
     
-    gp_uniform*       mUniform;
-    
     friend class Shader;
     friend class DrawOperation;
   };
@@ -358,8 +356,8 @@ namespace GP
     inline type Get();\
   };\
   Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform(gp_uniform_##Cname##_new_by_name(GetShader(shader), name)) {}\
-  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set(mUniform, data);}\
-  type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get(mUniform);}
+  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)mObject, data);}\
+  type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)mObject);}
   
   /*!
    * \brief Uniform specialized for Texture
@@ -381,7 +379,7 @@ namespace GP
     inline gp_texture* Get();
   };\
   UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform(gp_uniform_texture_new_by_name(GetShader(shader), name)) {}
-  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set(mUniform, texture.mTexture);}
+  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)mObject, texture.mTexture);}
   gp_texture* UniformTexture::Get() {return 0;}
   
   CXX_UNIFORM(Float, float, float)
