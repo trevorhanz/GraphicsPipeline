@@ -190,6 +190,15 @@ namespace GP
   public:
     //! Constructor
     inline ClearOperation();
+    
+    /*!
+     * Sets the color to be used for the clear operation.
+     * \param r Red channel.
+     * \param g Green channel.
+     * \param b Blue channel.
+     * \param a Alpha channel.
+     */
+    inline void SetColor(float r, float g, float b, float a);
   };
   
   /*!
@@ -307,6 +316,9 @@ namespace GP
     return *this;
   }
   ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
+  void ClearOperation::SetColor(float r, float g, float b, float a) {
+    gp_operation_clear_set_color((gp_operation*)mOperation, r, g, b,  a);
+  }
   DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
   void DrawOperation::SetShader(const Shader& shader)
   {
