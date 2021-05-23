@@ -38,6 +38,21 @@
 #include <GLES3/gl3.h>
 #endif // GP_GL
 
+struct _gp_texture_cache_list
+{
+  gp_list_node            mNode;
+  gp_texture*             mTexture;
+  int                     mIndex;
+};
+typedef struct _gp_texture_cache_list gp_texture_cache_list;
+
+struct __gp_draw_context
+{
+  gp_shader*              mShader;          // Current shader in use
+  gp_list                 mTextureCache;    // Current bound textures
+};
+typedef struct __gp_draw_context _gp_draw_context;
+
 struct _gp_frame_buffer
 {
   GLuint                  mFBO;
@@ -88,7 +103,7 @@ struct _gp_shader
   gp_refcounter           mRef;
 };
 
-typedef void(*LoadUniform)(gp_uniform* uniform);
+typedef void(*LoadUniform)(gp_uniform* uniform, _gp_draw_context* context);
 
 struct _gp_uniform
 {
@@ -107,7 +122,7 @@ struct __gp_operation_data
 
 struct _gp_operation
 {
-  void (*func)(_gp_operation_data* data);
+  void (*func)(_gp_operation_data* data, _gp_draw_context* context);
   _gp_operation_data*     mData;
   gp_refcounter           mRef;
 };
@@ -134,6 +149,8 @@ gp_pipeline* _gp_pipeline_new();
 void _gp_pipeline_free(gp_pipeline* pipeline);
 
 void _gp_pipeline_execute(gp_pipeline* pipeline);
+
+void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context);
 
 void _gp_api_init();
 

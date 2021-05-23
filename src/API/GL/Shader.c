@@ -187,33 +187,60 @@ void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
   shader->mAttribute = glGetAttribLocation(shader->mProgram, "position");
 }
 
-void _gp_uniform_load_texture(gp_uniform* uniform)
+void _gp_uniform_load_texture(gp_uniform* uniform, _gp_draw_context* context)
 {
+  //
+  // Find texture index if already bound
+  //
+  int index = -1;
+  gp_texture_cache_list* node = (gp_texture_cache_list*)gp_list_back(&context->mTextureCache);
+  while(node != NULL && node->mTexture != 0)
+  {
+    if(node->mTexture == (gp_texture*)uniform->mData)
+    {
+      index = node->mIndex;
+      break;
+    }
+    node = (gp_texture_cache_list*)gp_list_node_prev((gp_list_node*)node);
+  }
+  if(index == -1)
+  {
+    node = (gp_texture_cache_list*)gp_list_front(&context->mTextureCache);
+    index = node->mIndex;
+    node->mTexture = (gp_texture*)uniform->mData;
+    gp_list_remove(&context->mTextureCache, (gp_list_node*)node);
+    gp_list_push_back(&context->mTextureCache, (gp_list_node*)node);
+  }
+  
+  //
+  // Bind texture and set uniform value
+  //
+  glActiveTexture(GL_TEXTURE0+index);
   glBindTexture(GL_TEXTURE_2D, ((gp_texture*)uniform->mData)->mTexture);
-  glUniform1i(uniform->mLocation, 0);
+  glUniform1i(uniform->mLocation, index);
 }
-void _gp_uniform_load_int(gp_uniform* uniform) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
-void _gp_uniform_load_float(gp_uniform* uniform) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}
-void _gp_uniform_load_vec2(gp_uniform* uniform)
+void _gp_uniform_load_int(gp_uniform* uniform, _gp_draw_context* context) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
+void _gp_uniform_load_float(gp_uniform* uniform, _gp_draw_context* context) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}
+void _gp_uniform_load_vec2(gp_uniform* uniform, _gp_draw_context* context)
 {
   float* data = uniform->mData;
   glUniform2f(uniform->mLocation, data[0], data[1]);
 }
-void _gp_uniform_load_vec3(gp_uniform* uniform)
+void _gp_uniform_load_vec3(gp_uniform* uniform, _gp_draw_context* context)
 {
   float* data = uniform->mData;
   glUniform3f(uniform->mLocation, data[0], data[1], data[2]);
 }
-void _gp_uniform_load_vec4(gp_uniform* uniform)
+void _gp_uniform_load_vec4(gp_uniform* uniform, _gp_draw_context* context)
 {
   float* data = uniform->mData;
   glUniform4f(uniform->mLocation, data[0], data[1], data[2], data[3]);
 }
-void _gp_uniform_load_mat3(gp_uniform* uniform)
+void _gp_uniform_load_mat3(gp_uniform* uniform, _gp_draw_context* context)
 {
   glUniformMatrix3fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
 }
-void _gp_uniform_load_mat4(gp_uniform* uniform)
+void _gp_uniform_load_mat4(gp_uniform* uniform, _gp_draw_context* context)
 {
   glUniformMatrix4fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
 }

@@ -98,7 +98,7 @@ typedef struct
   float                   mColor[4]; // RGBA
 } _gp_operation_clear_data;
 
-void _gp_operation_clear(_gp_operation_data* data)
+void _gp_operation_clear(_gp_operation_data* data, _gp_draw_context* context)
 {
   _gp_operation_clear_data* d = (_gp_operation_clear_data*)data;
   
@@ -166,19 +166,23 @@ typedef struct
   gp_draw_mode            mMode;
 } _gp_operation_draw_data;
 
-void _gp_operation_draw(_gp_operation_data* data)
+void _gp_operation_draw(_gp_operation_data* data, _gp_draw_context* context)
 {
   _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
   
   CHECK_GL_ERROR();
   
-  glUseProgram(d->mShader->mProgram);
+  if(context->mShader != d->mShader)
+  {
+    glUseProgram(d->mShader->mProgram);
+    context->mShader = d->mShader;
+  }
   
   gp_list_node* node = gp_list_front(&d->mUniforms);
   while(node != NULL)
   {
     gp_uniform_list* uniform = (gp_uniform_list*)node;
-    uniform->mUniform->mOperation(uniform->mUniform);
+    uniform->mUniform->mOperation(uniform->mUniform, context);
     
     node = gp_list_node_next(node);
   }
@@ -335,13 +339,13 @@ typedef struct
   int                     mHeight;
 } _gp_operation_viewport_data;
 
-void _gp_operation_viewport(_gp_operation_data* data)
+void _gp_operation_viewport(_gp_operation_data* data, _gp_draw_context* context)
 {
   _gp_operation_viewport_data* d = (_gp_operation_viewport_data*)data;
   
   glViewport(d->mX, d->mY, d->mWidth, d->mHeight);
   
-  _gp_pipeline_execute(d->mPipeline);
+  _gp_pipeline_execute_with_context(d->mPipeline, context);
 }
 
 void _gp_operation_viewport_free(_gp_operation_data* data)
@@ -432,10 +436,40 @@ void _gp_pipeline_free(gp_pipeline* pipeline)
 
 void _gp_pipeline_execute(gp_pipeline* pipeline)
 {
+  _gp_draw_context* context = malloc(sizeof(_gp_draw_context));
+  context->mShader = 0;
+  gp_list_init(&context->mTextureCache);
+  
+  int texture_units;
+  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
+  
+  int i;
+  for(i=0; i<texture_units; ++i)
+  {
+    gp_texture_cache_list* node = malloc(sizeof(gp_texture_cache_list));
+    node->mTexture = 0;
+    node->mIndex = i;
+    gp_list_push_back(&context->mTextureCache, (gp_list_node*)node);
+  }
+  
+  _gp_pipeline_execute_with_context(pipeline, context);
+  
+  gp_list_node* node = gp_list_front(&context->mTextureCache);
+  while(node != NULL)
+  {
+    gp_list_node* temp = node;
+    node = gp_list_node_next(node);
+    free(temp);
+  }
+  free(context);
+}
+
+void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
+{
   gp_operation_list* list = (gp_operation_list*)gp_list_front(&pipeline->mOperations);
   while(list != NULL)
   {
-    list->mOperation->func(list->mOperation->mData);
+    list->mOperation->func(list->mOperation->mData, context);
     
     list = (gp_operation_list*)gp_list_node_next((gp_list_node*)list);
   }
