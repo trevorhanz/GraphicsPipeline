@@ -509,4 +509,6 @@ void _gp_api_init_context()
     glDebugMessageControl(GL_DONT_CARE, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, 0, GL_FALSE);
   }
 #endif // defined(GP_GL) && defined(GP_DEBUG) && !defined(__APPLE__)
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
