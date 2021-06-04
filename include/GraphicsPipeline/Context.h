@@ -64,6 +64,10 @@ namespace GP
    */
   class Context
   {
+  protected:
+    //! Constructor
+    inline Context(gp_context* context);
+    
   public:
     //! Constructor
     inline Context(const System& system);
@@ -78,6 +82,8 @@ namespace GP
     inline const Context& operator = (const Context& other);
     
   protected:
+    inline static gp_system* GetSystem(const System& system);
+    
     gp_context*           mContext;
     
     friend class Target;
@@ -90,6 +96,7 @@ namespace GP
   /*
    * Implementation
    */
+  Context::Context(gp_context* context) : mContext(context) {}
   Context::Context(const System& system) : mContext(gp_context_new((gp_system*)system.mObject)) {}
   Context::Context(const Context& other)
   {
@@ -103,6 +110,10 @@ namespace GP
     mContext = other.mContext;
     gp_context_ref(mContext);
     return *this;
+  }
+  gp_system* Context::GetSystem(const System& system)
+  {
+    return (gp_system*)system.mObject;
   }
 }
 #endif

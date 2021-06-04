@@ -78,18 +78,69 @@ void _gp_work_timeout(gp_timer* timer)
   }
 }
 
-gp_context* gp_context_new(gp_system* system)
+void _gp_context_build(gp_context* context)
 {
-  gp_context* context = malloc(sizeof(gp_context));
-  context->mParent = system;
-  gp_ref_init(&context->mRef);
-  
   context->mWorkTimer = gp_timer_new(system);
   gp_timer_set_callback(context->mWorkTimer, _gp_work_timeout);
   gp_timer_set_userdata(context->mWorkTimer, context);
   gp_list_init(&context->mWork);
   
   sContext = context;
+  
+  _gp_canvas_set_width(&context->mID[1], GP_DEFAULT_WINDOW_WIDTH);
+  _gp_canvas_set_height(&context->mID[1], GP_DEFAULT_WINDOW_HEIGHT);
+  
+  EmscriptenWebGLContextAttributes attrs;
+  emscripten_webgl_init_context_attributes(&attrs);
+  attrs.majorVersion = 2;
+  attrs.minorVersion = 0;
+  
+  context->mShare = emscripten_webgl_create_context(context->mID, &attrs);
+  
+  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(context->mShare);
+  assert(res == EMSCRIPTEN_RESULT_SUCCESS);
+  assert(emscripten_webgl_get_current_context() == context->mShare);
+  
+  const GLubyte* glVersion = glGetString(GL_VERSION);
+  gp_log_info("GL Version: %s", glVersion);
+  
+  const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+  gp_log_info("GLSL Version: %s", glslVersion);
+}
+
+gp_context* gp_context_new_from_id(gp_system* system, const char* id)
+{
+  gp_context* context = malloc(sizeof(gp_context));
+  context->mParent = system;
+  gp_ref_init(&context->mRef);
+  
+  int size = strlen(id);
+  context->mID = malloc(sizeof(char)*size);
+  memcpy(context->mID, id, sizeof(char)*size);
+  
+  _gp_context_build(context);
+  
+  return context;
+}
+
+gp_context* gp_context_new(gp_system* system)
+{
+  gp_context* context = malloc(sizeof(gp_context));
+  context->mParent = system;
+  gp_ref_init(&context->mRef);
+  
+  context->mID = malloc(sizeof(char)*15);
+  
+  int index = context->mParent->mCanvasIndex++;
+  snprintf(context->mID, 15, "#_gp_canvas_%d", index);
+  
+  EM_ASM({
+    let element = document.createElement("canvas");
+    element.id = UTF8ToString($0);
+    document.body.appendChild(element);
+  }, &context->mID[1]);
+  
+  _gp_context_build(context);
   
   return context;
 }
@@ -111,27 +162,7 @@ void _gp_target_build(gp_target* target)
 {
   gp_ref_init(&target->mRef);
   
-  EmscriptenWebGLContextAttributes attrs;
-  emscripten_webgl_init_context_attributes(&attrs);
-  attrs.majorVersion = 2;
-  attrs.minorVersion = 0;
-  
-  _gp_canvas_set_width(&target->mID[1], GP_DEFAULT_WINDOW_WIDTH);
-  _gp_canvas_set_height(&target->mID[1], GP_DEFAULT_WINDOW_HEIGHT);
-  
-  target->mContext = emscripten_webgl_create_context(target->mID, &attrs);
-  
-  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(target->mContext);
-  assert(res == EMSCRIPTEN_RESULT_SUCCESS);
-  assert(emscripten_webgl_get_current_context() == target->mContext);
-  
   target->mPipeline = _gp_pipeline_new();
-  
-  const GLubyte* glVersion = glGetString(GL_VERSION);
-  gp_log_info("GL Version: %s", glVersion);
-  
-  const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-  gp_log_info("GLSL Version: %s", glslVersion);
   
   gp_target_redraw(target);
 }
@@ -154,13 +185,11 @@ gp_target* gp_target_new(gp_context* context)
   gp_target* target = malloc(sizeof(gp_target));
   target->mID = malloc(sizeof(char)*15);
   
-  int index = context->mParent->mCanvasIndex++;
-  snprintf(target->mID, 15, "#_gp_canvas_%d", index);
+  int index = context->mParent->mTargetIndex++;
+  snprintf(target->mID, 15, "#_gp_target_%d", index);
   
   EM_ASM({
-    let div = document.createElement("div");
-    
-    let element = document.createElement("canvas");
+    let element = document.createElement("div");
     element.id = UTF8ToString($0);
     document.body.appendChild(element);
   }, &target->mID[1]);
@@ -192,8 +221,6 @@ gp_pipeline* gp_target_get_pipeline(gp_target* target)
 void _gp_target_redraw_callback(void* data)
 {
   gp_target* target = (gp_target*)data;
-  
-  emscripten_webgl_make_context_current(target->mContext);
   
   _gp_pipeline_execute(target->mPipeline);
 }

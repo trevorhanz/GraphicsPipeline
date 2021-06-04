@@ -34,9 +34,17 @@ extern "C" {
  */
 
 /*!
+ * Creates a new context object tied to an existing system object using a canvas id.
+ * \param system System object used to create context.
+ * \param id ID string of canvas object to be used.
+ * \return Newly created target.
+ */
+GP_EXPORT gp_context* gp_context_new_from_id(gp_system* system, const char* id);
+
+/*!
  * Creates a target object tied to this context using a canvas id.
  * \param context Context object used to create target.
- * \param id ID string of canvas object to be used.
+ * \param id ID string of element to be used.
  * \return Newly created target.
  */
 GP_EXPORT gp_target* gp_target_new_from_id(gp_context* context, const char* id);
@@ -50,6 +58,19 @@ namespace GP
 {
 namespace Web
 {
+  /*!
+   * \brief Wrapper class for ::gp_context extended for Web features.
+   */
+  class Context : public GP::Context
+  {
+  public:
+    //! Constructor
+    inline Context(const GP::System& system, const char* id);
+    
+    //! Copy Constructor
+    inline Context(const GP::Context& other);
+  };
+  
   /*!
    * \brief Wrapper class for ::gp_target extended for Web features.
    */
@@ -66,6 +87,8 @@ namespace Web
   /*
    * Implementation
    */
+  Context::Context(const GP::System& system, const char* id) : GP::Context(gp_context_new_from_id(GetSystem(system), id)) {}
+  
   Target::Target(const GP::Context& context, const char* id) : GP::Target(gp_target_new_from_id(GetContext(context), id)) {}
 }
 }

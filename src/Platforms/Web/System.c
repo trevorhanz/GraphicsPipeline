@@ -28,6 +28,7 @@ gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
   system->mCanvasIndex = 0;
+  system->mTargetIndex = 0;
   system->mState = 0;
   
   return system;

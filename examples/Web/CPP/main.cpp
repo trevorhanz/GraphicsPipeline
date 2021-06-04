@@ -40,11 +40,13 @@ int main(int argv, char* argc[])
 {
   System system;
   
-  Context context(system);
+  Web::Context context(system, "#WebContext");
   
-  Web::Target target(context, "#WebExample");
   Array array(context);
   Shader shader(context);
+  
+  Web::Target target1(context, "#WebTarget1");
+  Web::Target target2(context, "#WebTarget2");
   
   ArrayData ad;
   ad.Set(vertexData, 6);
@@ -55,12 +57,24 @@ int main(int argv, char* argc[])
   source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   shader.Compile(source);
   
-  Pipeline pipeline = target.GetPipeline();
+  Pipeline pipeline = target1.GetPipeline();
+  
+  ClearOperation clear1;
+  clear1.SetColor(1, 0, 0, 1);
+  pipeline.AddOperation(clear1);
   
   DrawOperation operation;
   operation.SetShader(shader);
   operation.AddArrayByIndex(array, 0, 2);
   operation.SetVerticies(3);
+  pipeline.AddOperation(operation);
+  
+  pipeline = target2.GetPipeline();
+  
+  ClearOperation clear2;
+  clear2.SetColor(0, 0, 1, 1);
+  pipeline.AddOperation(clear2);
+  
   pipeline.AddOperation(operation);
   
   system.Run();

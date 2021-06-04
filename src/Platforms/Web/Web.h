@@ -28,9 +28,12 @@
 
 #include "../../Utils/RefCounter.h"
 
+#include <stdint.h>
+
 struct _gp_system
 {
-  int                                   mCanvasIndex;
+  uint8_t                               mCanvasIndex;
+  uint8_t                               mTargetIndex;
   int                                   mState;
 };
 
@@ -38,6 +41,7 @@ struct _gp_context
 {
   gp_system*                            mParent;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mShare;
+  char*                                 mID;
   gp_refcounter                         mRef;
   
   gp_timer*                             mWorkTimer;
