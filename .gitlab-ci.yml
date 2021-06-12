@@ -138,10 +138,9 @@ pages:
   tags:
     - docker
   script:
-    - mkdir -p build/doxygen/
-    - doxygen doxygen/Doxyfile
-    - mv build/doxygen/html/ public
     - cd build
+    - make gp-docs
+    - mv docs/html/ ../public
     - find examples/ -name "*.html" | cpio -pdm ../public
     - find examples/ -name "*.js" | cpio -pdm ../public
     - find examples/ -name "*.wasm" | cpio -pdm ../public
@@ -150,3 +149,5 @@ pages:
       - public
   only:
     - master
+  dependencies:
+    - build_web

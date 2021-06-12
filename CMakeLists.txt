@@ -21,6 +21,7 @@ option(GP_BUILD_TEST "Build unit tests." OFF)
 option(GP_BUILD_EXAMPLES "BUILD example programs." OFF)
 
 add_subdirectory(src)
+add_subdirectory(docs)
 
 if(GP_BUILD_EXAMPLES)
     add_subdirectory(examples)
