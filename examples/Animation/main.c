@@ -57,7 +57,7 @@ float vertexData[] = {
 
 typedef struct
 {
-  gp_target* target;
+  gp_window* window;
   gp_uniform* offset;
   struct timeval beginFrame;
   int frame;
@@ -81,7 +81,7 @@ void TimerCallback(gp_timer* timer)
   
   gp_uniform_vec2_set(data->offset, data->position);
   
-  gp_target_redraw(data->target);
+  gp_window_redraw(data->window);
   
   struct timeval endFrame;
   gettimeofday(&endFrame, NULL);
@@ -102,13 +102,13 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_context_new(system);
   
-  gp_target* target = gp_target_new(context);
+  gp_window* window = gp_window_new(context);
   gp_array* array = gp_array_new(context);
   gp_texture* texture = gp_texture_new(context);
   gp_shader* shader = gp_shader_new(context);
   
   animation_data* data = malloc(sizeof(animation_data));
-  data->target = target;
+  data->window = window;
   data->frame = 0;
   data->direction[0] = .25;
   data->direction[1] = .5;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
   data->offset = gp_uniform_vec2_new_by_name(shader, "Offset");
   gp_uniform_vec2_set(data->offset, o);
   
-  gp_pipeline* pipeline = gp_target_get_pipeline(target);
+  gp_pipeline* pipeline = gp_window_get_pipeline(window);
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
-  gp_target_unref(target);
+  gp_window_unref(window);
   gp_context_unref(context);
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);

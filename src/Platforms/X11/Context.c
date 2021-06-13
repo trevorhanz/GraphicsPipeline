@@ -98,20 +98,20 @@ void _gp_work_done(gp_io* io)
   pthread_mutex_unlock(&context->mWorkMutex);
 }
 
-void _gp_target_wake_callback(gp_io* io)
+void _gp_window_wake_callback(gp_io* io)
 {
-  gp_target* target = (gp_target*)gp_io_get_userdata(io);
+  gp_window* window = (gp_window*)gp_io_get_userdata(io);
   for(;;)
   {
     char ch;
-    if(read(target->mPipe[0], &ch, 1) == -1)
+    if(read(window->mPipe[0], &ch, 1) == -1)
       break;
   }
   
-  if(target->mDirty)
+  if(window->mDirty)
   {
-    _gp_target_draw(target);
-    target->mDirty = 0;
+    _gp_window_draw(window);
+    window->mDirty = 0;
   }
 }
 
@@ -272,19 +272,19 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
-  gp_target* target = malloc(sizeof(struct _gp_target));
-  target->mParent = context;
-  target->mPipeline = _gp_pipeline_new();
-  target->mDirty = 1;
-  gp_ref_init(&target->mRef);
-  gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)target);
-  _gp_event_pipe_new(context->mParent->mEvent, target->mPipe);
+  gp_window* window = malloc(sizeof(struct _gp_window));
+  window->mParent = context;
+  window->mPipeline = _gp_pipeline_new();
+  window->mDirty = 1;
+  gp_ref_init(&window->mRef);
+  gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)window);
+  _gp_event_pipe_new(context->mParent->mEvent, window->mPipe);
   
-  target->mWake = gp_io_read_new(context->mParent, target->mPipe[0]);
-  gp_io_set_callback(target->mWake, _gp_target_wake_callback);
-  gp_io_set_userdata(target->mWake, target);
+  window->mWake = gp_io_read_new(context->mParent, window->mPipe[0]);
+  gp_io_set_callback(window->mWake, _gp_window_wake_callback);
+  gp_io_set_userdata(window->mWake, window);
   
   XSetWindowAttributes attr;
   attr.colormap = context->mColorMap;
@@ -292,7 +292,7 @@ gp_target* gp_target_new(gp_context* context)
   attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask |
   StructureNotifyMask | DestroyNotify | PointerMotionMask | FocusChangeMask;
   
-  target->mWindow = XCreateWindow(context->mDisplay, RootWindow(context->mDisplay, context->mVisualInfo->screen),
+  window->mWindow = XCreateWindow(context->mDisplay, RootWindow(context->mDisplay, context->mVisualInfo->screen),
                                   0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT,
                                   0, context->mVisualInfo->depth, InputOutput, context->mVisualInfo->visual,
                                   CWBorderPixel | CWColormap | CWEventMask, &attr);
@@ -307,66 +307,66 @@ gp_target* gp_target_new(gp_context* context)
   
   glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
   glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
-  target->mContext = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare,
+  window->mContext = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare,
                                               True, context_attribs );
-  XStoreName(context->mDisplay, target->mWindow, "GraphicsPipeline");
+  XStoreName(context->mDisplay, window->mWindow, "GraphicsPipeline");
   XFlush(context->mDisplay);
-  glXMakeCurrent(context->mDisplay, target->mWindow, target->mContext);
+  glXMakeCurrent(context->mDisplay, window->mWindow, window->mContext);
   XFlush(context->mDisplay);
-  XMapRaised(context->mDisplay, target->mWindow);
+  XMapRaised(context->mDisplay, window->mWindow);
   XFlush(context->mDisplay);
   
-  XSetWMProtocols(context->mDisplay, target->mWindow, &context->mParent->mDeleteMessage, 1);
+  XSetWMProtocols(context->mDisplay, window->mWindow, &context->mParent->mDeleteMessage, 1);
   
   _gp_api_init_context();
   
-  return target;
+  return window;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    glXDestroyContext(target->mParent->mDisplay, target->mContext);
+    glXDestroyContext(window->mParent->mDisplay, window->mContext);
     
-    gp_list_remove(&target->mParent->mParent->mTargets, (gp_list_node*)target);
-    _gp_pipeline_free(target->mPipeline);
+    gp_list_remove(&window->mParent->mParent->mTargets, (gp_list_node*)window);
+    _gp_pipeline_free(window->mPipeline);
     
-    gp_object_unref((gp_object*)target->mWake);
+    gp_object_unref((gp_object*)window->mWake);
     
-    close(target->mPipe[0]);
-    close(target->mPipe[1]);
+    close(window->mPipe[0]);
+    close(window->mPipe[1]);
     
-    free(target);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mPipeline;
+  return window->mPipeline;
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
-  size_t r = write(target->mPipe[1], "x", 1);
+  size_t r = write(window->mPipe[1], "x", 1);
   
-  target->mDirty = 1;
+  window->mDirty = 1;
 }
 
-void _gp_target_draw(gp_target* target)
+void _gp_window_draw(gp_window* window)
 {
-  glXMakeCurrent(target->mParent->mDisplay, target->mWindow, target->mContext);
+  glXMakeCurrent(window->mParent->mDisplay, window->mWindow, window->mContext);
   
-  _gp_pipeline_execute(target->mPipeline);
+  _gp_pipeline_execute(window->mPipeline);
   
-  glXSwapBuffers(target->mParent->mDisplay, target->mWindow);
+  glXSwapBuffers(window->mParent->mDisplay, window->mWindow);
   
-  target->mDirty = 0;
+  window->mDirty = 0;
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

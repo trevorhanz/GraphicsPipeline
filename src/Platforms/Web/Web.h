@@ -48,7 +48,7 @@ struct _gp_context
   gp_list                               mWork;
 };
 
-struct _gp_target
+struct _gp_window
 {
   char*                                 mID;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mContext;

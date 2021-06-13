@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   
   Context context(system);
   
-  Target target(context);
+  Window window(context);
   Array array(context);
   Shader shader(context);
   
@@ -76,13 +76,13 @@ int main(int argc, char* argv[])
     float o[] = {offset, 0.0f};
     uniform.Set(o);
     
-    target.Redraw();
+    window.Redraw();
     
     ++frame;
   });
   timer.Arm(TIMEOUT);
   
-  Pipeline pipeline = target.GetPipeline();
+  Pipeline pipeline = window.GetPipeline();
   
   ClearOperation clear;
   pipeline.AddOperation(clear);

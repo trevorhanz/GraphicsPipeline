@@ -53,11 +53,11 @@ gp_context* gp_qt_context_new();
 #include <QWidget>
 
 /*!
- * Retrieve QWidget associated with a gp_target.
- * \param target Pointer to gp_target.
- * \return Pointer to QWidget used by target.
+ * Retrieve QWidget associated with a gp_window.
+ * \param window Pointer to gp_window.
+ * \return Pointer to QWidget used by window.
  */
-QWidget* gp_target_get_qwidget(gp_target* target);
+QWidget* gp_window_get_qwidget(gp_window* window);
 #endif
 
 #endif // __GP_QT5_H__

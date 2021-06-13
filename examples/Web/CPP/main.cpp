@@ -45,8 +45,8 @@ int main(int argv, char* argc[])
   Array array(context);
   Shader shader(context);
   
-  Web::Target target1(context, "#WebTarget1");
-  Web::Target target2(context, "#WebTarget2");
+  Web::Window window1(context, "#WebWindow1");
+  Web::Window window2(context, "#WebWindow2");
   
   ArrayData ad;
   ad.Set(vertexData, 6);
@@ -57,7 +57,7 @@ int main(int argv, char* argc[])
   source.AddString(GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   shader.Compile(source);
   
-  Pipeline pipeline = target1.GetPipeline();
+  Pipeline pipeline = window1.GetPipeline();
   
   ClearOperation clear1;
   clear1.SetColor(1, 0, 0, 1);
@@ -69,7 +69,7 @@ int main(int argv, char* argc[])
   operation.SetVerticies(3);
   pipeline.AddOperation(operation);
   
-  pipeline = target2.GetPipeline();
+  pipeline = window2.GetPipeline();
   
   ClearOperation clear2;
   clear2.SetColor(0, 0, 1, 1);

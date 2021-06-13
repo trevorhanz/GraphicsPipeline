@@ -91,45 +91,45 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
   return NULL;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    _gp_pipeline_free(target->mPipeline);
-    free(target);
+    _gp_pipeline_free(window->mPipeline);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mPipeline;
+  return window->mPipeline;
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
 }
 
-gp_target* gp_target_new_from_native(gp_context* context, ANativeWindow* window)
+gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow)
 {
-  gp_target* target = malloc(sizeof(gp_target));
-  target->mWindow = window;
-  gp_ref_init(&target->mRef);
+  gp_window* window = malloc(sizeof(gp_window));
+  window->mWindow = awindow;
+  gp_ref_init(&window->mRef);
   
-  ANativeWindow_setBuffersGeometry(window, 0, 0, context->mFormat);
+  ANativeWindow_setBuffersGeometry(awindow, 0, 0, context->mFormat);
 
-  if (!(target->mSurface = eglCreateWindowSurface(context->mParent->mDisplay, context->mConfig, window, 0))) {
+  if (!(window->mSurface = eglCreateWindowSurface(context->mParent->mDisplay, context->mConfig, awindow, 0))) {
     gp_log_error("eglCreateWindowSurface() returned error %d", eglGetError());
-    free(target);
+    free(window);
     return NULL;
   }
   
@@ -138,21 +138,21 @@ gp_target* gp_target_new_from_native(gp_context* context, ANativeWindow* window)
     EGL_NONE
   };
   
-  if (!(target->mContext = eglCreateContext(context->mParent->mDisplay, context->mConfig, context->mShare, contextAttribs))) {
+  if (!(window->mContext = eglCreateContext(context->mParent->mDisplay, context->mConfig, context->mShare, contextAttribs))) {
     gp_log_error("eglCreateContext() returned error %d", eglGetError());
-    free(target);
+    free(window);
     return NULL;
   }
   
-  if (!eglMakeCurrent(context->mParent->mDisplay, target->mSurface, target->mSurface, target->mContext)) {
+  if (!eglMakeCurrent(context->mParent->mDisplay, window->mSurface, window->mSurface, window->mContext)) {
     gp_log_error("eglMakeCurrent() returned error %d", eglGetError());
-    free(target);
+    free(window);
     return NULL;
   }
   
-  target->mPipeline = _gp_pipeline_new();
+  window->mPipeline = _gp_pipeline_new();
   
-  return target;
+  return window;
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

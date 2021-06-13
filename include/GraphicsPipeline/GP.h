@@ -28,8 +28,8 @@
 #include "Pipeline.h"
 #include "Shader.h"
 #include "Logging.h"
-#include "Target.h"
 #include "Texture.h"
 #include "Types.h"
+#include "Window.h"
 
 #endif // __GRAPHICS_PIPELINE_H__

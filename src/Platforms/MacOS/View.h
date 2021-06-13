@@ -27,14 +27,14 @@
 
 @interface View : NSOpenGLView
 {
-  gp_target*          mTarget;
+  gp_window*          mWindow;
 }
 
 - (id) initWithFrame:(NSRect)frame;
 - (void) reshape;
 - (void) drawRect:(NSRect)rect;
 - (void) update;
-- (void) setTarget:(gp_target*)target;
+- (void) setWindow:(gp_window*)window;
 @end
 
 #endif // __VIEW_H__

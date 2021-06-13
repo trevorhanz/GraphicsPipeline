@@ -53,15 +53,15 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
   
   case WM_PAINT:
     {
-      gp_target* target = (gp_target*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+      gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
       PAINTSTRUCT ps;
       HDC hDC = BeginPaint(hWnd, &ps);
-      wglMakeCurrent(hDC, target->mContext);
+      wglMakeCurrent(hDC, window->mContext);
 
-      _gp_pipeline_execute(target->mPipeline);
+      _gp_pipeline_execute(window->mPipeline);
 
-      SwapBuffers(GetDC(target->mWindow));
+      SwapBuffers(GetDC(window->mWindow));
       EndPaint(hWnd, &ps);
     }
     return 0;

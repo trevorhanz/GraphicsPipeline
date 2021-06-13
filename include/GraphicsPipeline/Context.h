@@ -86,7 +86,7 @@ namespace GP
     
     gp_context*           mContext;
     
-    friend class Target;
+    friend class Window;
     friend class Array;
     friend class Texture;
     friend class Shader;

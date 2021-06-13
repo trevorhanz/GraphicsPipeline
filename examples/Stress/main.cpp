@@ -106,7 +106,7 @@ public:
   App()
     : mSystem(),
     mContext(mSystem),
-    mTarget(mContext),
+    mWindow(mContext),
     mArrays{Array(mContext), Array(mContext)},
     mTextures{Texture(mContext), Texture(mContext)},
     mThroughput(0),
@@ -171,7 +171,7 @@ public:
     mTextures[0]->SetData(&mTDs[0]);
 #endif
     
-    Pipeline pipeline = mTarget.GetPipeline();
+    Pipeline pipeline = mWindow.GetPipeline();
     
     ClearOperation clear;
     pipeline.AddOperation(clear);
@@ -209,8 +209,8 @@ public:
     
     Timer timer(mSystem);
     timer.SetCallback(std::function<void(Timer*)>([&](Timer* timer){
-      // Redraw Target
-      mTarget.Redraw();
+      // Redraw Window
+      mWindow.Redraw();
       
       // Calculate FPS at 1Hz
       struct timeval endFrame;
@@ -265,7 +265,7 @@ private:
   
   System                        mSystem;
   Context                       mContext;
-  Target                        mTarget;
+  Window                        mWindow;
   Array                         mArrays[2];
   Texture                       mTextures[2];
   ArrayData                     mADs[2];

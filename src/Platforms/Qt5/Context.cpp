@@ -76,9 +76,9 @@ extern "C" gp_context* gp_qt_context_new()
   return context;
 }
 
-QWidget* gp_target_get_qwidget(gp_target* target)
+QWidget* gp_window_get_qwidget(gp_window* window)
 {
-  return target->mTarget->GetWidget();
+  return window->mWindow->GetWidget();
 }
 
 extern "C" gp_context* gp_context_new(gp_system* system)
@@ -99,36 +99,36 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
-  gp_target* target = new gp_target();
-  target->mTarget = new Target(context->mShare);
-  gp_ref_init(&target->mRef);
+  gp_window* window = new gp_window();
+  window->mWindow = new Window(context->mShare);
+  gp_ref_init(&window->mRef);
   
-  return target;
+  return window;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    free(target);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mTarget->GetPipeline();
+  return window->mWindow->GetPipeline();
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
-  target->mTarget->Draw();
+  window->mWindow->Draw();
 }
 
 extern "C" void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

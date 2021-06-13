@@ -458,12 +458,12 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
-  gp_target* target = malloc(sizeof(struct _gp_target));
-  target->mParent = context;
-  target->mPipeline = _gp_pipeline_new();
-  gp_ref_init(&target->mRef);
+  gp_window* window = malloc(sizeof(struct _gp_window));
+  window->mParent = context;
+  window->mPipeline = _gp_pipeline_new();
+  gp_ref_init(&window->mRef);
   
   DWORD                 dwExStyle;                                  // Window Extended Style
   DWORD                 dwStyle;                                    // Window Style
@@ -522,7 +522,7 @@ gp_target* gp_target_new(gp_context* context)
       NULL,                                                         // No Parent Window
       NULL,                                                         // No Menu
       GetModuleHandle(NULL),                                        // Instance
-      target)))                                                     // Pass a pointer to this window
+      window)))                                                     // Pass a pointer to this window
   {
     MessageBox(NULL, "Window Creation Error.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
     return NULL;
@@ -553,36 +553,36 @@ gp_target* gp_target_new(gp_context* context)
 
   wglShareLists(context->mShare, hRC);
 
-  target->mWindow = hWnd;
-  target->mContext = hRC;
+  window->mWindow = hWnd;
+  window->mContext = hRC;
 
-  ShowWindow(target->mWindow, SW_SHOW);
+  ShowWindow(window->mWindow, SW_SHOW);
 
-  return target;
+  return window;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    _gp_pipeline_free(target->mPipeline);
-    free(target);
+    _gp_pipeline_free(window->mPipeline);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mPipeline;
+  return window->mPipeline;
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
-  RedrawWindow(target->mWindow, 0, 0, RDW_INVALIDATE);
+  RedrawWindow(window->mWindow, 0, 0, RDW_INVALIDATE);
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

@@ -27,7 +27,7 @@
 #include <QSocketNotifier>
 #include <QThread>
 
-#include "Target.h"
+#include "Window.h"
 #include "TimerCallback.h"
 #include "IOCallback.h"
 #include "WorkQueue.h"
@@ -50,9 +50,9 @@ struct _gp_context
   WorkQueue*             mWorkQueue;
 };
 
-struct _gp_target
+struct _gp_window
 {
-  Target*                 mTarget;
+  Window*                 mWindow;
   gp_refcounter           mRef;
 };
 

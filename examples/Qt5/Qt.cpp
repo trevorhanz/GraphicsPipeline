@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_qt_context_new();
   
-  gp_target* target = gp_target_new(context);
+  gp_window* view = gp_window_new(context);
   gp_array* array = gp_array_new(context);
   gp_shader* shader = gp_shader_new(context);
   
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   gp_shader_compile(shader, source);
   gp_shader_source_unref(source);
   
-  gp_pipeline* pipeline = gp_target_get_pipeline(target);
+  gp_pipeline* pipeline = gp_window_get_pipeline(view);
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   
-  gp_target_get_qwidget(target)->show();
+  gp_window_get_qwidget(view)->show();
   QHBoxLayout* layout = new QHBoxLayout();
-  layout->addWidget(gp_target_get_qwidget(target));
+  layout->addWidget(gp_window_get_qwidget(view));
   
   window.setLayout(layout);
   window.show();

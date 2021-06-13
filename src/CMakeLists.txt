@@ -15,10 +15,10 @@ set(PUBLIC_HEADERS
     ../include/GraphicsPipeline/Qt5.h
     ../include/GraphicsPipeline/Shader.h
     ../include/GraphicsPipeline/System.h
-    ../include/GraphicsPipeline/Target.h
     ../include/GraphicsPipeline/Texture.h
     ../include/GraphicsPipeline/Types.h
     ../include/GraphicsPipeline/Web.h
+    ../include/GraphicsPipeline/Window.h
     ../include/GraphicsPipeline/Windows.h
     ../include/GraphicsPipeline/X11.h
     )
@@ -186,7 +186,7 @@ else(ANDROID)
       Platforms/Qt5/IOCallback.cpp
       Platforms/Qt5/Logging.c
       Platforms/Qt5/System.cpp
-      Platforms/Qt5/Target.cpp
+      Platforms/Qt5/Window.cpp
       Platforms/Qt5/TimerCallback.cpp
       Platforms/Qt5/WorkQueue.cpp)
     

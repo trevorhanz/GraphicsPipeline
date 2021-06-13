@@ -17,10 +17,10 @@
 
 #include <GraphicsPipeline/Logging.h>
 
-#include "Target.h"
+#include "Window.h"
 #include "Platforms/Defaults.h"
 
-Target::Target(QOpenGLContext* share)
+Window::Window(QOpenGLContext* share)
   : mContext(new QOpenGLContext(this)),
   mPipeline(_gp_pipeline_new())
 {
@@ -40,22 +40,22 @@ Target::Target(QOpenGLContext* share)
   _gp_api_init_context();
 }
 
-Target::~Target()
+Window::~Window()
 {
   _gp_pipeline_free(mPipeline);
 }
 
-QWidget* Target::GetWidget()
+QWidget* Window::GetWidget()
 {
   return mContainer;
 }
 
-gp_pipeline* Target::GetPipeline()
+gp_pipeline* Window::GetPipeline()
 {
   return mPipeline;
 }
 
-void Target::Draw()
+void Window::Draw()
 {
   mContext->makeCurrent(this);
   
@@ -66,7 +66,7 @@ void Target::Draw()
   mContext->swapBuffers(this);
 }
 
-void Target::exposeEvent(QExposeEvent* event)
+void Window::exposeEvent(QExposeEvent* event)
 {
   Draw();
 }

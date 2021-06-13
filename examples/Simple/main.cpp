@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   
   Context context(system);
   
-  Target target(context);
+  Window window(context);
   Array array(context);
   Shader shader(context);
   
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   UniformVec4 color(shader, "Color");
   color.Set(c);
   
-  Pipeline pipeline = target.GetPipeline();
+  Pipeline pipeline = window.GetPipeline();
   
   ClearOperation clear;
   pipeline.AddOperation(clear);

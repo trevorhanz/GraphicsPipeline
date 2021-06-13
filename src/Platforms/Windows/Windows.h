@@ -52,7 +52,7 @@ struct _gp_context
   gp_list               mFinished;
 };
 
-struct _gp_target
+struct _gp_window
 {
   gp_context*           mParent;
   HGLRC                 mContext;

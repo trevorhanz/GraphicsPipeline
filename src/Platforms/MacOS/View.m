@@ -47,7 +47,7 @@
   
   [[self openGLContext] makeCurrentContext];
   
-  _gp_pipeline_execute(mTarget->mPipeline);
+  _gp_pipeline_execute(mWindow->mPipeline);
   
   [[self openGLContext] flushBuffer];
 }
@@ -57,9 +57,9 @@
   [super update];
 }
 
-- (void) setTarget:(gp_target*)target
+- (void) setWindow:(gp_window*)window
 {
-  mTarget = target;
+  mWindow = window;
 }
 
 @end

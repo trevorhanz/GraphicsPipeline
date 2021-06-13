@@ -66,7 +66,7 @@ struct _gp_context
   int                     mState;
 };
 
-struct _gp_target
+struct _gp_window
 {
   gp_list_node            mNode;
   gp_context*             mParent;
@@ -79,7 +79,7 @@ struct _gp_target
   gp_refcounter           mRef;
 };
 
-void _gp_target_draw(gp_target* target);
+void _gp_window_draw(gp_window* window);
 
 _gp_event* _gp_event_new();
 

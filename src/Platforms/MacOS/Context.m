@@ -167,61 +167,61 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
-  gp_target* target = malloc(sizeof(gp_target));
-  target->mParent = context;
-  target->mPipeline = _gp_pipeline_new();
-  gp_ref_init(&target->mRef);
+  gp_window* window = malloc(sizeof(gp_window));
+  window->mParent = context;
+  window->mPipeline = _gp_pipeline_new();
+  gp_ref_init(&window->mRef);
   
   NSUInteger windowStyle = NSWindowStyleMaskTitled |
                            NSWindowStyleMaskClosable |
                            NSWindowStyleMaskResizable |
                            NSWindowStyleMaskMiniaturizable;
-  target->mWindow = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT)
+  window->mWindow = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT)
   styleMask:windowStyle backing:NSBackingStoreBuffered defer:NO]
   autorelease];
-  [target->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
-  [target->mWindow setTitle:@"GP Window"];
-  [target->mWindow makeKeyAndOrderFront:nil];
+  [window->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
+  [window->mWindow setTitle:@"GP Window"];
+  [window->mWindow makeKeyAndOrderFront:nil];
 
   // Create OpenGL view
-  target->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT ) pixelFormat:context->mPixelFormat];
+  window->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT ) pixelFormat:context->mPixelFormat];
   NSOpenGLContext* newContext = [ [ NSOpenGLContext alloc ] initWithFormat:context->mPixelFormat shareContext:context->mShare ];
-  [target->mView setOpenGLContext: newContext];
-  [target->mWindow setContentView:target->mView];
-  [target->mView setTarget:target];
-  [target->mView display];
+  [window->mView setOpenGLContext: newContext];
+  [window->mWindow setContentView:window->mView];
+  [window->mView setWindow:window];
+  [window->mView display];
 
-  [[target->mView openGLContext] makeCurrentContext];
+  [[window->mView openGLContext] makeCurrentContext];
   
   _gp_api_init_context();
   
-  return target;
+  return window;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    _gp_pipeline_free(target->mPipeline);
-    free(target);
+    _gp_pipeline_free(window->mPipeline);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mPipeline;
+  return window->mPipeline;
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
-  [target->mView setNeedsDisplay:YES];
+  [window->mView setNeedsDisplay:YES];
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_context_new(system);
   
-  gp_target* target1 = gp_target_new(context);
-  gp_target* target2 = gp_target_new(context);
+  gp_window* window1 = gp_window_new(context);
+  gp_window* window2 = gp_window_new(context);
   
   gp_array* array = gp_array_new(context);
   gp_shader* shader = gp_shader_new(context);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   gp_shader_compile(shader, source);
   gp_shader_source_unref(source);
   
-  gp_pipeline* pipeline = gp_target_get_pipeline(target1);
+  gp_pipeline* pipeline = gp_window_get_pipeline(window1);
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   gp_pipeline_add_operation(pipeline, draw);
   gp_operation_unref(draw);
   
-  pipeline = gp_target_get_pipeline(target2);
+  pipeline = gp_window_get_pipeline(window2);
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
-  gp_target_unref(target1);
-  gp_target_unref(target2);
+  gp_window_unref(window1);
+  gp_window_unref(window2);
   gp_context_unref(context);
   gp_object_unref((gp_object*)system);
   

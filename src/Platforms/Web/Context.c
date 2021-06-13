@@ -26,7 +26,7 @@
 
 gp_context* sContext = 0;
 
-void gp_target_redraw(gp_target* target);
+void gp_window_redraw(gp_window* window);
 
 EM_JS(int, _gp_canvas_get_width, (const char* id), {
   return document.getElementById(UTF8ToString(id)).width;
@@ -158,76 +158,76 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-void _gp_target_build(gp_target* target)
+void _gp_window_build(gp_window* window)
 {
-  gp_ref_init(&target->mRef);
+  gp_ref_init(&window->mRef);
   
-  target->mPipeline = _gp_pipeline_new();
+  window->mPipeline = _gp_pipeline_new();
   
-  gp_target_redraw(target);
+  gp_window_redraw(window);
 }
 
-gp_target* gp_target_new_from_id(gp_context* context, const char* id)
+gp_window* gp_window_new_from_id(gp_context* context, const char* id)
 {
-  gp_target* target = malloc(sizeof(gp_target));
+  gp_window* window = malloc(sizeof(gp_window));
   
   int size = strlen(id);
-  target->mID = malloc(sizeof(char)*size);
-  memcpy(target->mID, id, sizeof(char)*size);
+  window->mID = malloc(sizeof(char)*size);
+  memcpy(window->mID, id, sizeof(char)*size);
   
-  _gp_target_build(target);
+  _gp_window_build(window);
   
-  return target;
+  return window;
 }
 
-gp_target* gp_target_new(gp_context* context)
+gp_window* gp_window_new(gp_context* context)
 {
-  gp_target* target = malloc(sizeof(gp_target));
-  target->mID = malloc(sizeof(char)*15);
+  gp_window* window = malloc(sizeof(gp_window));
+  window->mID = malloc(sizeof(char)*15);
   
   int index = context->mParent->mTargetIndex++;
-  snprintf(target->mID, 15, "#_gp_target_%d", index);
+  snprintf(window->mID, 15, "#_gp_window_%d", index);
   
   EM_ASM({
     let element = document.createElement("div");
     element.id = UTF8ToString($0);
     document.body.appendChild(element);
-  }, &target->mID[1]);
+  }, &window->mID[1]);
   
-  _gp_target_build(target);
+  _gp_window_build(window);
   
-  return target;
+  return window;
 }
 
-void gp_target_ref(gp_target* target)
+void gp_window_ref(gp_window* window)
 {
-  gp_ref_inc(&target->mRef);
+  gp_ref_inc(&window->mRef);
 }
 
-void gp_target_unref(gp_target* target)
+void gp_window_unref(gp_window* window)
 {
-  if(gp_ref_dec(&target->mRef))
+  if(gp_ref_dec(&window->mRef))
   {
-    _gp_pipeline_free(target->mPipeline);
-    free(target);
+    _gp_pipeline_free(window->mPipeline);
+    free(window);
   }
 }
 
-gp_pipeline* gp_target_get_pipeline(gp_target* target)
+gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
-  return target->mPipeline;
+  return window->mPipeline;
 }
 
-void _gp_target_redraw_callback(void* data)
+void _gp_window_redraw_callback(void* data)
 {
-  gp_target* target = (gp_target*)data;
+  gp_window* window = (gp_window*)data;
   
-  _gp_pipeline_execute(target->mPipeline);
+  _gp_pipeline_execute(window->mPipeline);
 }
 
-void gp_target_redraw(gp_target* target)
+void gp_window_redraw(gp_window* window)
 {
-  emscripten_async_call(_gp_target_redraw_callback, target, -1);
+  emscripten_async_call(_gp_window_redraw_callback, window, -1);
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

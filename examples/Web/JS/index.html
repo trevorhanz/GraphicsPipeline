@@ -41,22 +41,22 @@ void main()
         window.onload = () => {
           Module.onRuntimeInitialized = () => {
               var GP = {};
-              GP.Target = Module.Target;
+              GP.Window = Module.Window;
               GP.Context = Module.Context;
               
               console.log(Module);
               var context = new GP.Context();
-              var canv1 = new GP.Target("#canvas1");
-              var canv2 = new GP.Target("#canvas2");
+              var canv1 = new GP.Window("#canvas1");
+              var canv2 = new GP.Window("#canvas2");
               
               array = new Module.Array();
               shader = new Module.Shader();
               
-              targetFocus = new Module.TargetFocus();
-              targetFocus.SetTarget(canv1);
+              windowFocus = new Module.WindowFocus();
+              windowFocus.SetWindow(canv1);
               
               loadPipe = context.CreatePipeline();
-              loadPipe.AddOperation(targetFocus);
+              loadPipe.AddOperation(windowFocus);
               loadArray = new Module.LoadArray();
               loadArray.SetArray(array);
               loadPipe.AddOperation(loadArray);
@@ -68,7 +68,7 @@ void main()
               loadPipe.Execute();
               
               pipeline = context.CreatePipeline();
-              pipeline.AddOperation(targetFocus);
+              pipeline.AddOperation(windowFocus);
               draw = new Module.Draw();
               draw.SetShader(shader);
               draw.SetArray(array);

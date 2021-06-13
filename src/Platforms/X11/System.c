@@ -16,7 +16,7 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/System.h>
-#include <GraphicsPipeline/Target.h>
+#include <GraphicsPipeline/Window.h>
 #include <GraphicsPipeline/X11.h>
 #include "X11.h"
 #include "API/GL/GL.h"
@@ -76,10 +76,10 @@ void _gp_system_process_events(gp_io* io)
       gp_list_node* node = gp_list_front(&system->mTargets);
       while(node != NULL)
       {
-        gp_target* target = (gp_target*)node;
-        if(target->mWindow == event.xexpose.window)
+        gp_window* window = (gp_window*)node;
+        if(window->mWindow == event.xexpose.window)
         {
-          gp_target_redraw(target);
+          gp_window_redraw(window);
         }
         node = gp_list_node_next(node);
       }

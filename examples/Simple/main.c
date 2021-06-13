@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_context_new(system);
   
-  gp_target* target = gp_target_new(context);
+  gp_window* window = gp_window_new(context);
   gp_array* array = gp_array_new(context);
   gp_shader* shader = gp_shader_new(context);
   
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   gp_uniform* color = gp_uniform_vec4_new_by_name(shader, "Color");
   gp_uniform_vec4_set(color, c);
   
-  gp_pipeline* pipeline = gp_target_get_pipeline(target);
+  gp_pipeline* pipeline = gp_window_get_pipeline(window);
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
-  gp_target_unref(target);
+  gp_window_unref(window);
   gp_context_unref(context);
   gp_object_unref((gp_object*)system);
   

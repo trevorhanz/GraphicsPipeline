@@ -21,12 +21,12 @@
 
 #include "GL.h"
 
-class Target : public QWindow
+class Window : public QWindow
 {
   Q_OBJECT
 public:
-  Target(QOpenGLContext* share);
-  virtual ~Target();
+  Window(QOpenGLContext* share);
+  virtual ~Window();
   
   QWidget* GetWidget();
   gp_pipeline* GetPipeline();

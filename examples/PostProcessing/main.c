@@ -180,7 +180,7 @@ float vertexDataQuad[] = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
 typedef struct
 {
   gp_uniform*           offsetWave;
-  gp_target*            target;
+  gp_window*            window;
 } TimeoutData;
 
 void TimeoutFunc(gp_timer* timer)
@@ -189,7 +189,7 @@ void TimeoutFunc(gp_timer* timer)
   
   gp_uniform_float_set(data->offsetWave, gp_uniform_float_get(data->offsetWave)+.01);
   
-  gp_target_redraw(data->target);
+  gp_window_redraw(data->window);
   
   gp_timer_arm(timer, .01);
 }
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_context_new(system);
   
-  gp_target* target = gp_target_new(context);
+  gp_window* window = gp_window_new(context);
   gp_texture* texture = gp_texture_new(context);
   gp_frame_buffer* fb = gp_frame_buffer_new(context);
   gp_texture* textureG = gp_texture_new(context);
@@ -276,7 +276,7 @@ int main(int argc, char* argv[])
   gp_shader_unref(shader);
   gp_array_unref(array);
   
-  pipeline = gp_target_get_pipeline(target);
+  pipeline = gp_window_get_pipeline(window);
   
   //
   // Upper Left
@@ -401,7 +401,7 @@ int main(int argc, char* argv[])
   
   TimeoutData* data = malloc(sizeof(TimeoutData));
   data->offsetWave = offsetWave;
-  data->target = target;
+  data->window = window;
   
   gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, &TimeoutFunc);
@@ -412,7 +412,7 @@ int main(int argc, char* argv[])
   
   gp_frame_buffer_unref(fb);
   gp_frame_buffer_unref(fbG);
-  gp_target_unref(target);
+  gp_window_unref(window);
   gp_context_unref(context);
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);

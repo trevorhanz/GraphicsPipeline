@@ -38,7 +38,7 @@
 struct _gp_system
 {
   gp_object               mObject;
-  gp_target*              mTarget;
+  gp_window*              mTarget;
 };
 
 struct _gp_context
@@ -58,7 +58,7 @@ struct _gp_context
   gp_list                 mFinished;
 };
 
-struct _gp_target
+struct _gp_window
 {
   gp_context*             mParent;
   gp_pipeline*            mPipeline;

@@ -89,7 +89,7 @@ extern "C" {
 typedef struct _gp_object gp_object;
 typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
-typedef struct _gp_target gp_target;
+typedef struct _gp_window gp_window;
 typedef struct _gp_frame_buffer gp_frame_buffer;
 typedef struct _gp_array gp_array;
 typedef struct _gp_array_data gp_array_data;
