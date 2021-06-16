@@ -47,13 +47,13 @@ struct _gp_context
   QOpenGLContext*         mShare;
   QOffscreenSurface*      mSurface;
   gp_refcounter           mRef;
-  
-  WorkQueue*             mWorkQueue;
+  std::map<int, gp_key_t> mKeyMap;
+  WorkQueue*              mWorkQueue;
 };
 
 struct _gp_window
 {
-  Window*                 mWindow;
+  _Window*                mWindow;
   gp_refcounter           mRef;
 };
 

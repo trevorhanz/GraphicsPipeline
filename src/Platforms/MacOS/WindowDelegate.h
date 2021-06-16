@@ -1,6 +1,6 @@
 /************************************************************************
-* Copyright (C) 2020 Trevor Hanz
-* 
+* Copyright (C) 2021 Trevor Hanz
+*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
@@ -15,22 +15,24 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#ifndef __WINDOWDELEGATE_H__
+#define __WINDOWDELEGATE_H__
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+// OpenGL is deprecated since macOS 10.14
+// Apple recommends porting to Metal
+#define GL_SILENCE_DEPRECATION
+#import <Cocoa/Cocoa.h>
 
-#include "Array.h"
-#include "Context.h"
-#include "FrameBuffer.h"
-#include "Input.h"
-#include "System.h"
-#include "Object.h"
-#include "Pipeline.h"
-#include "Shader.h"
-#include "Logging.h"
-#include "Texture.h"
-#include "Types.h"
-#include "Window.h"
+#include <GraphicsPipeline/Types.h>
 
-#endif // __GRAPHICS_PIPELINE_H__
+@interface WindowDelegate : NSObject
+{
+  gp_window*          mWindow;
+}
+
+- (instancetype) initWithWindow:(gp_window*)window;
+- (void) windowDidResize:(NSNotification *)notification;
+
+@end
+
+#endif // __WINDOWDELEGATE_H__

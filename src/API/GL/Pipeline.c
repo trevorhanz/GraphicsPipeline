@@ -512,3 +512,8 @@ void _gp_api_init_context()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
+
+void _gp_api_prepare_window(unsigned int width, unsigned int height)
+{
+  glViewport(0, 0, width, height);
+}

@@ -158,6 +158,8 @@ void _gp_api_init_context();
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data);
 
+void _gp_api_prepare_window(unsigned int width, unsigned int height);
+
 #ifdef __cplusplus
 }
 #endif

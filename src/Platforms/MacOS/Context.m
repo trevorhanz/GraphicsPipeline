@@ -22,6 +22,7 @@
 #include <OpenGL/gl3.h>
 
 #include "View.h"
+#include "WindowDelegate.h"
 #include "Platforms/Defaults.h"
 
 gp_context* sContext = 0;
@@ -174,6 +175,16 @@ gp_window* gp_window_new(gp_context* context)
   gp_window* window = malloc(sizeof(gp_window));
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
+  window->mClickCB = NULL;
+  window->mClickData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
+  window->mEnterCB = NULL;
+  window->mEnterData = NULL;
+  window->mKeyCB = NULL;
+  window->mKeyData = NULL;
+  window->mResizeCB = NULL;
+  window->mResizeData = NULL;
   gp_ref_init(&window->mRef);
   
   NSUInteger windowStyle = NSWindowStyleMaskTitled |
@@ -185,16 +196,22 @@ gp_window* gp_window_new(gp_context* context)
   autorelease];
   [window->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
   [window->mWindow setTitle:@"GP Window"];
-  [window->mWindow makeKeyAndOrderFront:nil];
-
+  
+  // Set delegate
+  id delegate = [[WindowDelegate alloc] initWithWindow:window];
+  [window->mWindow setDelegate:delegate];
+  
   // Create OpenGL view
   window->mView = [[View alloc] initWithFrame:NSMakeRect( 0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT ) pixelFormat:context->mPixelFormat];
   NSOpenGLContext* newContext = [ [ NSOpenGLContext alloc ] initWithFormat:context->mPixelFormat shareContext:context->mShare ];
   [window->mView setOpenGLContext: newContext];
   [window->mWindow setContentView:window->mView];
+  [window->mWindow makeFirstResponder:window->mView];
+  [window->mWindow setInitialFirstResponder:window->mView];
+  [window->mWindow setAcceptsMouseMovedEvents:YES];
+  [window->mWindow makeKeyAndOrderFront:window->mWindow];
   [window->mView setWindow:window];
   [window->mView display];
-
   [[window->mView openGLContext] makeCurrentContext];
   
   _gp_api_init_context();
@@ -225,6 +242,30 @@ void gp_window_redraw(gp_window* window)
 {
   [window->mView setNeedsDisplay:YES];
 }
+
+void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
+{
+  NSRect rect = [window->mView frame];
+  if(width) *width = rect.size.width;
+  if(height) *height = rect.size.height;
+}
+
+#define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
+  void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
+  {\
+    if(window->data) gp_object_unref((gp_object*)window->data);\
+    \
+    window->cb = callback;\
+    window->data = userData;\
+    \
+    if(window->data) gp_object_ref((gp_object*)window->data);\
+  }
+
+_GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
+_GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
+_GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 {

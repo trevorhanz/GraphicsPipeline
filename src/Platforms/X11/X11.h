@@ -21,6 +21,7 @@
 #include <GraphicsPipeline/Types.h>
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Logging.h>
+#include <GraphicsPipeline/Window.h>
 
 #include "../../Utils/List.h"
 #include "../../Utils/Object.h"
@@ -35,6 +36,11 @@
 
 typedef struct __gp_event _gp_event;
 
+typedef struct
+{
+  gp_key_t                key;
+} _gp_key_map;
+
 struct _gp_system
 {
   gp_object               mObject;
@@ -42,6 +48,12 @@ struct _gp_system
   gp_list                 mTargets;
   _gp_event*              mEvent;
   Atom                    mDeleteMessage;
+  struct
+  {
+    int                   mMinCode;
+    int                   mMaxCode;
+    _gp_key_map*          mKeys;
+  } mKeyMap;
 };
 
 struct _gp_context
@@ -77,6 +89,16 @@ struct _gp_window
   int                     mPipe[2];
   gp_io*                  mWake;
   gp_refcounter           mRef;
+  gp_event_click_callback_t   mClickCB;
+  gp_pointer*                 mClickData;
+  gp_event_move_callback_t    mMoveCB;
+  gp_pointer*                 mMoveData;
+  gp_event_enter_callback_t   mEnterCB;
+  gp_pointer*                 mEnterData;
+  gp_event_key_callback_t     mKeyCB;
+  gp_pointer*                 mKeyData;
+  gp_event_resize_callback_t  mResizeCB;
+  gp_pointer*                 mResizeData;
 };
 
 void _gp_window_draw(gp_window* window);

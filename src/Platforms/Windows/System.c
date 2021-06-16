@@ -26,9 +26,37 @@
 #include "API/GL/GL.h"
 #include "Windows.h"
 #include <winsock2.h>
+#include <windowsx.h>
 
 #include <stdlib.h>
 #include <stdio.h>
+
+void _gp_send_click(HWND hWnd, gp_button_t button, gp_state_t state, LPARAM lparam)
+{
+  gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+  if (window->mClickCB)
+  {
+    gp_event_click_t click;
+    click.button = button;
+    click.state = state;
+    click.x = GET_X_LPARAM(lparam);
+    click.y = GET_Y_LPARAM(lparam);
+    window->mClickCB(&click, window->mClickData);
+  }
+}
+
+void _gp_send_key(HWND hWnd, gp_state_t state, WPARAM wparam)
+{
+  gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+  if (window->mKeyCB)
+  {
+    // TODO: Create key code mapping
+    gp_event_key_t key;
+    key.key = wparam;
+    key.state = state;
+    window->mKeyCB(&key, window->mKeyData);
+  }
+}
 
 static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle For This Window
                                     UINT    uMsg,                   // Message For This Window
@@ -46,7 +74,16 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
     return 0;
 
   case WM_SIZE:
-    return 0;
+  {
+    gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (window->mResizeCB)
+    {
+      gp_event_resize_t resize;
+      resize.width = LOWORD(lParam);
+      resize.height = HIWORD(lParam);
+      window->mResizeCB(&resize, window->mResizeData);
+    }
+  } return 0;
 
   case WM_DESTROY:
     return 0;
@@ -73,6 +110,69 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
     _gp_work_done(lParam);
     return 0;
 
+  case WM_LBUTTONDOWN:
+    _gp_send_click(hWnd, GP_BUTTON_LEFT, GP_PRESSED, lParam);
+    return 0;
+  case WM_LBUTTONUP:
+    _gp_send_click(hWnd, GP_BUTTON_LEFT, GP_RELEASED, lParam);
+    return 0;
+  case WM_MBUTTONDOWN:
+    _gp_send_click(hWnd, GP_BUTTON_MIDDLE, GP_PRESSED, lParam);
+    return 0;
+  case WM_MBUTTONUP:
+    _gp_send_click(hWnd, GP_BUTTON_MIDDLE, GP_RELEASED, lParam);
+    return 0;
+  case WM_RBUTTONDOWN:
+    _gp_send_click(hWnd, GP_BUTTON_RIGHT, GP_PRESSED, lParam);
+    return 0;
+  case WM_RBUTTONUP:
+    _gp_send_click(hWnd, GP_BUTTON_RIGHT, GP_RELEASED, lParam);
+    return 0;
+  case WM_MOUSEMOVE:
+  {
+    gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (!window->mMouseEntered)
+    {
+      TRACKMOUSEEVENT tme;
+      tme.cbSize = sizeof(tme);
+      tme.hwndTrack = hWnd;
+      tme.dwFlags = TME_LEAVE;
+      TrackMouseEvent(&tme);
+      window->mMouseEntered = 1;
+
+      if (window->mEnterCB)
+      {
+        gp_event_enter_t enter;
+        enter.enter = 1;
+        window->mEnterCB(&enter, window->mEnterData);
+      }
+    }
+
+    if (window->mMoveCB)
+    {
+      gp_event_move_t move;
+      move.x = GET_X_LPARAM(lParam);
+      move.y = GET_Y_LPARAM(lParam);
+      window->mMoveCB(&move, window->mMoveData);
+    }
+  } return 0;
+  case WM_MOUSELEAVE:
+  {
+    gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (window->mEnterCB)
+    {
+      gp_event_enter_t enter;
+      enter.enter = 0;
+      window->mEnterCB(&enter, window->mEnterData);
+    }
+    window->mMouseEntered = 0;
+  } return 0;
+  case WM_KEYDOWN:
+    _gp_send_key(hWnd, GP_PRESSED, wParam);
+    return 0;
+  case WM_KEYUP:
+    _gp_send_key(hWnd, GP_RELEASED, wParam);
+    return 0;
   default:
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
   }

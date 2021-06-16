@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2021 Trevor Hanz
+* Copyright (C) 2020 Trevor Hanz
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -16,43 +16,56 @@
 ************************************************************************/
 
 #include <GraphicsPipeline/GP.h>
-#include <GraphicsPipeline/Desktop.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 
-#include "../Common.h"
+#ifdef __APPLE__
+#define GLSL(src) "#version 400\n" #src
+#else
+#define GLSL(src) "#version 300 es\n" #src
+#endif
 
 const char* vertexSource = GLSL(
   in highp vec4 position;
-  uniform vec2 size;
   void main()
   {
-    gl_Position = vec4(position.x/(size.x/2.0)-1.0, position.y/(size.y/2.0)-1.0, position.z, 1.0);
+    gl_Position = vec4(position.xyz, 1.0);
   });
 const char* fragmentSource = GLSL(
+  uniform highp vec4 Color;
   out highp vec4 fragColor;
   void main()
   {
-    fragColor = vec4(0, 1, 1, 1);
+    fragColor = Color;
   });
-float vertexData[] = {512.0f, 744.0f, 1000.0f, 24.0f, 24.0f, 24.0f};
+float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
-typedef struct
+void mouse_click_callback(const gp_event_click_t* click, gp_pointer* userData)
 {
-  gp_window*        window;
-  gp_uniform*       size;
-} callbackData;
+  gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
+}
+
+void mouse_move_callback(const gp_event_move_t* move, gp_pointer* userData)
+{
+  gp_log("Move: %d, %d", move->x, move->y);
+}
+
+void mouse_enter_callback(const gp_event_enter_t* enter, gp_pointer* userData)
+{
+  if(enter->enter) gp_log("Enter");
+  else gp_log("Leave");
+}
+
+void key_callback(const gp_event_key_t* key, gp_pointer* userData)
+{
+  if(key->state) gp_log("Press: %d", key->key);
+  else gp_log("Release: %d", key->key);
+}
 
 void window_resize_callback(const gp_event_resize_t* resize, gp_pointer* userData)
 {
-  callbackData* data = (callbackData*)gp_pointer_get_pointer(userData);
-  
-  float size[2];
-  size[0] = resize->width;
-  size[1] = resize->height;
-  gp_uniform_vec2_set(data->size, size);
-  
-  gp_window_redraw(data->window);
+  gp_log("Resize: %dx%d", resize->width, resize->height);
 }
 
 int main(int argc, char* argv[])
@@ -61,18 +74,15 @@ int main(int argc, char* argv[])
   
   gp_context* context = gp_context_new(system);
   
-  gp_window* window1 = gp_window_new(context);
-  gp_window* window2 = gp_window_new(context);
-  
-  callbackData window1Data;
-  callbackData window2Data;
-  gp_window_set_resize_callback(window1, window_resize_callback, gp_pointer_new(&window1Data, NULL));
-  gp_window_set_resize_callback(window2, window_resize_callback, gp_pointer_new(&window2Data, NULL));
-  window1Data.window = window1;
-  window2Data.window = window2;
-  
+  gp_window* window = gp_window_new(context);
   gp_array* array = gp_array_new(context);
   gp_shader* shader = gp_shader_new(context);
+  
+  gp_window_set_click_callback(window, mouse_click_callback, NULL);
+  gp_window_set_move_callback(window, mouse_move_callback, NULL);
+  gp_window_set_enter_callback(window, mouse_enter_callback, NULL);
+  gp_window_set_key_callback(window, key_callback, NULL);
+  gp_window_set_resize_callback(window, window_resize_callback, NULL);
   
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 6);
@@ -85,42 +95,33 @@ int main(int argc, char* argv[])
   gp_shader_compile(shader, source);
   gp_shader_source_unref(source);
   
-  window1Data.size = gp_uniform_vec2_new_by_name(shader, "size");
-  window2Data.size = gp_uniform_vec2_new_by_name(shader, "size");
+  float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
+  gp_uniform* color = gp_uniform_vec4_new_by_name(shader, "Color");
+  gp_uniform_vec4_set(color, c);
   
-  float size[2];
-  size[0] = 1024;
-  size[1] = 768;
-  gp_uniform_vec2_set(window1Data.size, size);
-  gp_uniform_vec2_set(window2Data.size, size);
+  gp_pipeline* pipeline = gp_window_get_pipeline(window);
   
-  gp_pipeline* pipeline = gp_window_get_pipeline(window1);
+  gp_operation* clear = gp_operation_clear_new();
+  gp_pipeline_add_operation(pipeline, clear);
+  gp_operation_unref(clear);
+  
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
-  gp_operation_draw_set_uniform(draw, window1Data.size);
+  gp_operation_draw_set_uniform(draw, color);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   gp_operation_unref(draw);
-  
-  pipeline = gp_window_get_pipeline(window2);
-  draw = gp_operation_draw_new();
-  gp_operation_draw_set_shader(draw, shader);
-  gp_operation_draw_set_uniform(draw, window2Data.size);
-  gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
-  gp_operation_draw_set_verticies(draw, 3);
-  gp_pipeline_add_operation(pipeline, draw);
-  gp_operation_unref(draw);
-  
+  gp_object_unref((gp_object*)color);
   gp_shader_unref(shader);
   gp_array_unref(array);
   
   gp_system_run(system);
   
-  gp_window_unref(window1);
-  gp_window_unref(window2);
+  gp_window_unref(window);
   gp_context_unref(context);
   gp_object_unref((gp_object*)system);
   
   return EXIT_SUCCESS;
 }
+

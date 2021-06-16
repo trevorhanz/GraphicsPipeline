@@ -1,6 +1,6 @@
 /************************************************************************
-* Copyright (C) 2020 Trevor Hanz
-* 
+* Copyright (C) 2021 Trevor Hanz
+*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
@@ -15,22 +15,31 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#import "WindowDelegate.h"
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include "MacOS.h"
+#include <GraphicsPipeline/Window.h>
+#include <GraphicsPipeline/Logging.h>
 
-#include "Array.h"
-#include "Context.h"
-#include "FrameBuffer.h"
-#include "Input.h"
-#include "System.h"
-#include "Object.h"
-#include "Pipeline.h"
-#include "Shader.h"
-#include "Logging.h"
-#include "Texture.h"
-#include "Types.h"
-#include "Window.h"
+@implementation WindowDelegate
 
-#endif // __GRAPHICS_PIPELINE_H__
+- (instancetype) initWithWindow:(gp_window *)window
+{
+  self = [super init];
+  
+  mWindow = window;
+  
+  return self;
+}
+
+- (void) windowDidResize:(NSNotification *)notification
+{
+  NSRect rect = [mWindow->mView frame];
+  
+  gp_event_resize_t resize;
+  resize.width = rect.size.width;
+  resize.height = rect.size.height;
+  mWindow->mResizeCB(&resize, mWindow->mResizeData);
+}
+
+@end

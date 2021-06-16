@@ -279,6 +279,16 @@ gp_window* gp_window_new(gp_context* context)
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
   window->mDirty = 1;
+  window->mClickCB = NULL;
+  window->mClickData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
+  window->mEnterCB = NULL;
+  window->mEnterData = NULL;
+  window->mKeyCB = NULL;
+  window->mKeyData = NULL;
+  window->mResizeCB = NULL;
+  window->mResizeData = NULL;
   gp_ref_init(&window->mRef);
   gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)window);
   _gp_event_pipe_new(context->mParent->mEvent, window->mPipe);
@@ -345,6 +355,12 @@ void gp_window_unref(gp_window* window)
     close(window->mPipe[0]);
     close(window->mPipe[1]);
     
+    if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+    if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+    if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
+    if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
+    if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+    
     free(window);
   }
 }
@@ -361,9 +377,38 @@ void gp_window_redraw(gp_window* window)
   window->mDirty = 1;
 }
 
+void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
+{
+  XWindowAttributes attributes;
+  XGetWindowAttributes(window->mParent->mDisplay, window->mWindow, &attributes);
+  if(width) *width = attributes.width;
+  if(height) *height = attributes.height;
+}
+
+#define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
+  void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
+  {\
+    if(window->data) gp_object_unref((gp_object*)window->data);\
+    \
+    window->cb = callback;\
+    window->data = userData;\
+    \
+    if(window->data) gp_object_ref((gp_object*)window->data);\
+  }
+
+_GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
+_GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
+_GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
+
 void _gp_window_draw(gp_window* window)
 {
   glXMakeCurrent(window->mParent->mDisplay, window->mWindow, window->mContext);
+  
+  unsigned int width, height;
+  gp_window_get_size(window, &width, &height);
+  _gp_api_prepare_window(width, height);
   
   _gp_pipeline_execute(window->mPipeline);
   

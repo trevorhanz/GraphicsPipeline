@@ -24,17 +24,32 @@
 #import <Cocoa/Cocoa.h>
 
 #include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Window.h>
 
 @interface View : NSOpenGLView
 {
   gp_window*          mWindow;
 }
 
-- (id) initWithFrame:(NSRect)frame;
+- (BOOL) acceptsFirstResponder;
+- (BOOL) acceptsFirstMouse:(NSEvent *)event;
+- (instancetype) initWithFrame:(NSRect)frame pixelFormat:(NSOpenGLPixelFormat *)format;
 - (void) reshape;
 - (void) drawRect:(NSRect)rect;
 - (void) update;
 - (void) setWindow:(gp_window*)window;
+- (void) mouseDown:(NSEvent*)event;
+- (void) mouseUp:(NSEvent*)event;
+- (void) rightMouseDown:(NSEvent *)event;
+- (void) rightMouseUp:(NSEvent *)event;
+- (void) otherMouseDown:(NSEvent *)event;
+- (void) otherMouseUp:(NSEvent *)event;
+- (void) mouseMoved:(NSEvent *)event;
+- (void) mouseEntered:(NSEvent *)event;
+- (void) mouseExited:(NSEvent *)event;
+- (void) keyDown:(NSEvent *)event;
+- (void) keyUp:(NSEvent *)event;
+- (void) handleMouseClick:(gp_button_t)button :(gp_state_t)state :(NSPoint)position;
 @end
 
 #endif // __VIEW_H__

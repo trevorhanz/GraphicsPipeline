@@ -19,6 +19,8 @@
 #define __GP_WINDOWS_COMMON_H__
 
 #include <GraphicsPipeline/Types.h>
+#include <GraphicsPipeline/Input.h>
+#include <GraphicsPipeline/Window.h>
 #include <API/GL/GL.h>
 
 #include "../../Utils/Object.h"
@@ -59,6 +61,19 @@ struct _gp_window
   HWND                  mWindow;
   gp_pipeline*          mPipeline;
   gp_refcounter         mRef;
+
+  gp_event_click_callback_t   mClickCB;
+  gp_pointer*                 mClickData;
+  gp_event_move_callback_t    mMoveCB;
+  gp_pointer*                 mMoveData;
+  gp_event_enter_callback_t   mEnterCB;
+  gp_pointer*                 mEnterData;
+  gp_event_key_callback_t     mKeyCB;
+  gp_pointer*                 mKeyData;
+  gp_event_resize_callback_t  mResizeCB;
+  gp_pointer*                 mResizeData;
+
+  unsigned char               mMouseEntered;
 };
 
 struct _gp_timer

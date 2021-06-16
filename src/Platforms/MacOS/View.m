@@ -29,9 +29,24 @@
 
 @implementation View
 
-- (id) initWithFrame:(NSRect)frame
+- (BOOL) acceptsFirstResponder
 {
-  self = [super initWithFrame:frame];
+  return YES;
+}
+
+- (BOOL) acceptsFirstMouse:(NSEvent *)event
+{
+  return YES;
+}
+
+- (BOOL) canBecomeKeyView
+{
+  return YES;
+}
+
+- (id) initWithFrame:(NSRect)frame pixelFormat:(NSOpenGLPixelFormat *)format
+{
+  self = [super initWithFrame:frame pixelFormat:format];
   
   return self;
 }
@@ -60,6 +75,104 @@
 - (void) setWindow:(gp_window*)window
 {
   mWindow = window;
+}
+
+- (void) mouseDown:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_LEFT :GP_PRESSED :[event locationInWindow]];
+}
+
+- (void) mouseUp:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_LEFT :GP_RELEASED :[event locationInWindow]];
+}
+
+- (void) rightMouseDown:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_RIGHT :GP_PRESSED :[event locationInWindow]];
+}
+
+- (void) rightMouseUp:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_RIGHT :GP_RELEASED :[event locationInWindow]];
+}
+
+- (void) otherMouseDown:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_MIDDLE :GP_PRESSED :[event locationInWindow]];
+}
+
+- (void) otherMouseUp:(NSEvent *)event
+{
+  [self handleMouseClick:GP_BUTTON_MIDDLE :GP_RELEASED :[event locationInWindow]];
+}
+
+- (void) mouseMoved:(NSEvent *)event
+{
+  if(mWindow->mMoveCB)
+  {
+    gp_event_move_t move;
+    move.x = [event locationInWindow].x;
+    move.y = [event locationInWindow].y;
+    mWindow->mMoveCB(&move, mWindow->mMoveData);
+  }
+}
+
+- (void) mouseEntered:(NSEvent *)event
+{
+  if(mWindow->mEnterCB)
+  {
+    gp_event_enter_t enter;
+    enter.enter = 1;
+    mWindow->mEnterCB(&enter, mWindow->mEnterData);
+  }
+}
+
+- (void) mouseExited:(NSEvent *)event
+{
+  if(mWindow->mEnterCB)
+  {
+    gp_event_enter_t enter;
+    enter.enter = 0;
+    mWindow->mEnterCB(&enter, mWindow->mEnterData);
+  }
+}
+
+- (void) keyDown:(NSEvent *)event
+{
+  if(mWindow->mKeyCB)
+  {
+    // TODO: Create keyCode mapping
+    gp_event_key_t key;
+    key.key = event.keyCode;
+    key.state = GP_PRESSED;
+    mWindow->mKeyCB(&key, mWindow->mKeyData);
+  }
+}
+
+- (void) keyUp:(NSEvent *)event
+{
+  if(mWindow->mKeyCB)
+  {
+    // TODO: Create keyCode mapping
+    gp_event_key_t key;
+    key.key = event.keyCode;
+    key.state = GP_RELEASED;
+    mWindow->mKeyCB(&key, mWindow->mKeyData);
+  }
+}
+
+- (void) handleMouseClick:(gp_button_t)button :(gp_state_t)state :(NSPoint)position
+{
+  if(mWindow->mClickCB)
+  {
+    gp_event_click_t click;
+    click.button = button;
+    click.state = state;
+    click.x = position.x;
+    click.y = position.y;
+    mWindow->mClickCB(&click, mWindow->mClickData);
+  }
 }
 
 @end

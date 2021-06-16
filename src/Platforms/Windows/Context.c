@@ -22,6 +22,7 @@
 #include <GL/wglew.h>
 
 #include <GraphicsPipeline/Context.h>
+#include <GraphicsPipeline/Window.h>
 #include "API/GL/GL.h"
 #include "Windows.h"
 #include "Platforms/Defaults.h"
@@ -463,6 +464,17 @@ gp_window* gp_window_new(gp_context* context)
   gp_window* window = malloc(sizeof(struct _gp_window));
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
+  window->mClickCB = NULL;
+  window->mClickData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
+  window->mEnterCB = NULL;
+  window->mEnterData = NULL;
+  window->mKeyCB = NULL;
+  window->mKeyData = NULL;
+  window->mResizeCB = NULL;
+  window->mResizeData = NULL;
+  window->mMouseEntered = 0;
   gp_ref_init(&window->mRef);
   
   DWORD                 dwExStyle;                                  // Window Extended Style
@@ -584,6 +596,33 @@ void gp_window_redraw(gp_window* window)
 {
   RedrawWindow(window->mWindow, 0, 0, RDW_INVALIDATE);
 }
+
+void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
+{
+  RECT rect;
+  if (GetClientRect(window->mWindow, &rect))
+  {
+    if (width) *width = rect.right - rect.left;
+    if (height) *height = rect.bottom - rect.top;
+  }
+}
+
+#define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
+  void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
+  {\
+    if(window->data) gp_object_unref((gp_object*)window->data);\
+    \
+    window->cb = callback;\
+    window->data = userData;\
+    \
+    if(window->data) gp_object_ref((gp_object*)window->data);\
+  }
+
+_GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
+_GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
+_GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 {

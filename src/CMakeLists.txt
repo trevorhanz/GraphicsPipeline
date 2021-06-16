@@ -8,6 +8,8 @@ set(PUBLIC_HEADERS
     ../include/GraphicsPipeline/Common.h
     ../include/GraphicsPipeline/Context.h
     ../include/GraphicsPipeline/Desktop.h
+    ../include/GraphicsPipeline/FrameBuffer.h
+    ../include/GraphicsPipeline/Input.h
     ../include/GraphicsPipeline/GP.h
     ../include/GraphicsPipeline/Logging.h
     ../include/GraphicsPipeline/MacOS.h
@@ -149,7 +151,9 @@ else(ANDROID)
       Platforms/MacOS/View.h
       Platforms/MacOS/Timer.m
       Platforms/MacOS/Timer.h
-      Platforms/MacOS/System.m)
+      Platforms/MacOS/System.m
+      Platforms/MacOS/WindowDelegate.h
+      Platforms/MacOS/WindowDelegate.m)
   elseif(UNIX)
     set(GP_LINUX ON)
     

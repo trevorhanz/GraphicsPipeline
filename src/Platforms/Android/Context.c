@@ -106,6 +106,13 @@ void gp_window_unref(gp_window* window)
   if(gp_ref_dec(&window->mRef))
   {
     _gp_pipeline_free(window->mPipeline);
+    
+    if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+    if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+    if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
+    if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
+    if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+    
     free(window);
   }
 }
@@ -123,6 +130,14 @@ gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow
 {
   gp_window* window = malloc(sizeof(gp_window));
   window->mWindow = awindow;
+  window->mClickCB = NULL;
+  window->mMoveData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
+  window->mKeyCB = NULL;
+  window->mKeyData = NULL;
+  window->mResizeCB = NULL;
+  window->mResizeData = NULL;
   gp_ref_init(&window->mRef);
   
   ANativeWindow_setBuffersGeometry(awindow, 0, 0, context->mFormat);
@@ -154,6 +169,30 @@ gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow
   
   return window;
 }
+
+void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
+{
+  // TODO: fillout with correct values.
+  if(width) *width = 0;
+  if(height) *height = 0;
+}
+
+#define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
+  void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
+  {\
+    if(window->data) gp_object_unref((gp_object*)window->data);\
+    \
+    window->cb = callback;\
+    window->data = userData;\
+    \
+    if(window->data) gp_object_ref((gp_object*)window->data);\
+  }
+
+_GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
+_GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
+_GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 {

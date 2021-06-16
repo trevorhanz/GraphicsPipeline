@@ -20,6 +20,7 @@
 
 #include <GraphicsPipeline/System.h>
 #include <GraphicsPipeline/Logging.h>
+#include <GraphicsPipeline/Window.h>
 
 #include <API/GL/GL.h>
 
@@ -56,6 +57,16 @@ struct _gp_window
   GLuint                                shaderProgram;
   GLint                                 posAttrib;
   gp_pipeline*                          mPipeline;
+  gp_event_click_callback_t             mClickCB;
+  gp_pointer*                           mClickData;
+  gp_event_move_callback_t              mMoveCB;
+  gp_pointer*                           mMoveData;
+  gp_event_enter_callback_t             mEnterCB;
+  gp_pointer*                           mEnterData;
+  gp_event_key_callback_t               mKeyCB;
+  gp_pointer*                           mKeyData;
+  gp_event_resize_callback_t            mResizeCB;
+  gp_pointer*                           mResizeData;
   gp_refcounter                         mRef;
 };
 
