@@ -44,4 +44,11 @@ int gp_ref_dec(gp_refcounter* ref)
 #endif
 }
 
-
+unsigned gp_ref_get_count(gp_refcounter* ref)
+{
+#ifndef GP_ATOMICS
+  return ref->mRefCount;
+#else
+  return atomic_load(&ref->mRefCount);
+#endif
+}

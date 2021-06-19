@@ -45,6 +45,13 @@ GP_EXPORT void gp_object_ref(gp_object* object);
  */
 GP_EXPORT void gp_object_unref(gp_object* object);
 
+/*!
+ * Retrieve the reference count of a gp_object.
+ * \param object Object for which to retrieve the reference count.
+ * \return The reference count on a gp_object.
+ */
+GP_EXPORT unsigned gp_object_get_count(gp_object* object);
+
 //! \} // Object
 
 #ifdef __cplusplus
@@ -68,6 +75,12 @@ namespace GP
     //! Destructor
     inline ~Object();
     
+    /*!
+     * Retrieve the reference count.
+     * \return The reference count.
+     */
+    inline unsigned GetCount();
+    
     //! Equal operator
     inline const Object& operator = (const Object& other);
     
@@ -85,6 +98,7 @@ namespace GP
     gp_object_ref(mObject);
   }
   Object::~Object() {gp_object_unref(mObject);}
+  unsigned Object::GetCount() {return gp_object_get_count(mObject);}
   const Object& Object::operator = (const Object& other)
   {
     gp_object_unref(mObject);

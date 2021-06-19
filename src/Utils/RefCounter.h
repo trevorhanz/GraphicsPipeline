@@ -51,6 +51,7 @@ extern "C" {
 void gp_ref_init(gp_refcounter* ref);
 void gp_ref_inc(gp_refcounter* ref);
 int gp_ref_dec(gp_refcounter* ref);
+unsigned gp_ref_get_count(gp_refcounter* ref);
 
 #ifdef __cplusplus
 }

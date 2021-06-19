@@ -30,6 +30,11 @@ void gp_object_unref(gp_object* object)
   }
 }
 
+unsigned gp_object_get_count(gp_object* object)
+{
+  return gp_ref_get_count(&object->mRef);
+}
+
 void _gp_object_init(gp_object* object, gp_object_free func)
 {
   gp_ref_init(&object->mRef);
