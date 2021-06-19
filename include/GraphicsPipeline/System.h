@@ -160,6 +160,9 @@ namespace GP
     //! Constructor
     inline System();
     
+    //! Constructor
+    inline System(gp_system* system);
+    
     //! Destructor
     inline ~System();
     
@@ -204,7 +207,7 @@ namespace GP
      * Sets callback function to be called at timeout.
      * \param callback Callback function to be called.
      */
-    inline void SetCallback(std::function<void(Timer*)> callback);
+    inline void SetCallback(std::function<void(Timer&)> callback);
     
     /*!
      * Start timer count down.
@@ -222,7 +225,7 @@ namespace GP
     
     struct CallbackData
     {
-      std::function<void(Timer*)>           mCallback;
+      std::function<void(Timer&)>           mCallback;
     };
   };
   
@@ -232,10 +235,13 @@ namespace GP
   class IO : public Object
   {
   protected:
+    //! Constructor. Only for internal use.
+    inline IO(void* io);
+    
+  public:
     //! Constructor
     inline IO(gp_io* io);
     
-  public:
     //! Destructor
     inline ~IO();
     
@@ -243,14 +249,14 @@ namespace GP
      * Sets callback function to be called at timeout.
      * \param callback Callback function to be called.
      */
-    inline void SetCallback(std::function<void(IO*)> callback);
+    inline void SetCallback(std::function<void(IO&)> callback);
     
   private:
     inline static void HandleUpdate(gp_io* io);
     
     struct CallbackData
     {
-      std::function<void(IO*)>              mCallback;
+      std::function<void(IO&)>              mCallback;
     };
     
     friend class System;
@@ -277,16 +283,17 @@ namespace GP
   //
   // Implementation
   //
-  System::System() : Object((gp_object*)gp_system_new()) {}
+  System::System() : Object((void*)gp_system_new()) {}
+  System::System(gp_system* system) : Object((gp_object*)system) {}
   System::~System() {}
   void System::Run() {gp_system_run((gp_system*)mObject);}
   void System::Stop() {gp_system_stop((gp_system*)mObject);}
   
-  Timer::Timer(gp_timer* timer) : Object((gp_object*)timer) {gp_object_ref((gp_object*)timer);}
-  Timer::Timer(const System& system) : Object((gp_object*)gp_timer_new((gp_system*)system.mObject)) {}
+  Timer::Timer(gp_timer* timer) : Object((gp_object*)timer) {}
+  Timer::Timer(const System& system) : Object((void*)gp_timer_new((gp_system*)system.mObject)) {}
   Timer::Timer(const Object& other) : Object(other) {}
   Timer::~Timer() {}
-  void Timer::SetCallback(std::function<void(Timer*)> callback)
+  void Timer::SetCallback(std::function<void(Timer&)> callback)
   {
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
@@ -297,14 +304,15 @@ namespace GP
   {
     CallbackData* data = (CallbackData*)gp_timer_get_userdata(timer);
     Timer t = timer;
-    data->mCallback(&t);
+    data->mCallback(t);
   }
   void Timer::Arm(double seconds) {gp_timer_arm((gp_timer*)mObject, seconds);}
   void Timer::Disarm() {gp_timer_disarm((gp_timer*)mObject);}
   
+  IO::IO(void* io) : Object((void*)io) {}
   IO::IO(gp_io* io) : Object((gp_object*)io) {}
   IO::~IO() {}
-  void IO::SetCallback(std::function<void(IO*)> callback)
+  void IO::SetCallback(std::function<void(IO&)> callback)
   {
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
@@ -315,10 +323,10 @@ namespace GP
   {
     CallbackData* data = (CallbackData*)gp_io_get_userdata(io);
     IO i = io;
-    data->mCallback(&i);
+    data->mCallback(i);
   }
   
-  ReadIO::ReadIO(const System& system, int fd) : IO(gp_io_read_new((gp_system*)system.mObject, fd)) {}
+  ReadIO::ReadIO(const System& system, int fd) : IO((void*)gp_io_read_new((gp_system*)system.mObject, fd)) {}
   
   WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)system.mObject, fd)) {}
 }

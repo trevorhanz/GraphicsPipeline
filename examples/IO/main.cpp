@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   System system;
   
   ReadIO io(system, 0); // STDIN;
-  io.SetCallback([](IO*)
+  io.SetCallback([](IO&)
   {
     std::string in;
     std::cin >> in;

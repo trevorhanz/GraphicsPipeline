@@ -65,9 +65,9 @@ int main(int argc, char* argv[])
   
   int frame = 0;
   Timer timer(system);
-  timer.SetCallback([&](Timer* timer)
+  timer.SetCallback([&](Timer& timer)
   {
-    timer->Arm(TIMEOUT);
+    timer.Arm(TIMEOUT);
     
     float offset = frame%200/200.0;
     if(offset > .5) offset = 1.0-offset;

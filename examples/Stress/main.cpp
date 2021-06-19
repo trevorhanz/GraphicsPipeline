@@ -208,7 +208,7 @@ public:
     gettimeofday(&mBeginFrame, NULL);
     
     Timer timer(mSystem);
-    timer.SetCallback(std::function<void(Timer*)>([&](Timer* timer){
+    timer.SetCallback(std::function<void(Timer&)>([&](Timer& timer){
       // Redraw Window
       mWindow.Redraw();
       
@@ -225,7 +225,7 @@ public:
       }
       
       ++mFrame;
-      timer->Arm(.01);
+      timer.Arm(.01);
     }));
     timer.Arm(.01);
     

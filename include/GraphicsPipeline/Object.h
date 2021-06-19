@@ -65,10 +65,13 @@ namespace GP
   class Object
   {
   protected:
+    //! Constructor.  Only for internal use.
+    inline Object(void* object);
+    
+  public:
     //! Constructor
     inline Object(gp_object* object);
     
-  public:
     //! Copy Constructor
     inline Object(const Object& other);
     
@@ -81,6 +84,12 @@ namespace GP
      */
     inline unsigned GetCount();
     
+    /*!
+     * Get underlying gp_object. Object's ref count will be incremented.
+     * \return Underlying gp_object.
+     */
+    inline gp_object* GetObject();
+    
     //! Equal operator
     inline const Object& operator = (const Object& other);
     
@@ -91,7 +100,8 @@ namespace GP
   //
   // Implementation
   //
-  Object::Object(gp_object* object) : mObject(object) {}
+  Object::Object(void* object) : mObject((gp_object*)object) {}
+  Object::Object(gp_object* object) : mObject(object) {gp_object_ref(mObject);}
   Object::Object(const Object& other)
   {
     mObject = other.mObject;
@@ -99,6 +109,7 @@ namespace GP
   }
   Object::~Object() {gp_object_unref(mObject);}
   unsigned Object::GetCount() {return gp_object_get_count(mObject);}
+  gp_object* Object::GetObject() {gp_object_ref(mObject); return mObject;}
   const Object& Object::operator = (const Object& other)
   {
     gp_object_unref(mObject);

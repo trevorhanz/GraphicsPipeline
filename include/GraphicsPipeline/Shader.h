@@ -318,10 +318,13 @@ namespace GP
   class Uniform : public Object
   {
   protected:
+    //! Constructor. Only for internal use.
+    inline Uniform(void* uniform);
+    
+  public:
     //! Constructor
     inline Uniform(gp_uniform* uniform);
     
-  public:
     //! Copy Constructor
     inline Uniform(const Object& other);
     
@@ -355,7 +358,7 @@ namespace GP
      */\
     inline type Get();\
   };\
-  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform(gp_uniform_##Cname##_new_by_name(GetShader(shader), name)) {}\
+  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name(GetShader(shader), name)) {}\
   void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)mObject, data);}\
   type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)mObject);}
   
@@ -426,6 +429,7 @@ namespace GP
     return *this;
   }
   
+  Uniform::Uniform(void* uniform) : Object((void*)uniform) {}
   Uniform::Uniform(gp_uniform* uniform) : Object((gp_object*)uniform) {}
   Uniform::Uniform(const Object& other) : Object(other) {}
   Uniform::~Uniform() {}
