@@ -29,6 +29,10 @@ extern "C" {
  * \brief \ref Object object.
  * Default base class for all objects.
  * 
+ * \typedef gp_pointer
+ * \brief \ref Pointer object.
+ * Memory managed pointer.
+ * 
  * \typedef gp_system
  * \brief \ref System object.
  * Controls the main event loop and creates system specific rendering contexts.
@@ -87,6 +91,7 @@ extern "C" {
  * \brief Event io object.
  */
 typedef struct _gp_object gp_object;
+typedef struct _gp_pointer gp_pointer;
 typedef struct _gp_system gp_system;
 typedef struct _gp_context gp_context;
 typedef struct _gp_window gp_window;
@@ -121,6 +126,11 @@ typedef void(*gp_timer_callback)(gp_timer* timer);
  */
 typedef void(*gp_io_callback)(gp_io* io);
 
+/*!
+ * \brief Callback function for custom dealocation.
+ * \param data Data to be freed.
+ */
+typedef void(*gp_free)(void* data);
 
 #ifdef __cplusplus
 }

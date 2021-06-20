@@ -56,7 +56,7 @@ typedef struct
   _gp_event*              mEvent;
   int                     mFD;
   gp_timer_callback       mCallback;
-  void*                   mUserData;
+  gp_pointer*             mUserData;
 } _gp_timer_data;
 
 struct _gp_timer
@@ -72,7 +72,7 @@ struct _gp_io
   _gp_event*              mEvent;
   int                     mFD;
   gp_io_callback          mCallback;
-  void*                   mUserData;
+  gp_pointer*             mUserData;
 };
 
 void _gp_event_fd_set(int fd, fd_set* fds, int* max_fd) {
@@ -204,6 +204,11 @@ void _gp_timer_free(gp_object* object)
   
   gp_list_remove(&timer->mTimer.mEvent->mTimer, (gp_list_node*)&timer->mTimer);
   
+  if(timer->mTimer.mUserData)
+  {
+    gp_object_unref((gp_object*)timer->mTimer.mUserData);
+  }
+  
   free(timer);
 }
 
@@ -214,6 +219,7 @@ gp_timer* _gp_event_timer_new(_gp_event* event)
   timer->mTimer.mEvent = event;
   timer->mTimer.mFD = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
   timer->mTimer.mCallback = NULL;
+  timer->mTimer.mUserData = NULL;
   
   _gp_event_fd_set(timer->mTimer.mFD, &event->mReadFDs, &event->mReadFDMax);
   
@@ -227,12 +233,22 @@ void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
   timer->mTimer.mCallback = callback;
 }
 
-void gp_timer_set_userdata(gp_timer* timer, void* userdata)
+void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
 {
+  if(timer->mTimer.mUserData)
+  {
+    gp_object_unref((gp_object*)timer->mTimer.mUserData);
+  }
+  
   timer->mTimer.mUserData = userdata;
+  
+  if(timer->mTimer.mUserData)
+  {
+    gp_object_ref((gp_object*)timer->mTimer.mUserData);
+  }
 }
 
-void* gp_timer_get_userdata(gp_timer* timer)
+gp_pointer* gp_timer_get_userdata(gp_timer* timer)
 {
   return timer->mTimer.mUserData;
 }
@@ -268,6 +284,11 @@ void _gp_io_free(gp_object* object)
   
   gp_list_remove(&io->mEvent->mIORead, &io->mNode);
   gp_list_remove(&io->mEvent->mIOWrite, &io->mNode);
+  
+  if(io->mUserData)
+  {
+    gp_object_unref((gp_object*)io->mUserData);
+  }
   
   free(io);
 }
@@ -309,12 +330,22 @@ void gp_io_set_callback(gp_io* io, gp_io_callback callback)
   io->mCallback = callback;
 }
 
-void gp_io_set_userdata(gp_io* io, void* userdata)
+void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
 {
+  if(io->mUserData)
+  {
+    gp_object_unref((gp_object*)io->mUserData);
+  }
+  
   io->mUserData = userdata;
+  
+  if(io->mUserData)
+  {
+    gp_object_ref((gp_object*)io->mUserData);
+  }
 }
 
-void* gp_io_get_userdata(gp_io* io)
+gp_pointer* gp_io_get_userdata(gp_io* io)
 {
   return io->mUserData;
 }

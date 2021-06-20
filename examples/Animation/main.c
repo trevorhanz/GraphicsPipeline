@@ -69,7 +69,7 @@ void TimerCallback(gp_timer* timer)
 {
   gp_timer_arm(timer, TIMEOUT);
   
-  animation_data* data = gp_timer_get_userdata(timer);
+  animation_data* data = gp_pointer_get_pointer(gp_timer_get_userdata(timer));
   
   data->position[0] += data->direction[0]*TIMEOUT;
   data->position[1] += data->direction[1]*TIMEOUT;
@@ -115,11 +115,13 @@ int main(int argc, char* argv[])
   data->position[0] = 0;
   data->position[1] = 0;
   gettimeofday(&data->beginFrame, NULL);
+  gp_pointer* pointer = gp_pointer_new(data, free);
   
   gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, TimerCallback);
-  gp_timer_set_userdata(timer, data);
+  gp_timer_set_userdata(timer, pointer);
   gp_timer_arm(timer, TIMEOUT);
+  gp_object_unref((gp_object*)pointer);
   
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 30);

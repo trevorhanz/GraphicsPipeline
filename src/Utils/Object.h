@@ -29,6 +29,13 @@ struct _gp_object
   gp_object_free          mFree;
 };
 
+struct _gp_pointer
+{
+  gp_object               mObject;
+  void*                   mPointer;
+  gp_free                 mFree;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

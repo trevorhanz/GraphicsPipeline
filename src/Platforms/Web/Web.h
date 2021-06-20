@@ -61,9 +61,10 @@ struct _gp_window
 
 struct _gp_timer
 {
+  gp_object                             mObject;
   int                                   mTimerID;
   gp_timer_callback                     mCallback;
-  void*                                 mUserData;
+  gp_pointer*                           mUserData;
 };
 
 struct _gp_io

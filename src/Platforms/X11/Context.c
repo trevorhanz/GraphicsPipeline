@@ -226,9 +226,11 @@ gp_context* gp_context_new(gp_system* system)
   context->mWorkCtx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare, True, context_attribs);
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
+  gp_pointer* pointer = gp_pointer_new(context, 0);
   context->mWorkIO = gp_io_read_new(system, context->mWorkPipe[0]);
   gp_io_set_callback(context->mWorkIO, _gp_work_done);
-  gp_io_set_userdata(context->mWorkIO, context);
+  gp_io_set_userdata(context->mWorkIO, pointer);
+  gp_object_unref((gp_object*)pointer);
   
   pthread_mutex_init(&context->mWorkMutex, NULL);
   pthread_cond_init(&context->mWorkCV, NULL);
@@ -282,9 +284,11 @@ gp_window* gp_window_new(gp_context* context)
   gp_list_push_back(&context->mParent->mTargets, (gp_list_node*)window);
   _gp_event_pipe_new(context->mParent->mEvent, window->mPipe);
   
+  gp_pointer* pointer = gp_pointer_new(window, 0);
   window->mWake = gp_io_read_new(context->mParent, window->mPipe[0]);
   gp_io_set_callback(window->mWake, _gp_window_wake_callback);
-  gp_io_set_userdata(window->mWake, window);
+  gp_io_set_userdata(window->mWake, pointer);
+  gp_object_unref((gp_object*)pointer);
   
   XSetWindowAttributes attr;
   attr.colormap = context->mColorMap;

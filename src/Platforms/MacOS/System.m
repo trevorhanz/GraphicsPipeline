@@ -68,6 +68,8 @@ void _gp_io_free(gp_object* object)
 {
   gp_io* io = (gp_io*)object;
   
+  if(io->mUserData) gp_object_unref((gp_object*)io->mUserData);
+  
   free(io);
 }
 
@@ -79,6 +81,7 @@ gp_io* gp_io_read_new(gp_system*  system, int fd)
   io->mHandle.readabilityHandler = ^(NSFileHandle* fh){
     io->mCallback(io);
   };
+  io->mUserData = NULL;
   
   return io;
 }

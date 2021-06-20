@@ -74,14 +74,14 @@ GP_EXPORT void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback
  * \param timer Pointer to timer object.
  * \param userdata Pointer to user defined data.
  */
-GP_EXPORT void gp_timer_set_userdata(gp_timer* timer, void* userdata);
+GP_EXPORT void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata);
 
 /*!
  * Get user defined data to be associated with a gp_timer object.
  * \param timer Pointer to timer object.
  * \return Pointer to user defined data.
  */
-GP_EXPORT void* gp_timer_get_userdata(gp_timer* timer);
+GP_EXPORT gp_pointer* gp_timer_get_userdata(gp_timer* timer);
 
 /*!
  * Start the timer count down.
@@ -130,14 +130,14 @@ GP_EXPORT void gp_io_set_callback(gp_io* io, gp_io_callback callback);
  * \param io Pointer to io object.
  * \param userdata Pointer to user defined data.
  */
-GP_EXPORT void gp_io_set_userdata(gp_io* io, void* userdata);
+GP_EXPORT void gp_io_set_userdata(gp_io* io, gp_pointer* userdata);
 
 /*!
  * Get user defined data to be associated with a gp_timer object.
  * \param io Pointer to io object.
  * \return Pointer to user defined data.
  */
-GP_EXPORT void* gp_io_get_userdata(gp_io* io);
+GP_EXPORT gp_pointer* gp_io_get_userdata(gp_io* io);
 
 //! \} // System
 
@@ -297,12 +297,14 @@ namespace GP
   {
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
+    auto pointer = Pointer(data).GetObject();
     gp_timer_set_callback((gp_timer*)mObject, HandleTimeout);
-    gp_timer_set_userdata((gp_timer*)mObject, (void*)data);
+    gp_timer_set_userdata((gp_timer*)mObject, (gp_pointer*)pointer);
+    gp_object_unref(pointer);
   }
   void Timer::HandleTimeout(gp_timer* timer)
   {
-    CallbackData* data = (CallbackData*)gp_timer_get_userdata(timer);
+    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
     Timer t = timer;
     data->mCallback(t);
   }
@@ -316,12 +318,14 @@ namespace GP
   {
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
+    auto pointer = Pointer(data).GetObject();
     gp_io_set_callback((gp_io*)mObject, HandleUpdate);
-    gp_io_set_userdata((gp_io*)mObject, (void*)data);
+    gp_io_set_userdata((gp_io*)mObject, (gp_pointer*)pointer);
+    gp_object_unref(pointer);
   }
   void IO::HandleUpdate(gp_io* io)
   {
-    CallbackData* data = (CallbackData*)gp_io_get_userdata(io);
+    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(gp_io_get_userdata(io));
     IO i = io;
     data->mCallback(i);
   }

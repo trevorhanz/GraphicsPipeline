@@ -19,22 +19,27 @@
 
 #include <stdlib.h>
 
-void gp_timer_free(gp_timer* timer)
-{
-  free(timer);
-}
-
 void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
 {
   timer->mCallback = callback;
 }
 
-void gp_timer_set_userdata(gp_timer* timer, void* userdata)
+void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
 {
+  if(timer->mUserData)
+  {
+    gp_object_unref((gp_object*)timer->mUserData);
+  }
+  
   timer->mUserData = userdata;
+  
+  if(timer->mUserData)
+  {
+    gp_object_ref((gp_object*)timer->mUserData);
+  }
 }
 
-void* gp_timer_get_userdata(gp_timer* timer)
+gp_pointer* gp_timer_get_userdata(gp_timer* timer)
 {
   return timer->mUserData;
 }
@@ -68,11 +73,11 @@ void gp_io_set_callback(gp_io* io, gp_io_callback callback)
 {
 }
 
-void gp_io_set_userdata(gp_io* io, void* userdata)
+void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
 {
 }
 
-void* gp_io_get_userdata(gp_io* io)
+gp_pointer* gp_io_get_userdata(gp_io* io)
 {
   return NULL;
 }

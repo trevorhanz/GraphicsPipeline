@@ -25,16 +25,17 @@
   NSTimer*                  mTimer;
   gp_timer*                 mGPTimer;
   gp_timer_callback         mCallback;
-  void*                     mUserdata;
+  gp_pointer*               mUserData;
 }
 
+- (void) dealloc;
 - (Timer*) init:(gp_timer*)timer;
 - (void) Arm:(double)seconds;
 - (void) Disarm;
 - (void) HandleTimeout:(NSTimer*)timer;
 - (void) SetCallback:(gp_timer_callback) callback;
-- (void) SetUserData:(void*)userdata;
-- (void*) GetUserData;
+- (void) SetUserData:(gp_pointer*)userdata;
+- (gp_pointer*) GetUserData;
 
 @end
 

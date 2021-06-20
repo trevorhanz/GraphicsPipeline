@@ -185,7 +185,7 @@ typedef struct
 
 void TimeoutFunc(gp_timer* timer)
 {
-  TimeoutData* data = (TimeoutData*)gp_timer_get_userdata(timer);
+  TimeoutData* data = (TimeoutData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
   
   gp_uniform_float_set(data->offsetWave, gp_uniform_float_get(data->offsetWave)+.01);
   
@@ -402,11 +402,13 @@ int main(int argc, char* argv[])
   TimeoutData* data = malloc(sizeof(TimeoutData));
   data->offsetWave = offsetWave;
   data->window = window;
+  gp_pointer* pointer = gp_pointer_new(data, free);
   
   gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, &TimeoutFunc);
-  gp_timer_set_userdata(timer, data);
+  gp_timer_set_userdata(timer, pointer);
   gp_timer_arm(timer, 0.01);
+  gp_object_unref((gp_object*)pointer);
   
   gp_system_run(system);
   

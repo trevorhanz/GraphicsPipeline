@@ -54,9 +54,22 @@ void gp_system_stop(gp_system* system)
   system->mState &= ~GP_STATE_RUNNING;
 }
 
+void _gp_timer_free(gp_object* object)
+{
+  gp_timer* timer = (gp_timer*)object;
+  
+  if(timer->mUserData)
+  {
+    gp_object_unref((gp_object*)timer->mUserData);
+  }
+  
+  free(timer);
+}
+
 gp_timer* gp_timer_new(gp_system* system)
 {
   gp_timer* timer = malloc(sizeof(gp_timer));
+  _gp_object_init(&timer->mObject, _gp_timer_free);
   timer->mTimerID = -1;
   timer->mCallback = NULL;
   timer->mUserData = NULL;

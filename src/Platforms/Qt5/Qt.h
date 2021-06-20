@@ -61,7 +61,7 @@ struct _gp_timer
   gp_object               mObject;
   QTimer*                 mTimer;
   TimerCallback*          mTimerCallback;
-  void*                   mUserData;
+  gp_pointer*             mUserData;
 };
 
 struct _gp_io
@@ -69,7 +69,7 @@ struct _gp_io
   gp_object               mObject;
   QSocketNotifier*        mSocketNotifier;
   IOCallback*             mIOCallback;
-  void*                   mUserData;
+  gp_pointer*             mUserData;
 };
 
 #endif // __GP_QT_COMMON_H__

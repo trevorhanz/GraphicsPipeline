@@ -80,10 +80,13 @@ void _gp_work_timeout(gp_timer* timer)
 
 void _gp_context_build(gp_context* context)
 {
+  gp_pointer* pointer = gp_pointer_new(context, 0);
+  
   context->mWorkTimer = gp_timer_new(system);
   gp_timer_set_callback(context->mWorkTimer, _gp_work_timeout);
-  gp_timer_set_userdata(context->mWorkTimer, context);
+  gp_timer_set_userdata(context->mWorkTimer, pointer);
   gp_list_init(&context->mWork);
+  gp_object_unref((gp_object*)pointer);
   
   sContext = context;
   

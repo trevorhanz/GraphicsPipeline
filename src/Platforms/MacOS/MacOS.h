@@ -78,7 +78,7 @@ struct _gp_io
   gp_object               mObject;
   NSFileHandle*           mHandle;
   gp_io_callback          mCallback;
-  void*                   mUserData;
+  gp_pointer*             mUserData;
 };
 
 #endif // __MACOS_COMMON_H__

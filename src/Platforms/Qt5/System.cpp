@@ -58,6 +58,11 @@ void _gp_timer_free(gp_object* object)
 {
   gp_timer* timer = (gp_timer*)object;
   
+  if(timer->mUserData)
+  {
+    gp_object_unref((gp_object*)timer->mUserData);
+  }
+  
   delete timer->mTimer;
   delete timer->mTimerCallback;
   delete timer;
@@ -79,6 +84,11 @@ extern "C" gp_timer* gp_timer_new(gp_system* system)
 void _gp_io_free(gp_object* object)
 {
   gp_io* io = (gp_io*)object;
+  
+  if(io->mUserData)
+  {
+    gp_object_unref((gp_object*)io->mUserData);
+  }
   
   delete io->mSocketNotifier;
   delete io->mIOCallback;

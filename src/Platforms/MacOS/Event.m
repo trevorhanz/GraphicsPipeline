@@ -22,12 +22,12 @@ void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
   [timer->mTimer SetCallback:callback];
 }
 
-void gp_timer_set_userdata(gp_timer* timer, void* userdata)
+void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
 {
   [timer->mTimer SetUserData:userdata];
 }
 
-void* gp_timer_get_userdata(gp_timer* timer)
+gp_pointer* gp_timer_get_userdata(gp_timer* timer)
 {
   return [timer->mTimer GetUserData];
 }
@@ -47,12 +47,16 @@ void gp_io_set_callback(gp_io* io, gp_io_callback callback)
   io->mCallback = callback;
 }
 
-void gp_io_set_userdata(gp_io* io, void* userdata)
+void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
 {
+  if(io->mUserData) gp_object_unref((gp_object*)io->mUserData);
+  
   io->mUserData = userdata;
+  
+  if(io->mUserData) gp_object_ref((gp_object*)io->mUserData);
 }
 
-void* gp_io_get_userdata(gp_io* io)
+gp_pointer* gp_io_get_userdata(gp_io* io)
 {
   return io->mUserData;
 }

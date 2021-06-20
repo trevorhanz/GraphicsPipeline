@@ -66,7 +66,7 @@ struct _gp_timer
   gp_object             mObject;
   gp_system*            mSystem;
   gp_timer_callback     mCallback;
-  void*                 mUserData;
+  gp_pointer*           mUserData;
 };
 
 struct _gp_io
@@ -74,7 +74,7 @@ struct _gp_io
   gp_object             mObject;
   gp_system*            mSystem;
   gp_io_callback        mCallback;
-  void*                 mUserData;
+  gp_pointer*           mUserData;
 };
 
 void _gp_work_done(void* data);

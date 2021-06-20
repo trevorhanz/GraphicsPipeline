@@ -17,6 +17,8 @@
 
 #include "Object.h"
 
+#include <stdlib.h>
+
 void gp_object_ref(gp_object* object)
 {
   gp_ref_inc(&object->mRef);
@@ -41,4 +43,26 @@ void _gp_object_init(gp_object* object, gp_object_free func)
   object->mFree = func;
 }
 
+void _gp_pointer_free(gp_object* object)
+{
+  if(((gp_pointer*)object)->mFree)
+  {
+    ((gp_pointer*)object)->mFree(((gp_pointer*)object)->mPointer);
+  }
+  free(object);
+}
 
+gp_pointer* gp_pointer_new(void* pointer, gp_free free_func)
+{
+  gp_pointer* result = (gp_pointer*)malloc(sizeof(gp_pointer));
+  _gp_object_init(&result->mObject, _gp_pointer_free);
+  result->mPointer = pointer;
+  result->mFree = free_func;
+  
+  return result;
+}
+
+void* gp_pointer_get_pointer(gp_pointer* pointer)
+{
+  return pointer->mPointer;
+}

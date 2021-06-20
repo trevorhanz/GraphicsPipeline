@@ -52,6 +52,20 @@ GP_EXPORT void gp_object_unref(gp_object* object);
  */
 GP_EXPORT unsigned gp_object_get_count(gp_object* object);
 
+/*!
+ * Creates a new pointer object.
+ * \param pointer Pointer to be stored in gp_pointer object.
+ * \return Newly created gp_pointer object.
+ */
+GP_EXPORT gp_pointer* gp_pointer_new(void* pointer, gp_free free_func);
+
+/*!
+ * Retrieve the underlying pointer in a gp_pointer object.
+ * \param pointer Object for which to retrieve the pointer.
+ * \return Pointer contained inside the gp_pointer object.
+ */
+GP_EXPORT void* gp_pointer_get_pointer(gp_pointer* pointer);
+
 //! \} // Object
 
 #ifdef __cplusplus
@@ -97,6 +111,33 @@ namespace GP
     gp_object*                mObject;
   };
   
+  /*!
+   * \brief Wrapper class for ::gp_pointer
+   */
+  class Pointer : public Object
+  {
+  public:
+    //! Constructor
+    inline Pointer(gp_pointer* pointer);
+    
+    //! Constructor
+    template <typename T>
+    inline Pointer(T* pointer);
+    
+    //! Constructor
+    inline Pointer(void* pointer, gp_free free_func);
+    
+    /*!
+     * Retrieve the underlying pointer.
+     * \return Underlying pointer.
+     */
+    inline void* GetPointer();
+    
+  private:
+    template <typename T>
+    inline static void Deleter(void* data);
+  };
+  
   //
   // Implementation
   //
@@ -118,6 +159,13 @@ namespace GP
     return *this;
   }
   
+  Pointer::Pointer(gp_pointer* pointer) : Object((gp_object*)pointer) {}
+  template <typename T>
+  Pointer::Pointer(T* pointer) : Object((void*)gp_pointer_new(pointer, Deleter<T>)) {}
+  Pointer::Pointer(void* pointer, gp_free free_func) : Object((void*)gp_pointer_new(pointer, free_func)) {}
+  void* Pointer::GetPointer() {return gp_pointer_get_pointer((gp_pointer*)mObject);}
+  template <typename T>
+  void Pointer::Deleter(void* data) {delete ((T*)data);}
 }
 
 #endif // __cplusplus

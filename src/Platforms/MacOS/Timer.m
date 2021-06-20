@@ -19,9 +19,17 @@
 
 #include "Timer.h"
 
+#include <GraphicsPipeline/Object.h>
 #include <GraphicsPipeline/Logging.h>
 
 @implementation Timer
+
+- (void) dealloc
+{
+  if(mUserData) gp_object_unref((gp_object*)mUserData);
+  
+  [super dealloc];
+}
 
 - (Timer*) init:(gp_timer *)timer
 {
@@ -29,7 +37,7 @@
   {
     mGPTimer = timer;
     mCallback = NULL;
-    mUserdata = NULL;
+    mUserData = NULL;
   }
   
   return self;
@@ -61,14 +69,18 @@
   mCallback = callback;
 }
 
-- (void)SetUserData:(void *)userdata
+- (void)SetUserData:(gp_pointer*)userdata
 {
-  mUserdata = userdata;
+  if(mUserData) gp_object_unref((gp_object*)mUserData);
+  
+  mUserData = userdata;
+  
+  if(mUserData) gp_object_ref((gp_object*)mUserData);
 }
 
-- (void *)GetUserData
+- (gp_pointer*)GetUserData
 {
-  return mUserdata;
+  return mUserData;
 }
 
 @end
