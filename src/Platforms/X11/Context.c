@@ -100,7 +100,7 @@ void _gp_work_done(gp_io* io)
 
 void _gp_window_wake_callback(gp_io* io)
 {
-  gp_window* window = (gp_window*)gp_io_get_userdata(io);
+  gp_window* window = (gp_window*)gp_pointer_get_pointer(gp_io_get_userdata(io));
   for(;;)
   {
     char ch;
