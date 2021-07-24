@@ -58,6 +58,56 @@ gp_context* gp_qt_context_new();
  * \return Pointer to QWidget used by window.
  */
 QWidget* gp_window_get_qwidget(gp_window* window);
-#endif
+
+namespace GP
+{
+namespace Qt
+{
+  /*!
+   * \brief Wrapper class for ::gp_system extended for Qt features.
+   */
+  class System : public GP::System
+  {
+  public:
+    inline System(int* argc, char** argv);
+  };
+  
+  /*!
+   * \brief Wrapper class for ::gp_context extended for Qt features.
+   */
+  class Context : public GP::Context
+  {
+  public:
+    inline Context();
+  };
+  
+  /*!
+   * \brief Wrapper class for ::gp_window extended for Qt features.
+   */
+  class Window : public GP::Window
+  {
+  public:
+    inline Window(const GP::Context& context);
+    
+    /*!
+     * Retrieve QWidget associated with a gp_window.
+     * \return Pointer to QWidget used by the window.
+     */
+    inline QWidget* GetQWidget();
+  };
+  
+  //
+  // Implementation
+  //
+  System::System(int* argc, char** argv) : GP::System(gp_qt_system_new(argc, argv)) {}
+  
+  Context::Context() : GP::Context(gp_qt_context_new()) {}
+  
+  Window::Window(const GP::Context& context) : GP::Window(context) {}
+  QWidget* Window::GetQWidget() {return gp_window_get_qwidget(GetWindow());}
+}
+}
+
+#endif // __cplusplus
 
 #endif // __GP_QT5_H__

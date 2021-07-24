@@ -107,6 +107,7 @@ namespace GP
     
   protected:
     inline static gp_context* GetContext(const Context& context);
+    inline gp_window* GetWindow() {return mWindow;}
     
   private:
     gp_window*        mWindow;
