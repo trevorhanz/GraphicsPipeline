@@ -22,28 +22,28 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-const char* vertexSource =
-    "#version 300 es\n"
-    "precision highp float;                       \n"
-    "in vec3 position;                     \n"
-    "in vec2 UV;                           \n"
-    "uniform vec2 Offset;                         \n"
-    "out vec2 uv;                             \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  uv = UV;                                   \n"
-    "  gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);\n"
-    "}                                            \n";
-const char* fragmentSource =
-    "#version 300 es\n"
-    "precision highp float;                       \n"
-    "in vec2 uv;                             \n"
-    "uniform sampler2D Texture;                   \n"
-    "out vec4 fragColor;\n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  fragColor = texture(Texture, uv);       \n"
-    "}                                            \n";
+#include "../Common.h"
+
+const char* vertexSource = GLSL(
+  precision highp float;
+  in vec3 position;
+  in vec2 UV;
+  uniform vec2 Offset;
+  out vec2 uv;
+  void main()
+  {
+    uv = UV;
+    gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);
+  });
+const char* fragmentSource = GLSL(
+  precision highp float;
+  in vec2 uv;
+  uniform sampler2D Texture;
+  out vec4 fragColor;
+  void main()
+  {
+    fragColor = texture(Texture, uv);
+  });
 float vertexData[] = {
   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
   -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
   data->position[0] = 0;
   data->position[1] = 0;
   gettimeofday(&data->beginFrame, NULL);
-  gp_pointer* pointer = gp_pointer_new(data, free);
+  gp_pointer* pointer = gp_pointer_new(data, 0);
   
   gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, TimerCallback);

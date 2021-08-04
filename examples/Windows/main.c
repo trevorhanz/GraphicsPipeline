@@ -20,17 +20,21 @@
 
 #include <stdlib.h>
 
-const char* vertexSource =
-    "attribute vec4 position;                     \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_Position = vec4(position.xyz, 1.0);     \n"
-    "}                                            \n";
-const char* fragmentSource =
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
-    "}                                            \n";
+#include "../Common.h"
+
+const char* vertexSource = GLSL(
+  in highp vec4 position;
+  uniform vec2 size;
+  void main()
+  {
+    gl_Position = vec4(position.x/(size.x/2.0)-1.0, position.y/(size.y/2.0)-1.0, position.z, 1.0);
+  });
+const char* fragmentSource = GLSL(
+  out highp vec4 fragColor;
+  void main()
+  {
+    fragColor = vec4(0, 1, 1, 1);
+  });
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argc, char* argv[])

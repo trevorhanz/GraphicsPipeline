@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#define GLSL(src) "#version 300 es\n" #src
+#include "../Common.h"
 
 // Shader sources
 const char* vertexSource = GLSL(

@@ -20,24 +20,24 @@
 
 #include <stdlib.h>
 
+#include "../Common.h"
+
 using namespace GP;
 
 // Shader sources
-const char* vertexSource =
-    "#version 300 es                              \n"
-    "in highp vec4 position;                      \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_Position = vec4(position.xyz, 1.0);     \n"
-    "}                                            \n";
-const char* fragmentSource =
-    "#version 300 es                              \n"
-    "uniform highp vec4 Color;                    \n"
-    "out highp vec4 fragColor;                    \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  fragColor = Color;                         \n"
-    "}                                            \n";
+const char* vertexSource = GLSL(
+  in highp vec4 position;
+  void main()
+  {
+    gl_Position = vec4(position.xyz, 1.0);
+  });
+const char* fragmentSource = GLSL(
+  uniform highp vec4 Color;
+  out highp vec4 fragColor;
+  void main()
+  {
+    fragColor = Color;
+  });
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 int main(int argc, char* argv[])

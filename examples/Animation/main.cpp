@@ -22,20 +22,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "../Common.h"
+
 using namespace GP;
 
-const char* vertexSource =
-    "attribute vec4 position;                     \n"
-    "uniform vec2 Offset;                         \n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);\n"
-    "}                                            \n";
-const char* fragmentSource =
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);   \n"
-    "}                                            \n";
+const char* vertexSource = GLSL(
+  in vec4 position;
+  uniform vec2 Offset; 
+  void main()
+  {
+    gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);
+  });
+const char* fragmentSource = GLSL(
+  out vec4 fragColor;
+  void main()
+  { 
+    fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  });
 float vertexData[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
 
 #define TIMEOUT .01

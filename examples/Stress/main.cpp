@@ -56,13 +56,9 @@ int gettimeofday(struct timeval* tp, struct timezone* tzp)
 #include <sys/time.h>
 #endif
 
-using namespace GP;
+#include "../Common.h"
 
-#ifdef __APPLE__
-#define GLSL(src) "#version 400\n" #src
-#else
-#define GLSL(src) "#version 300 es\n" #src
-#endif
+using namespace GP;
 
 const char* vertexSource = GLSL(
   in highp vec4 position;

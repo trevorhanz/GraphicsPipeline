@@ -22,9 +22,9 @@
 #include <QWidget>
 #include <QHBoxLayout>
 
-using namespace GP;
+#include "../Common.h"
 
-#define GLSL(src) "#version 300 es\n" #src
+using namespace GP;
 
 const char* vertexSource = GLSL(
   in highp vec4 position;

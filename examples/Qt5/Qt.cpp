@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <QHBoxLayout>
 
-#define GLSL(src) "#version 300 es\n" #src
+#include "../Common.h"
 
 const char* vertexSource = GLSL(
   in highp vec4 position;
