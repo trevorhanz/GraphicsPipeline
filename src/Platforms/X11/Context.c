@@ -168,7 +168,6 @@ gp_context* gp_context_new(gp_system* system)
         best_fbc = i;
         best_samples = samples;
         context->mVisualInfo = vi;
-        break;
       }
     }
   }
