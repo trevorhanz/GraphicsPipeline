@@ -23,7 +23,8 @@ void _gp_system_free(gp_object* object)
 {
   gp_system* system = (gp_system*)object;
   
-  delete system->mApp;
+  if(system->mManageApp)
+    delete system->mApp;
   delete system;
 }
 
@@ -39,7 +40,17 @@ extern "C" gp_system* gp_qt_system_new(int* argc, char** argv)
 {
   gp_system* system = new gp_system();
   _gp_object_init(&system->mObject, _gp_system_free);
-  system->mApp = new QApplication(*argc, argv);
+  auto app = QCoreApplication::instance();
+  if(app)
+  {
+    system->mApp = app;
+    system->mManageApp = false;
+  }
+  else
+  {
+    system->mApp = new QApplication(*argc, argv);
+    system->mManageApp = true;
+  }
   
   return system;
 }

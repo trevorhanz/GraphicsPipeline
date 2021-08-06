@@ -38,7 +38,8 @@
 struct _gp_system
 {
   gp_object               mObject;
-  QApplication*           mApp;
+  QCoreApplication*       mApp;
+  bool                    mManageApp;
 };
 
 struct _gp_context

@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   
   GP::Qt::Context context;
   
-  GP::Qt::Window view(context);
+  GP::Window view(context);
   Array array(context);
   Shader shader(context);
   
@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
   draw.SetVerticies(3);
   pipeline.AddOperation(draw);
   
-  view.GetQWidget()->show();
+  QWidget* widget = static_cast<GP::Qt::Window&>(view).GetQWidget();
   QHBoxLayout* layout = new QHBoxLayout();
-  layout->addWidget(view.GetQWidget());
+  layout->addWidget(widget);
   
   window.setLayout(layout);
   window.show();
