@@ -34,6 +34,8 @@
 
 #include <pthread.h>
 
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
+
 typedef struct __gp_event _gp_event;
 
 typedef struct

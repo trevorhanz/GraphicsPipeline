@@ -84,7 +84,8 @@ if(EMSCRIPTEN)
     Platforms/Web/System.c
     Platforms/Web/Context.c
     Platforms/Web/Event.c
-    Platforms/Web/Logging.c)
+    Platforms/Web/Logging.c
+    Platforms/Web/Window.c)
 elseif(ANDROID)
   set(GP_MOBILE ON)
   set(GP_ANDROID ON)
@@ -115,7 +116,8 @@ elseif(ANDROID)
     Platforms/Android/Context.c
     Platforms/Android/Event.c
     Platforms/Android/Logging.c
-    Platforms/Android/System.c)
+    Platforms/Android/System.c
+    Platforms/Android/Window.c)
 else(ANDROID)
   set(GP_DESKTOP ON)
   set(GP_GL ON)
@@ -133,7 +135,8 @@ else(ANDROID)
       Platforms/Windows/Logging.c
       Platforms/Windows/Event.c
       Platforms/Windows/System.c
-      Platforms/Windows/Windows.h)
+      Platforms/Windows/Windows.h
+      Platforms/Windows/Window.c)
     list(APPEND LIB wsock32)
   elseif(APPLE)
     set(GP_MACOS ON)
@@ -153,7 +156,8 @@ else(ANDROID)
       Platforms/MacOS/Timer.h
       Platforms/MacOS/System.m
       Platforms/MacOS/WindowDelegate.h
-      Platforms/MacOS/WindowDelegate.m)
+      Platforms/MacOS/WindowDelegate.m
+      Platforms/MacOS/Window.m)
   elseif(UNIX)
     set(GP_LINUX ON)
     
@@ -161,7 +165,8 @@ else(ANDROID)
       Platforms/X11/Context.c
       Platforms/X11/Event.c
       Platforms/X11/Logging.c
-      Platforms/X11/System.c)
+      Platforms/X11/System.c
+      Platforms/X11/Window.c)
     
     find_package(Threads REQUIRED)
     

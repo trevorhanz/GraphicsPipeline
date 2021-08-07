@@ -201,61 +201,6 @@ void gp_context_unref(gp_context* context)
   }
 }
 
-gp_window* gp_window_new(gp_context* context)
-{
-  gp_window* window = new gp_window();
-  window->mWindow = new _Window(context, context->mShare);
-  gp_ref_init(&window->mRef);
-  
-  return window;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if(gp_ref_dec(&window->mRef))
-  {
-    delete window;
-  }
-}
-
-#define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
-  void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
-  {\
-    if(window->mWindow->data) gp_object_unref((gp_object*)window->mWindow->data);\
-    \
-    window->mWindow->cb = callback;\
-    window->mWindow->data = userData;\
-    \
-    if(window->mWindow->data) gp_object_ref((gp_object*)window->mWindow->data);\
-  }
-
-_GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
-_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
-_GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
-_GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
-_GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
-
-gp_pipeline* gp_window_get_pipeline(gp_window* window)
-{
-  return window->mWindow->GetPipeline();
-}
-
-void gp_window_redraw(gp_window* window)
-{
-  window->mWindow->Draw();
-}
-
-void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
-{
-  if(width) *width = window->mWindow->width();
-  if(height) *height = window->mWindow->height();
-}
-
 extern "C" void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 {
   sContext->mWorkQueue->AddWork(work, join, data);

@@ -82,4 +82,9 @@ struct _gp_io
 {
 };
 
+int _gp_canvas_get_width(const char* id);
+int _gp_canvas_get_height(const char* id);
+void _gp_canvas_set_width(const char* id, int value);
+void _gp_canvas_set_height(const char* id, int value);
+
 #endif // __GP_WEB_COMMON_H__
