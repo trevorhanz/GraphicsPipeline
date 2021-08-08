@@ -39,11 +39,11 @@ struct _gp_system
 
 struct _gp_context
 {
+  gp_object             mObject;
   gp_system*            mParent;
   HGLRC                 mShare;
   HWND                  mWindow;
   unsigned int          mPixelFormat;
-  gp_refcounter         mRef;
 
   HGLRC                 mWorkContext;
   HWND                  mWorkWindow;
@@ -56,12 +56,12 @@ struct _gp_context
 
 struct _gp_window
 {
+  gp_object             mObject;
   gp_context*           mParent;
   HGLRC                 mContext;
   HWND                  mWindow;
   gp_pipeline*          mPipeline;
-  gp_refcounter         mRef;
-
+  
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
   gp_event_move_callback_t    mMoveCB;

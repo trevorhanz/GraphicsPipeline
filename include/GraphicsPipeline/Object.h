@@ -102,7 +102,7 @@ namespace GP
      * Get underlying gp_object. Object's ref count will be incremented.
      * \return Underlying gp_object.
      */
-    inline gp_object* GetObject();
+    inline gp_object* GetObject() const;
     
     //! Equal operator
     inline const Object& operator = (const Object& other);
@@ -150,7 +150,7 @@ namespace GP
   }
   Object::~Object() {gp_object_unref(mObject);}
   unsigned Object::GetCount() {return gp_object_get_count(mObject);}
-  gp_object* Object::GetObject() {gp_object_ref(mObject); return mObject;}
+  gp_object* Object::GetObject() const {gp_object_ref(mObject); return mObject;}
   const Object& Object::operator = (const Object& other)
   {
     gp_object_unref(mObject);

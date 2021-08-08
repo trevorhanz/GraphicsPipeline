@@ -24,6 +24,7 @@
 #include "Types.h"
 #include "Pipeline.h"
 #include "Texture.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,18 +41,6 @@ extern "C" {
  * \return Newly created frame buffer.
  */
 GP_EXPORT gp_frame_buffer* gp_frame_buffer_new(gp_context* context);
-
-/*!
- * Increase frame buffer object reference count.
- * \param fb FrameBuffer object for which to increase the ref count.
- */
-GP_EXPORT void gp_frame_buffer_ref(gp_frame_buffer* fb);
-
-/*!
- * Decrease frame buffer object reference count.
- * \param fb FrameBuffer object for which to decrease the ref count.
- */
-GP_EXPORT void gp_frame_buffer_unref(gp_frame_buffer* fb);
 
 /*!
  * Get the gp_pipeline tied to a gp_frame_buffer.
@@ -91,17 +80,14 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_frame_buffer
    */
-  class FrameBuffer
+  class FrameBuffer : public Object
   {
   public:
     //! Constructor
+    inline FrameBuffer(gp_frame_buffer* frame_buffer);
+    
+    //! Constructor
     inline FrameBuffer(const Context& context);
-    
-    //! Copy Constructor
-    inline FrameBuffer(const FrameBuffer& other);
-    
-    //! Destructor
-    inline ~FrameBuffer();
     
     /*!
      * Get the gp_pipeline tied to a gp_frame_buffer.
@@ -126,28 +112,17 @@ namespace GP
      * \param height Number of pixels high.
      */
     inline void SetSize(int width, int height);
-    
-    //! Equal operator
-    inline const FrameBuffer& operator = (const FrameBuffer& other);
-    
-  private:
-    gp_frame_buffer*                mFrameBuffer;
   };
   
   //
   // Implementation
   //
-  FrameBuffer::FrameBuffer(const Context& context) : mFrameBuffer(gp_frame_buffer_new(context.mContext)) {}
-  FrameBuffer::FrameBuffer(const FrameBuffer& other)
-  {
-    mFrameBuffer = other.mFrameBuffer;
-    gp_frame_buffer_ref(mFrameBuffer);
-  }
-  FrameBuffer::~FrameBuffer() {gp_frame_buffer_unref(mFrameBuffer);}
-  Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline(mFrameBuffer));}
-  void FrameBuffer::Redraw() {gp_frame_buffer_redraw(mFrameBuffer);}
-  void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach(mFrameBuffer, texture.mTexture);}
-  void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size(mFrameBuffer, width, height);}
+  FrameBuffer::FrameBuffer(gp_frame_buffer* frame_buffer) : Object((gp_object*)frame_buffer) {}
+  FrameBuffer::FrameBuffer(const Context& context) : Object((void*)gp_frame_buffer_new((gp_context*)context.GetObject())) {}
+  Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline((gp_frame_buffer*)GetObject()));}
+  void FrameBuffer::Redraw() {gp_frame_buffer_redraw((gp_frame_buffer*)GetObject());}
+  void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach((gp_frame_buffer*)GetObject(), (gp_texture*)texture.GetObject());}
+  void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size((gp_frame_buffer*)GetObject(), width, height);}
 }
 
 #endif // __cplusplus

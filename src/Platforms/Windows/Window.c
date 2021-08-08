@@ -26,9 +26,18 @@
 #include "Windows.h"
 #include "Platforms/Defaults.h"
 
+void _gp_window_free(gp_object* object)
+{
+  gp_window* window = (gp_window*)object;
+  
+  _gp_pipeline_free(window->mPipeline);
+  free(window);
+}
+
 gp_window* gp_window_new(gp_context* context)
 {
   gp_window* window = malloc(sizeof(struct _gp_window));
+  _gp_object_init(&window->mObject, _gp_window_free);
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
@@ -42,7 +51,6 @@ gp_window* gp_window_new(gp_context* context)
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
   window->mMouseEntered = 0;
-  gp_ref_init(&window->mRef);
 
   DWORD                 dwExStyle;                                  // Window Extended Style
   DWORD                 dwStyle;                                    // Window Style
@@ -138,20 +146,6 @@ gp_window* gp_window_new(gp_context* context)
   ShowWindow(window->mWindow, SW_SHOW);
 
   return window;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if (gp_ref_dec(&window->mRef))
-  {
-    _gp_pipeline_free(window->mPipeline);
-    free(window);
-  }
 }
 
 gp_pipeline* gp_window_get_pipeline(gp_window* window)

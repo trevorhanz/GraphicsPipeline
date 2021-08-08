@@ -37,38 +37,31 @@ typedef struct
   const char*                 mText;
 } _gp_shader_source_node;
 
+void _gp_shader_source_free(gp_object* object)
+{
+  gp_shader_source* source = (gp_shader_source*)object;
+  
+  gp_list_node* node = gp_list_front(&source->mSource);
+  while(node != NULL)
+  {
+    _gp_shader_source_node* s = (_gp_shader_source_node*)node;
+    free((char*)s->mText);
+    
+    node = gp_list_node_next(node);
+    
+    free(s);
+  }
+  
+  free(source);
+}
+
 gp_shader_source* gp_shader_source_new()
 {
   gp_shader_source* source = malloc(sizeof(gp_shader_source));
-  
+  _gp_object_init(&source->mObject, _gp_shader_source_free);
   gp_list_init(&source->mSource);
-  gp_ref_init(&source->mRef);
   
   return source;
-}
-
-void gp_shader_source_ref(gp_shader_source* source)
-{
-  gp_ref_inc(&source->mRef);
-}
-
-void gp_shader_source_unref(gp_shader_source* source)
-{
-  if(gp_ref_dec(&source->mRef))
-  {
-    gp_list_node* node = gp_list_front(&source->mSource);
-    while(node != NULL)
-    {
-      _gp_shader_source_node* s = (_gp_shader_source_node*)node;
-      free((char*)s->mText);
-      
-      node = gp_list_node_next(node);
-      
-      free(s);
-    }
-    
-    free(source);
-  }
 }
 
 void gp_shader_source_add_from_string(gp_shader_source* source, GP_SHADER_SOURCE_TYPE type, const char* str)
@@ -80,29 +73,22 @@ void gp_shader_source_add_from_string(gp_shader_source* source, GP_SHADER_SOURCE
   gp_list_push_front(&source->mSource, (gp_list_node*)node);
 }
 
+void _gp_shader_free(gp_object* object)
+{
+  gp_shader* self = (gp_shader*)object;
+  
+  glDeleteProgram(self->mProgram);
+  free(self);
+}
+
 gp_shader* gp_shader_new(gp_context* context)
 {
   gp_shader* shader = malloc(sizeof(gp_shader));
-  
+  _gp_object_init(&shader->mObject, _gp_shader_free);
   shader->mProgram = 0;
   shader->mAttribute = 0;
-  gp_ref_init(&shader->mRef);
   
   return shader;
-}
-
-void gp_shader_ref(gp_shader* shader)
-{
-  gp_ref_inc(&shader->mRef);
-}
-
-void gp_shader_unref(gp_shader* shader)
-{
-  if(gp_ref_dec(&shader->mRef))
-  {
-    glDeleteProgram(shader->mProgram);
-    free(shader);
-  }
 }
 
 int _check_shader_status(unsigned int shader, GP_SHADER_SOURCE_TYPE type)
@@ -270,7 +256,7 @@ void _gp_uniform_texture_free(gp_object* object)
   gp_uniform* uniform = (gp_uniform*)object;
   
   if(uniform->mData)
-    gp_texture_unref((gp_texture*)uniform->mData);
+    gp_object_unref((gp_object*)uniform->mData);
   
   free(uniform);
 }
@@ -312,9 +298,9 @@ void gp_uniform_texture_set(gp_uniform* uniform, gp_texture* texture)
 {
   assert(uniform->mOperation == _gp_uniform_load_texture);
   
-  if(uniform->mData) gp_texture_unref((gp_texture*)uniform->mData);
+  if(uniform->mData) gp_object_unref((gp_object*)uniform->mData);
   uniform->mData = texture;
-  if(uniform->mData) gp_texture_ref((gp_texture*)uniform->mData);
+  if(uniform->mData) gp_object_ref((gp_object*)uniform->mData);
 }
 
 void gp_uniform_float_set(gp_uniform* uniform, float data)

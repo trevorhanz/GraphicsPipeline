@@ -34,6 +34,8 @@
 
 #include <pthread.h>
 
+#define GP_OBJECT_FROM_LIST_NODE(node) (gp_object*)(((char*)node)-sizeof(gp_object))
+
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 typedef struct __gp_event _gp_event;
@@ -47,7 +49,7 @@ struct _gp_system
 {
   gp_object               mObject;
   Display*                mDisplay;
-  gp_list                 mTargets;
+  gp_list                 mWindows;
   _gp_event*              mEvent;
   Atom                    mDeleteMessage;
   struct
@@ -60,6 +62,7 @@ struct _gp_system
 
 struct _gp_context
 {
+  gp_object               mObject;
   gp_system*              mParent;
   Display*                mDisplay;
   XVisualInfo*            mVisualInfo;
@@ -67,7 +70,6 @@ struct _gp_context
   Window                  mWindow;
   Colormap                mColorMap;
   GLXContext              mShare;
-  gp_refcounter           mRef;
   
   GLXContext              mWorkCtx;
   pthread_t               mWorkThread;
@@ -82,6 +84,7 @@ struct _gp_context
 
 struct _gp_window
 {
+  gp_object               mObject;
   gp_list_node            mNode;
   gp_context*             mParent;
   gp_pipeline*            mPipeline;
@@ -90,7 +93,6 @@ struct _gp_window
   uint8_t                 mDirty;
   int                     mPipe[2];
   gp_io*                  mWake;
-  gp_refcounter           mRef;
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
   gp_event_move_callback_t    mMoveCB;

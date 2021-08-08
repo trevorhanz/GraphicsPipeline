@@ -77,13 +77,13 @@ int main(int argc, char* argv[])
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 6);
   gp_array_set_data(array, ad);
-  gp_array_data_unref(ad);
+  gp_object_unref((gp_object*)ad);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   gp_shader_compile(shader, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   window1Data.size = gp_uniform_vec2_new_by_name(shader, "size");
   window2Data.size = gp_uniform_vec2_new_by_name(shader, "size");
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   
   pipeline = gp_window_get_pipeline(window2);
   draw = gp_operation_draw_new();
@@ -110,16 +110,16 @@ int main(int argc, char* argv[])
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   
-  gp_shader_unref(shader);
-  gp_array_unref(array);
+  gp_object_unref((gp_object*)shader);
+  gp_object_unref((gp_object*)array);
   
   gp_system_run(system);
   
-  gp_window_unref(window1);
-  gp_window_unref(window2);
-  gp_context_unref(context);
+  gp_object_unref((gp_object*)window1);
+  gp_object_unref((gp_object*)window2);
+  gp_object_unref((gp_object*)context);
   gp_object_unref((gp_object*)system);
   
   return EXIT_SUCCESS;

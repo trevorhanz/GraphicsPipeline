@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 30);
   gp_array_set_data(array, ad);
-  gp_array_data_unref(ad);
+  gp_object_unref((gp_object*)ad);
   
   float textureData[] = {
     1.0f, 0.0f, 0.0f, 1.0f,
@@ -137,13 +137,13 @@ int main(int argc, char* argv[])
   gp_texture_data* td = gp_texture_data_new();
   gp_texture_data_set(td, textureData, 2, 2);
   gp_texture_set_data(texture, td);
-  gp_texture_data_unref(td);
+  gp_object_unref((gp_object*)td);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   gp_shader_compile(shader, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   gp_uniform* tex = gp_uniform_texture_new_by_name(shader, "Texture");
   gp_uniform_texture_set(tex, texture);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
-  gp_operation_unref(clear);
+  gp_object_unref((gp_object*)clear);
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
@@ -167,17 +167,17 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 6);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
   gp_pipeline_add_operation(pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)tex);
   
-  gp_shader_unref(shader);
-  gp_array_unref(array);
-  gp_texture_unref(texture);
+  gp_object_unref((gp_object*)shader);
+  gp_object_unref((gp_object*)array);
+  gp_object_unref((gp_object*)texture);
   
   gp_system_run(system);
   
-  gp_window_unref(window);
-  gp_context_unref(context);
+  gp_object_unref((gp_object*)window);
+  gp_object_unref((gp_object*)context);
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);
   

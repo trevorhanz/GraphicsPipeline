@@ -46,7 +46,7 @@ gp_system* gp_system_new()
 {
   gp_system* system = (gp_system*)malloc(sizeof(struct _gp_system));
   _gp_object_init(&system->mObject, _gp_system_free);
-  gp_list_init(&system->mTargets);
+  gp_list_init(&system->mWindows);
   system->mEvent = _gp_event_new();
   
   char* display = getenv("DISPLAY");
@@ -220,10 +220,10 @@ gp_system* gp_system_new()
 
 gp_window* _gp_system_find_window(gp_system* system, Window window)
 {
-  gp_list_node* node = gp_list_front(&system->mTargets);
+  gp_list_node* node = gp_list_front(&system->mWindows);
   while(node != NULL)
   {
-    gp_window* w = (gp_window*)node;
+    gp_window* w = (gp_window*)GP_OBJECT_FROM_LIST_NODE(node);
     if(w->mWindow == window)
     {
       return w;
@@ -376,5 +376,3 @@ gp_io* gp_io_write_new(gp_system* system, int fd)
 {
   return _gp_event_io_write_new(system->mEvent, fd);
 }
-
-

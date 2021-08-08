@@ -23,6 +23,7 @@
 #include "Common.h"
 #include "Types.h"
 #include "System.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,18 +41,6 @@ extern "C" {
  */
 GP_EXPORT gp_context* gp_context_new(gp_system* system);
 
-/*!
- * Increase context object reference count.
- * \param context Context object for which to increase the ref count.
- */
-GP_EXPORT void gp_context_ref(gp_context* context);
-
-/*!
- * Decrease context object reference count.
- * \param context Context object for which to decrease the ref count.
- */
-GP_EXPORT void gp_context_unref(gp_context* context);
-
 //! \} // Context
 
 #ifdef __cplusplus
@@ -62,59 +51,21 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_context
    */
-  class Context
+  class Context : public Object
   {
-  protected:
+  public:
     //! Constructor
     inline Context(gp_context* context);
     
-  public:
     //! Constructor
     inline Context(const System& system);
-    
-    //! Copy Constructor
-    inline Context(const Context& other);
-    
-    //! Destructor
-    inline ~Context();
-    
-    //! Equal operator
-    inline const Context& operator = (const Context& other);
-    
-  protected:
-    inline static gp_system* GetSystem(const System& system);
-    
-    gp_context*           mContext;
-    
-    friend class Window;
-    friend class Array;
-    friend class Texture;
-    friend class Shader;
-    friend class FrameBuffer;
   };
   
   /*
    * Implementation
    */
-  Context::Context(gp_context* context) : mContext(context) {}
-  Context::Context(const System& system) : mContext(gp_context_new((gp_system*)system.mObject)) {}
-  Context::Context(const Context& other)
-  {
-    mContext = other.mContext;
-    gp_context_ref(mContext);
-  }
-  Context::~Context() {gp_context_unref(mContext);}
-  const Context& Context::operator = (const Context& other)
-  {
-    gp_context_unref(mContext);
-    mContext = other.mContext;
-    gp_context_ref(mContext);
-    return *this;
-  }
-  gp_system* Context::GetSystem(const System& system)
-  {
-    return (gp_system*)system.mObject;
-  }
+  Context::Context(gp_context* context) : Object((gp_object*)context) {}
+  Context::Context(const System& system) : Object((void*)gp_context_new((gp_system*)system.GetObject())) {}
 }
 #endif
 

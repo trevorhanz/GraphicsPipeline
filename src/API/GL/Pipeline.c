@@ -78,58 +78,41 @@ void DebugCallbackFunction(GLenum source,
   }\
 }
 
-void gp_operation_ref(gp_operation* operation)
-{
-  gp_ref_inc(&operation->mRef);
-}
-
-void gp_operation_unref(gp_operation* operation)
-{
-  if(gp_ref_dec(&operation->mRef))
-  {
-    operation->mData->free(operation->mData);
-    free(operation);
-  }
-}
-
 typedef struct
 {
-  _gp_operation_data      mData;
+  gp_operation            mOperation;
   float                   mColor[4]; // RGBA
-} _gp_operation_clear_data;
+} _gp_operation_clear;
 
-void _gp_operation_clear(_gp_operation_data* data, _gp_draw_context* context)
+void _gp_operation_clear_func(gp_operation* self, _gp_draw_context* context)
 {
-  _gp_operation_clear_data* d = (_gp_operation_clear_data*)data;
+  _gp_operation_clear* clear = (_gp_operation_clear*)self;
   
-  glClearColor(d->mColor[0], d->mColor[1], d->mColor[2], d->mColor[3]);
+  glClearColor(clear->mColor[0], clear->mColor[1], clear->mColor[2], clear->mColor[3]);
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 }
 
 gp_operation* gp_operation_clear_new()
 {
-  gp_operation* operation = malloc(sizeof(gp_operation));
-  operation->func = _gp_operation_clear;
-  operation->mData = malloc(sizeof(_gp_operation_clear_data));
-  operation->mData->free = (void(*)(_gp_operation_data*))free;
-  gp_ref_init(&operation->mRef);
+  _gp_operation_clear* operation = malloc(sizeof(_gp_operation_clear));
+  _gp_object_init(&operation->mOperation.mObject, (gp_object_free)free);
+  operation->mOperation.mFunc = _gp_operation_clear_func;
   
-  _gp_operation_clear_data* d = (_gp_operation_clear_data*)operation->mData;
-  d->mColor[0] = 0;
-  d->mColor[1] = 0;
-  d->mColor[2] = 0;
-  d->mColor[3] = 1;
+  operation->mColor[0] = 0;
+  operation->mColor[1] = 0;
+  operation->mColor[2] = 0;
+  operation->mColor[3] = 1;
   
-  return operation;
+  return (gp_operation*)operation;
 }
 
 void gp_operation_clear_set_color(gp_operation* operation, float r, float g, float b, float a)
 {
-  _gp_operation_clear_data* d = (_gp_operation_clear_data*)operation->mData;
-  d->mColor[0] = r;
-  d->mColor[1] = g;
-  d->mColor[2] = b;
-  d->mColor[3] = a;
+  _gp_operation_clear* self = (_gp_operation_clear*)operation;
+  self->mColor[0] = r;
+  self->mColor[1] = g;
+  self->mColor[2] = b;
+  self->mColor[3] = a;
 }
 
 typedef struct _gp_array_list gp_array_list;
@@ -154,7 +137,7 @@ struct _gp_uniform_list
 
 typedef struct
 {
-  _gp_operation_data      mData;
+  gp_operation            mOperation;
 #ifndef GP_GLES2
   GLuint                  mVAO;
   uint8_t                 mDirty;
@@ -164,21 +147,21 @@ typedef struct
   gp_list                 mUniforms;
   unsigned int            mVerticies;
   gp_draw_mode            mMode;
-} _gp_operation_draw_data;
+} _gp_operation_draw;
 
-void _gp_operation_draw(_gp_operation_data* data, _gp_draw_context* context)
+void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
 {
-  _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
   
   CHECK_GL_ERROR();
   
-  if(context->mShader != d->mShader)
+  if(context->mShader != self->mShader)
   {
-    glUseProgram(d->mShader->mProgram);
-    context->mShader = d->mShader;
+    glUseProgram(self->mShader->mProgram);
+    context->mShader = self->mShader;
   }
   
-  gp_list_node* node = gp_list_front(&d->mUniforms);
+  gp_list_node* node = gp_list_front(&self->mUniforms);
   while(node != NULL)
   {
     gp_uniform_list* uniform = (gp_uniform_list*)node;
@@ -188,14 +171,14 @@ void _gp_operation_draw(_gp_operation_data* data, _gp_draw_context* context)
   }
   
 #ifndef GP_GLES2
-  if(d->mVAO == 0)
-    glGenVertexArrays(1, &d->mVAO);
+  if(self->mVAO == 0)
+    glGenVertexArrays(1, &self->mVAO);
   
-  glBindVertexArray(d->mVAO);
-  if(d->mDirty == 1)
+  glBindVertexArray(self->mVAO);
+  if(self->mDirty == 1)
   {
 #endif
-  node = gp_list_front(&d->mArrays);
+  node = gp_list_front(&self->mArrays);
   while(node != NULL)
   {
     gp_array_list* array = (gp_array_list*)node;
@@ -210,27 +193,27 @@ void _gp_operation_draw(_gp_operation_data* data, _gp_draw_context* context)
     node = gp_list_node_next(node);
   }
 #ifndef GP_GLES2
-  d->mDirty = 0;
+  self->mDirty = 0;
   }
 #endif
   
-  glDrawArrays(d->mMode, 0, d->mVerticies);
+  glDrawArrays(self->mMode, 0, self->mVerticies);
   CHECK_GL_ERROR();
 }
 
-void _gp_operation_draw_free(_gp_operation_data* data)
+void _gp_operation_draw_free(gp_object* object)
 {
-  _gp_operation_draw_data* d = (_gp_operation_draw_data*)data;
+  _gp_operation_draw* d = (_gp_operation_draw*)object;
   
   if(d->mShader)
-    gp_shader_unref(d->mShader);
+    gp_object_unref((gp_object*)d->mShader);
   
   // TODO - free VAO
   gp_list_node* node = gp_list_front(&d->mArrays);
   while(node != NULL)
   {
     gp_array_list* array = (gp_array_list*)node;
-    gp_array_unref(array->mArray);
+    gp_object_unref((gp_object*)array->mArray);
     
     node = gp_list_node_next(node);
     free(array);
@@ -251,52 +234,49 @@ void _gp_operation_draw_free(_gp_operation_data* data)
 
 gp_operation* gp_operation_draw_new()
 {
-  gp_operation* operation = malloc(sizeof(gp_operation));
-  operation->func = _gp_operation_draw;
-  gp_ref_init(&operation->mRef);
-  operation->mData = malloc(sizeof(_gp_operation_draw_data));
-  operation->mData->free = _gp_operation_draw_free;
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  gp_list_init(&data->mUniforms);
-  gp_list_init(&data->mArrays);
-  data->mShader = NULL;
+  _gp_operation_draw* operation = malloc(sizeof(_gp_operation_draw));
+  _gp_object_init(&operation->mOperation.mObject, _gp_operation_draw_free);
+  operation->mOperation.mFunc = _gp_operation_draw_func;
+  gp_list_init(&operation->mUniforms);
+  gp_list_init(&operation->mArrays);
+  operation->mShader = NULL;
 #ifndef GP_GLES2
-  data->mVAO = 0;
-  data->mDirty = 1;
+  operation->mVAO = 0;
+  operation->mDirty = 1;
 #endif
-  data->mVerticies = 0;
-  data->mMode = GL_TRIANGLES;
+  operation->mVerticies = 0;
+  operation->mMode = GL_TRIANGLES;
   
-  return operation;
+  return (gp_operation*)operation;
 }
 
 void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
 {
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  if(data->mShader)
-    gp_shader_unref(data->mShader);
-  data->mShader = shader;
-  gp_shader_ref(data->mShader);
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
+  if(self->mShader)
+    gp_object_unref((gp_object*)self->mShader);
+  self->mShader = shader;
+  gp_object_ref((gp_object*)self->mShader);
   
 #ifndef GP_GLES2
-  data->mDirty = 1;
+  self->mDirty = 1;
 #endif
 }
 
 void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset)
 {
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
   
   gp_array_list* a = NULL;
   
   // Search for existing array at index first.
-  gp_list_node* node = gp_list_front(&data->mArrays);
+  gp_list_node* node = gp_list_front(&self->mArrays);
   while(node != NULL)
   {
     a = (gp_array_list*)node;
     if(a->mIndex == index)
     {
-      gp_array_unref(a->mArray);
+      gp_object_unref((gp_object*)a->mArray);
       break;
     }
     
@@ -307,7 +287,7 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   if(node == NULL)
   {
     a = malloc(sizeof(gp_array_list));
-    gp_list_push_back(&data->mArrays, (gp_list_node*)a);
+    gp_list_push_back(&self->mArrays, (gp_list_node*)a);
   }
   
   a->mArray = array;
@@ -316,96 +296,93 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
   a->mStride = stride;
   a->mOffset = offset;
   
-  gp_array_ref(array);
+  gp_object_ref((gp_object*)array);
   
 #ifndef GP_GLES2
-  data->mDirty = 1;
+  self->mDirty = 1;
 #endif
 }
 
 void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform* uniform)
 {
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
   
   gp_uniform_list* u = malloc(sizeof(gp_uniform_list));
   u->mUniform = uniform;
-  gp_list_push_back(&data->mUniforms, (gp_list_node*)u);
+  gp_list_push_back(&self->mUniforms, (gp_list_node*)u);
   
   gp_object_ref((gp_object*)uniform);
   
 #ifndef GP_GLES2
-  data->mDirty = 1;
+  self->mDirty = 1;
 #endif
 }
 
 void gp_operation_draw_set_verticies(gp_operation* operation, int count)
 {
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  data->mVerticies = count;
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
+  self->mVerticies = count;
 }
 
 void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode)
 {
-  _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
-  data->mMode = mode;
+  _gp_operation_draw* self = (_gp_operation_draw*)operation;
+  self->mMode = mode;
 }
 
 typedef struct
 {
-  _gp_operation_data      mData;
+  gp_operation            mOperation;
   gp_pipeline*            mPipeline;
   int                     mX;
   int                     mY;
   int                     mWidth;
   int                     mHeight;
-} _gp_operation_viewport_data;
+} _gp_operation_viewport;
 
-void _gp_operation_viewport(_gp_operation_data* data, _gp_draw_context* context)
+void _gp_operation_viewport_func(gp_operation* operation, _gp_draw_context* context)
 {
-  _gp_operation_viewport_data* d = (_gp_operation_viewport_data*)data;
+  _gp_operation_viewport* self = (_gp_operation_viewport*)operation;
   
-  glViewport(d->mX, d->mY, d->mWidth, d->mHeight);
+  glViewport(self->mX, self->mY, self->mWidth, self->mHeight);
   
-  _gp_pipeline_execute_with_context(d->mPipeline, context);
+  _gp_pipeline_execute_with_context(self->mPipeline, context);
 }
 
-void _gp_operation_viewport_free(_gp_operation_data* data)
+void _gp_operation_viewport_free(gp_object* object)
 {
-  _gp_operation_viewport_data* d = (_gp_operation_viewport_data*)data;
-  _gp_pipeline_free(d->mPipeline);
-  free(d);
+  _gp_operation_viewport* self = (_gp_operation_viewport*)object;
+  _gp_pipeline_free(self->mPipeline);
+  free(self);
 }
 
 gp_operation* gp_operation_viewport_new()
 {
-  gp_operation* operation = malloc(sizeof(gp_operation));
-  operation->func = _gp_operation_viewport;
-  gp_ref_init(&operation->mRef);
-  operation->mData = malloc(sizeof(_gp_operation_viewport_data));
-  operation->mData->free = _gp_operation_viewport_free;
-  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
-  data->mPipeline = _gp_pipeline_new();
-  data->mX = 0;
-  data->mY = 0;
-  data->mWidth = 0;
-  data->mHeight = 0;
+  _gp_operation_viewport* operation = malloc(sizeof(_gp_operation_viewport));
+  _gp_object_init(&operation->mOperation.mObject, _gp_operation_viewport_free);
+  operation->mOperation.mFunc = _gp_operation_viewport_func;
+  operation->mPipeline = _gp_pipeline_new();
+  operation->mX = 0;
+  operation->mY = 0;
+  operation->mWidth = 0;
+  operation->mHeight = 0;
   
-  return operation;
+  return (gp_operation*)operation;
 }
 
 gp_pipeline* gp_operation_viewport_get_pipeline(gp_operation* operation)
 {
-  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
-  return data->mPipeline;
+  _gp_operation_viewport* self = (_gp_operation_viewport*)operation;
+  return self->mPipeline;
 }
 
 void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, int width, int height)
 {
-  _gp_operation_viewport_data* data = (_gp_operation_viewport_data*)operation->mData;
-  data->mX = x;
-  data->mY = y;
-  data->mWidth = width;
-  data->mHeight = height;
+  _gp_operation_viewport* self = (_gp_operation_viewport*)operation;
+  self->mX = x;
+  self->mY = y;
+  self->mWidth = width;
+  self->mHeight = height;
 }
 
 
@@ -414,7 +391,7 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
   list->mOperation = operation;
-  gp_operation_ref(operation);
+  gp_object_ref((gp_object*)operation);
   gp_list_push_back(&pipeline->mOperations, (gp_list_node*)list);
 }
 
@@ -429,7 +406,7 @@ void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation
   if(node)
   {
     gp_list_remove(&pipeline->mOperations, node);
-    gp_operation_unref(operation);
+    gp_object_unref((gp_object*)operation);
     free(node);
   }
 }
@@ -449,7 +426,7 @@ void _gp_pipeline_free(gp_pipeline* pipeline)
   {
     gp_operation_list* op = (gp_operation_list*)node;
     node = gp_list_node_next(node);
-    gp_operation_unref(op->mOperation);
+    gp_object_unref((gp_object*)op->mOperation);
     free(op);
   }
   free(pipeline);
@@ -490,7 +467,7 @@ void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* 
   gp_operation_list* list = (gp_operation_list*)gp_list_front(&pipeline->mOperations);
   while(list != NULL)
   {
-    list->mOperation->func(list->mOperation->mData, context);
+    list->mOperation->mFunc(list->mOperation, context);
     
     list = (gp_operation_list*)gp_list_node_next((gp_list_node*)list);
   }

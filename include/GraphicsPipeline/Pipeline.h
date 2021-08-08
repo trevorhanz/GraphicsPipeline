@@ -24,6 +24,7 @@
 #include "Types.h"
 #include "Shader.h"
 #include "Array.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,18 +38,6 @@ extern "C" {
 typedef unsigned int gp_draw_mode;
 extern const gp_draw_mode GP_MODE_TRIANGLES;
 extern const gp_draw_mode GP_MODE_TRIANGLE_STRIP;
-
-/*!
- * Increase the reference count of an operation.
- * \param operation Operation object for which to add the ref count.
- */
-GP_EXPORT void gp_operation_ref(gp_operation* operation);
-
-/*!
- * Decrease the reference count of an operation.
- * \param operation Operation object for which to add the ref count.
- */
-GP_EXPORT void gp_operation_unref(gp_operation* operation);
 
 /*!
  * Create a new clear operation.
@@ -159,27 +148,11 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_operation
    */
-  class Operation
+  class Operation : public Object
   {
-  protected:
+  public:
     //! Constructor
     inline Operation(gp_operation* operation);
-    
-    //! Copy Cunstructor
-    inline Operation(const Operation& other);
-    
-  public:
-    //! Destructor
-    inline ~Operation();
-    
-    //! Equal operator
-    inline const Operation& operator = (const Operation& operation);
-    
-  protected:
-    
-    gp_operation*         mOperation;
-    
-    friend class Pipeline;
   };
   
   /*!
@@ -301,58 +274,46 @@ namespace GP
   //
   // Implementation
   //
-  Operation::Operation(gp_operation* operation) : mOperation(operation) {}
-  Operation::Operation(const Operation& other)
-  {
-    mOperation = other.mOperation;
-    gp_operation_ref(mOperation);
-  }
-  Operation::~Operation() {gp_operation_unref(mOperation);}
-  const Operation& Operation::operator = (const Operation& other)
-  {
-    gp_operation_unref(mOperation);
-    mOperation = other.mOperation;
-    gp_operation_ref(mOperation);
-    return *this;
-  }
+  Operation::Operation(gp_operation* operation) : Object((gp_object*)operation) {}
+  
   ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
   void ClearOperation::SetColor(float r, float g, float b, float a) {
-    gp_operation_clear_set_color((gp_operation*)mOperation, r, g, b,  a);
+    gp_operation_clear_set_color((gp_operation*)GetObject(), r, g, b,  a);
   }
   DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
   void DrawOperation::SetShader(const Shader& shader)
   {
-    gp_operation_draw_set_shader(mOperation, shader.mShader);
+    gp_operation_draw_set_shader((gp_operation*)GetObject(), (gp_shader*)shader.GetObject());
   }
   void DrawOperation::SetUniform(const Uniform& uniform)
   {
-    gp_operation_draw_set_uniform(mOperation, (gp_uniform*)uniform.mObject);
+    gp_operation_draw_set_uniform((gp_operation*)GetObject(), (gp_uniform*)uniform.GetObject());
   }
   void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, int stride, int offset)
   {
-    gp_operation_draw_add_array_by_index(mOperation, array.mArray, index, components, stride, offset);
+    gp_operation_draw_add_array_by_index((gp_operation*)GetObject(), (gp_array*)array.GetObject(), index, components, stride, offset);
   }
-  void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies(mOperation, count);}
-  void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode(mOperation, mode);}
+  void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies((gp_operation*)GetObject(), count);}
+  void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(), mode);}
   
   ViewportOperation::ViewportOperation()
     : Operation(gp_operation_viewport_new())
     {}
-  Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline(mOperation));}
+  Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline((gp_operation*)GetObject()));}
   void ViewportOperation::SetDimensions(int x, int y, int width, int height)
   {
-    gp_operation_viewport_set_dimesions(mOperation, x, y, width, height);
+    gp_operation_viewport_set_dimesions((gp_operation*)GetObject(), x, y, width, height);
   }
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}
   void Pipeline::AddOperation(const Operation& operation)
   {
-    gp_pipeline_add_operation(mPipeline, operation.mOperation);
+    gp_pipeline_add_operation(mPipeline, (gp_operation*)operation.GetObject());
   }
   void Pipeline::RemoveOperation(const Operation& operation)
   {
-    gp_pipeline_remove_operation(mPipeline, operation.mOperation);
+    gp_pipeline_remove_operation(mPipeline, (gp_operation*)operation.GetObject());
   }
 }
 #endif // __cplusplus

@@ -24,6 +24,7 @@
 #include "Types.h"
 #include "Context.h"
 #include "Input.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 #include <functional>
@@ -57,18 +58,6 @@ typedef void(*gp_event_resize_callback_t)(const gp_event_resize_t* resize, gp_po
  * \return Newly created window.
  */
 GP_EXPORT gp_window* gp_window_new(gp_context* context);
-
-/*!
- * Increase window object reference count.
- * \param window Window object for which to increase the ref count.
- */
-GP_EXPORT void gp_window_ref(gp_window* window);
-
-/*!
- * Decrease window object reference count.
- * \param window Window object for which to decrease the ref count.
- */
-GP_EXPORT void gp_window_unref(gp_window* window);
 
 /*!
  * Get the gp_pipeline tied to a gp_window.
@@ -136,21 +125,14 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_window.
    */
-  class Window
+  class Window : public Object
   {
-  protected:
+  public:
     //! Constructor
     inline Window(gp_window* window);
     
-  public:
     //! Constructor
     inline Window(const Context& context);
-    
-    //! Copy Constructor
-    inline Window(const Window& other);
-    
-    //! Destructor
-    inline ~Window();
     
     /*!
      * Retrieve GP::Pipeline object.
@@ -200,13 +182,6 @@ namespace GP
      */
     inline void SetResizeCallback(std::function<void(const gp_event_resize_t*)> callback);
     
-    //! Equal operator
-    inline const Window& operator = (const Window& other);
-    
-  protected:
-    inline static gp_context* GetContext(const Context& context);
-    inline gp_window* GetWindow() {return mWindow;}
-    
   private:
     typedef std::function<void(const gp_event_click_t*)>    ClickCallback;
     typedef std::function<void(const gp_event_move_t*)>     MoveCallback;
@@ -222,30 +197,22 @@ namespace GP
     {
       T               mCallback;
     };
-    
-    gp_window*        mWindow;
   };
   
   //
   // Implementation
   //
-  Window::Window(gp_window* window) : mWindow(window) {}
-  Window::Window(const Context& context) : mWindow(gp_window_new(context.mContext)) {}
-  Window::Window(const Window& other)
-  {
-    mWindow = other.mWindow;
-    gp_window_ref(mWindow);
-  }
-  Window::~Window() {gp_window_unref(mWindow);}
-  Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline(mWindow));}
-  void Window::Redraw() {gp_window_redraw(mWindow);}
-  void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size(mWindow, width, height);}
+  Window::Window(gp_window* window) : Object((gp_object*)window) {}
+  Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)context.GetObject())) {}
+  Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject()));}
+  void Window::Redraw() {gp_window_redraw((gp_window*)GetObject());}
+  void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size((gp_window*)GetObject(), width, height);}
   void Window::SetClickCallback(std::function<void(const gp_event_click_t*)> callback)
   {
     auto data = new CallbackData<ClickCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_click_callback(mWindow, HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
+    gp_window_set_click_callback((gp_window*)GetObject(), HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetMoveCallback(std::function<void(const gp_event_move_t*)> callback)
@@ -253,7 +220,7 @@ namespace GP
     auto data = new CallbackData<MoveCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_move_callback(mWindow, HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
+    gp_window_set_move_callback((gp_window*)GetObject(), HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetEnterCallback(std::function<void(const gp_event_enter_t*)> callback)
@@ -261,7 +228,7 @@ namespace GP
     auto data = new CallbackData<EnterCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_enter_callback(mWindow, HandleCallback<gp_event_enter_t>, (gp_pointer*)pointer);
+    gp_window_set_enter_callback((gp_window*)GetObject(), HandleCallback<gp_event_enter_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetKeyCallback(std::function<void(const gp_event_key_t*)> callback)
@@ -269,7 +236,7 @@ namespace GP
     auto data = new CallbackData<KeyCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_key_callback(mWindow, HandleCallback<gp_event_key_t>, (gp_pointer*)pointer);
+    gp_window_set_key_callback((gp_window*)GetObject(), HandleCallback<gp_event_key_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetResizeCallback(std::function<void(const gp_event_resize_t*)> callback)
@@ -277,7 +244,7 @@ namespace GP
     auto data = new CallbackData<ResizeCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_resize_callback(mWindow, HandleCallback<gp_event_resize_t>, (gp_pointer*)pointer);
+    gp_window_set_resize_callback((gp_window*)GetObject(), HandleCallback<gp_event_resize_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   template <typename T>
@@ -286,14 +253,6 @@ namespace GP
     auto data = (CallbackData<std::function<void(const T*)> >*)gp_pointer_get_pointer(userData);
     data->mCallback(input);
   }
-  const Window& Window::operator = (const Window& other)
-  {
-    gp_window_unref(mWindow);
-    mWindow = other.mWindow;
-    gp_window_ref(mWindow);
-    return *this;
-  }
-  gp_context* Window::GetContext(const Context& context) {return context.mContext;}
 }
 
 #endif // __cplusplus

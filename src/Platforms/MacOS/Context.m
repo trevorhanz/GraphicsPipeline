@@ -88,10 +88,17 @@ void _gp_work_done(gp_io* io)
   pthread_mutex_unlock(&context->mWorkMutex);
 }
 
+void _gp_context_free(gp_object* object)
+{
+  gp_context* context = (gp_context*)object;
+  
+  free(context);
+}
+
 gp_context* gp_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
-  gp_ref_init(&context->mRef);
+  _gp_object_init(&context->mObject, _gp_context_free);
   
   NSOpenGLPixelFormatAttribute pixelAttribs[ 16 ];
   int pixNum = 0;
@@ -151,19 +158,6 @@ gp_context* gp_context_new(gp_system* system)
   pthread_create(&context->mWorkThread, NULL, _gp_work_thread, context);
   
   return context;
-}
-
-void gp_context_ref(gp_context* context)
-{
-  gp_ref_inc(&context->mRef);
-}
-
-void gp_context_unref(gp_context* context)
-{
-  if(gp_ref_dec(&context->mRef))
-  {
-    free(context);
-  }
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

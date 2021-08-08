@@ -44,17 +44,17 @@ struct _gp_system
 
 struct _gp_context
 {
+  gp_object               mObject;
   QOpenGLContext*         mShare;
   QOffscreenSurface*      mSurface;
-  gp_refcounter           mRef;
   std::map<int, gp_key_t> mKeyMap;
   WorkQueue*              mWorkQueue;
 };
 
 struct _gp_window
 {
+  gp_object               mObject;
   _Window*                mWindow;
-  gp_refcounter           mRef;
 };
 
 struct _gp_timer

@@ -21,9 +21,18 @@
 #include "WindowDelegate.h"
 #include "Platforms/Defaults.h"
 
+void _gp_window_free(gp_object* object)
+{
+  gp_window* window = (gp_window*)object;
+  
+  _gp_pipeline_free(window->mPipeline);
+  free(window);
+}
+
 gp_window* gp_window_new(gp_context* context)
 {
   gp_window* window = malloc(sizeof(gp_window));
+  _gp_object_init(&window->mObject, _gp_window_free);
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
@@ -36,7 +45,6 @@ gp_window* gp_window_new(gp_context* context)
   window->mKeyData = NULL;
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
-  gp_ref_init(&window->mRef);
   
   NSUInteger windowStyle = NSWindowStyleMaskTitled |
                            NSWindowStyleMaskClosable |
@@ -68,20 +76,6 @@ gp_window* gp_window_new(gp_context* context)
   _gp_api_init_context();
   
   return window;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if(gp_ref_dec(&window->mRef))
-  {
-    _gp_pipeline_free(window->mPipeline);
-    free(window);
-  }
 }
 
 gp_pipeline* gp_window_get_pipeline(gp_window* window)

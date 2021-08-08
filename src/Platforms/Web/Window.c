@@ -109,9 +109,24 @@ EM_BOOL _gp_window_resize_callback(int eventType, const EmscriptenUiEvent* uiEve
   return EM_TRUE;
 }
 
+void _gp_window_free(gp_object* object)
+{
+  gp_window* window = (gp_window*)object;
+  
+  _gp_pipeline_free(window->mPipeline);
+  
+  if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+  if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
+  if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
+  if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+  
+  free(window);
+}
+
 void _gp_window_build(gp_window* window)
 {
-  gp_ref_init(&window->mRef);
+  _gp_object_init(&window->mObject, _gp_window_free);
   
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
@@ -176,27 +191,6 @@ gp_window* gp_window_new(gp_context* context)
   _gp_window_build(window);
   
   return window;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if(gp_ref_dec(&window->mRef))
-  {
-    _gp_pipeline_free(window->mPipeline);
-    
-    if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
-    if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
-    if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
-    if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
-    if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
-    
-    free(window);
-  }
 }
 
 gp_pipeline* gp_window_get_pipeline(gp_window* window)

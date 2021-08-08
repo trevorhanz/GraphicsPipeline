@@ -206,26 +206,20 @@ bool _Window::event(QEvent* event)
   return QWindow::event(event);
 }
 
+void _gp_window_free(gp_object* object)
+{
+  gp_window* window = (gp_window*)object;
+  
+  delete window;
+}
+
 gp_window* gp_window_new(gp_context* context)
 {
   gp_window* window = new gp_window();
+  _gp_object_init(&window->mObject, _gp_window_free);
   window->mWindow = new _Window(context, context->mShare);
-  gp_ref_init(&window->mRef);
   
   return window;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if(gp_ref_dec(&window->mRef))
-  {
-    delete window;
-  }
 }
 
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\

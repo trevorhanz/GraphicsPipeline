@@ -40,10 +40,10 @@ struct _gp_system
 
 struct _gp_context
 {
+  gp_object                             mObject;
   gp_system*                            mParent;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mShare;
   char*                                 mID;
-  gp_refcounter                         mRef;
   
   gp_timer*                             mWorkTimer;
   gp_list                               mWork;
@@ -51,6 +51,7 @@ struct _gp_context
 
 struct _gp_window
 {
+  gp_object                             mObject;
   char*                                 mID;
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE       mContext;
   GLuint                                vbo;
@@ -67,7 +68,6 @@ struct _gp_window
   gp_pointer*                           mKeyData;
   gp_event_resize_callback_t            mResizeCB;
   gp_pointer*                           mResizeData;
-  gp_refcounter                         mRef;
 };
 
 struct _gp_timer

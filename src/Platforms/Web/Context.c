@@ -79,6 +79,13 @@ void _gp_work_timeout(gp_timer* timer)
   }
 }
 
+void _gp_context_free(gp_object* object)
+{
+  gp_context* context = (gp_context*)object;
+  
+  free(context);
+}
+
 void _gp_context_build(gp_context* context)
 {
   gp_pointer* pointer = gp_pointer_new(context, 0);
@@ -119,8 +126,8 @@ void _gp_context_build(gp_context* context)
 gp_context* gp_context_new_from_id(gp_system* system, const char* id)
 {
   gp_context* context = malloc(sizeof(gp_context));
+  _gp_object_init(&context->mObject, _gp_context_free);
   context->mParent = system;
-  gp_ref_init(&context->mRef);
   
   int size = strlen(id);
   context->mID = malloc(sizeof(char)*size);
@@ -134,8 +141,8 @@ gp_context* gp_context_new_from_id(gp_system* system, const char* id)
 gp_context* gp_context_new(gp_system* system)
 {
   gp_context* context = malloc(sizeof(gp_context));
+  _gp_object_init(&context->mObject, _gp_context_free);
   context->mParent = system;
-  gp_ref_init(&context->mRef);
   
   context->mID = malloc(sizeof(char)*15);
   
@@ -151,19 +158,6 @@ gp_context* gp_context_new(gp_system* system)
   _gp_context_build(context);
   
   return context;
-}
-
-void gp_context_ref(gp_context* context)
-{
-  gp_ref_inc(&context->mRef);
-}
-
-void gp_context_unref(gp_context* context)
-{
-  if(gp_ref_dec(&context->mRef))
-  {
-    free(context);
-  }
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

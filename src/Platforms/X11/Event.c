@@ -146,7 +146,7 @@ void _gp_event_run(_gp_event* event)
       gp_list_node* node = gp_list_front(&event->mIORead);
       while(node != NULL)
       {
-        gp_io* io = (gp_io*)(((char*)node)-sizeof(gp_object));
+        gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &readfds))
         {
           io->mCallback(io);
@@ -157,7 +157,7 @@ void _gp_event_run(_gp_event* event)
       node = gp_list_front(&event->mIOWrite);
       while(node != NULL)
       {
-        gp_io* io = (gp_io*)(((char*)node)-sizeof(gp_object));
+        gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &writefds))
         {
           io->mCallback(io);
@@ -173,7 +173,7 @@ void _gp_event_run(_gp_event* event)
         {
           uint64_t buff;
           size_t r = read(timer->mFD, &buff, sizeof(uint64_t));
-          timer->mCallback((gp_timer*)(((char*)timer)-sizeof(gp_object)));
+          timer->mCallback((gp_timer*)GP_OBJECT_FROM_LIST_NODE(node));
         }
         node = gp_list_node_next(node);
       }

@@ -96,16 +96,36 @@ void _gp_work_done(gp_io* io)
   pthread_mutex_unlock(&context->mWorkMutex);
 }
 
+void _gp_context_free(gp_object* object)
+{
+  gp_context* context = (gp_context*)object;
+  
+  glXDestroyContext(context->mDisplay, context->mShare);
+  XFreeColormap(context->mDisplay, context->mColorMap);
+  XFree(context->mVisualInfo);
+  gp_object_unref((gp_object*)context->mWorkIO);
+  
+  close(context->mWorkPipe[0]);
+  close(context->mWorkPipe[1]);
+  
+  pthread_mutex_lock(&context->mWorkMutex);
+  context->mState &= ~GP_STATE_RUNNING;
+  pthread_cond_signal(&sContext->mWorkCV);
+  pthread_mutex_unlock(&context->mWorkMutex);
+  pthread_join(context->mWorkThread, NULL);
+  free(context);
+}
+
 gp_context* gp_context_new(gp_system* system)
 {
   assert(system != NULL);
   
   gp_context* context = (gp_context*)malloc(sizeof(struct _gp_context));
+  _gp_object_init(&context->mObject, _gp_context_free);
   context->mParent = system;
   context->mDisplay = system->mDisplay;
   context->mWindow = 0;
   context->mState = GP_STATE_RUNNING;
-  gp_ref_init(&context->mRef);
   
   gp_list_init(&context->mWork);
   gp_list_init(&context->mFinished);
@@ -239,32 +259,6 @@ gp_context* gp_context_new(gp_system* system)
   sContext = context;
   
   return context;
-}
-
-void gp_context_ref(gp_context* context)
-{
-  gp_ref_inc(&context->mRef);
-}
-
-void gp_context_unref(gp_context* context)
-{
-  if(gp_ref_dec(&context->mRef))
-  {
-    glXDestroyContext(context->mDisplay, context->mShare);
-    XFreeColormap(context->mDisplay, context->mColorMap);
-    XFree(context->mVisualInfo);
-    gp_object_unref((gp_object*)context->mWorkIO);
-    
-    close(context->mWorkPipe[0]);
-    close(context->mWorkPipe[1]);
-    
-    pthread_mutex_lock(&context->mWorkMutex);
-    context->mState &= ~GP_STATE_RUNNING;
-    pthread_cond_signal(&sContext->mWorkCV);
-    pthread_mutex_unlock(&context->mWorkMutex);
-    pthread_join(context->mWorkThread, NULL);
-    free(context);
-  }
 }
 
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

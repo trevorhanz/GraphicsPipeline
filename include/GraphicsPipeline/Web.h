@@ -87,9 +87,9 @@ namespace Web
   /*
    * Implementation
    */
-  Context::Context(const GP::System& system, const char* id) : GP::Context(gp_context_new_from_id(GetSystem(system), id)) {}
+  Context::Context(const GP::System& system, const char* id) : GP::Context(gp_context_new_from_id((gp_system*)system.GetObject(), id)) {}
   
-  Window::Window(const GP::Context& context, const char* id) : GP::Window(gp_window_new_from_id(GetContext(context), id)) {}
+  Window::Window(const GP::Context& context, const char* id) : GP::Window(gp_window_new_from_id((gp_context*)context.GetObject(), id)) {}
 }
 }
 

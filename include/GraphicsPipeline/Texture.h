@@ -22,6 +22,7 @@
 
 #include "Common.h"
 #include "Types.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,18 +40,6 @@ extern "C" {
 GP_EXPORT gp_texture_data* gp_texture_data_new();
 
 /*!
- * Increase texture data object reference count.
- * \param data Texture data object for which to increase the ref count.
- */
-GP_EXPORT void gp_texture_data_ref(gp_texture_data* data);
-
-/*!
- * Decrease texture data object reference count.
- * \param data Texture data object for which to decrease the ref count.
- */
-GP_EXPORT void gp_texture_data_unref(gp_texture_data* data);
-
-/*!
  * Store float data in texture data object.
  * \param td Texture data object to be used.
  * \param data Pointer to an array of floats.
@@ -65,18 +54,6 @@ GP_EXPORT void gp_texture_data_set(gp_texture_data* td, float* data, unsigned in
  * \return Newly created texture.
  */
 GP_EXPORT gp_texture* gp_texture_new(gp_context* context);
-
-/*!
- * Increase texture object reference count.
- * \param texture Texture object for which to increase the ref count.
- */
-GP_EXPORT void gp_texture_ref(gp_texture* texture);
-
-/*!
- * Decrease texture object reference count.
- * \param texture Texture object for which to decrease the ref count.
- */
-GP_EXPORT void gp_texture_unref(gp_texture* texture);
 
 /*!
  * Upload data to a texture object.
@@ -103,17 +80,14 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_texture_data
    */
-  class TextureData
+  class TextureData : public Object
   {
   public:
     //! Constructor
+    inline TextureData(gp_texture_data* data);
+    
+    //! Constructor
     inline TextureData();
-    
-    //! Copy Constructor
-    inline TextureData(const TextureData& other);
-    
-    //! Destructor
-    inline ~TextureData();
     
     /*!
      * Store float data in texture data object.
@@ -122,31 +96,19 @@ namespace GP
      * \param height Number of elements in data height.
      */
     inline void Set(float* data, unsigned int width, unsigned int height);
-    
-    
-    //! Equal operator
-    inline const TextureData& operator = (const TextureData& other);
-    
-  private:
-    gp_texture_data*      mData;      //!< Internal texture data object
-    
-    friend class Texture;
   };
   
   /*!
    * \brief Wrapper class for ::gp_texture.
    */
-  class Texture
+  class Texture : public Object
   {
   public:
     //! Constructor
+    inline Texture(gp_texture* texture);
+    
+    //! Constructor
     inline Texture(const Context& context);
-    
-    //! Copy Constructor
-    inline Texture(const Texture& other);
-    
-    //! Destructor
-    inline ~Texture();
     
     /*!
      * Uploads texture to %Texture object.
@@ -161,9 +123,6 @@ namespace GP
      */
     inline void SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback);
     
-    //! Equal operator
-    inline const Texture& operator = (const Texture& other);
-    
   private:
     struct AsyncData
     {
@@ -171,54 +130,27 @@ namespace GP
       std::function<void(Texture*)> mCallback;
     };
     inline static void AsyncCallback(void* data);
-    
-    gp_texture*           mTexture;     //!< Internal texture object
-    
-    friend class Context;
-    friend class UniformTexture;
-    friend class FrameBuffer;
   };
   
   //
   // Implementation
   //
-  TextureData::TextureData() : mData(gp_texture_data_new()) {}
-  TextureData::TextureData(const TextureData& other)
+  TextureData::TextureData(gp_texture_data* data) : Object((gp_object*)data) {}
+  TextureData::TextureData() : Object((void*)gp_texture_data_new()) {}
+  void TextureData::Set(float* data, unsigned int width, unsigned int height)
   {
-    mData = other.mData;
-    gp_texture_data_ref(mData);
-  }
-  TextureData::~TextureData() {gp_texture_data_unref(mData);}
-  void TextureData::Set(float* data, unsigned int width, unsigned int height) {gp_texture_data_set(mData, data, width, height);}
-  const TextureData& TextureData::operator = (const TextureData& other)
-  {
-    gp_texture_data_unref(mData);
-    mData = other.mData;
-    gp_texture_data_ref(mData);
-    return *this;
+    gp_texture_data_set((gp_texture_data*)GetObject(), data, width, height);
   }
   
-  Texture::Texture(const Context& context) : mTexture(gp_texture_new(context.mContext)) {}
-  Texture::Texture(const Texture& other)
-  {
-    mTexture = other.mTexture;
-    gp_texture_ref(mTexture);
-  }
-  Texture::~Texture() {gp_texture_unref(mTexture);}
-  void Texture::SetData(const TextureData& data) {gp_texture_set_data(mTexture, data.mData);}
+  Texture::Texture(gp_texture* texture) : Object((void*)texture) {}
+  Texture::Texture(const Context& context) : Object((gp_object*)gp_texture_new((gp_context*)context.GetObject())) {}
+  void Texture::SetData(const TextureData& data) {gp_texture_set_data((gp_texture*)GetObject(), (gp_texture_data*)data.GetObject());}
   void Texture::SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback)
   {
     AsyncData* async = new AsyncData();
     async->mTexture = this;
     async->mCallback = callback;
-    gp_texture_set_data_async(mTexture, data.mData, &Texture::AsyncCallback, async);
-  }
-  const Texture& Texture::operator = (const Texture& other)
-  {
-    gp_texture_unref(mTexture);
-    mTexture = other.mTexture;
-    gp_texture_ref(mTexture);
-    return *this;
+    gp_texture_set_data_async((gp_texture*)GetObject(), (gp_texture_data*)data.GetObject(), &Texture::AsyncCallback, async);
   }
   void Texture::AsyncCallback(void* data)
   {

@@ -24,6 +24,7 @@
 #include "Types.h"
 #include "Texture.h"
 #include "Context.h"
+#include "Object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,18 +42,6 @@ extern "C" {
 GP_EXPORT gp_shader_source* gp_shader_source_new();
 
 /*!
- * Increase shader source ref count.
- * \param shader Shader source to have its ref count increased.
- */
-GP_EXPORT void gp_shader_source_ref(gp_shader_source* source);
-
-/*!
- * Decreate shader source ref count.
- * \param shader Shader source to have its ref count decreased.
- */
-GP_EXPORT void gp_shader_source_unref(gp_shader_source* source);
-
-/*!
  * Store a shader source string in this shader source obect.
  * \param source The shader source object for which to add the source code.
  * \param type The type shader stage for which the string should be compiled.
@@ -66,18 +55,6 @@ GP_EXPORT void gp_shader_source_add_from_string(gp_shader_source* source, GP_SHA
  * \return Newly created shader.
  */
 GP_EXPORT gp_shader* gp_shader_new(gp_context* context);
-
-/*!
- * Increase shader ref count.
- * \param shader Shader to have its ref count increased.
- */
-GP_EXPORT void gp_shader_ref(gp_shader* shader);
-
-/*!
- * Decreate shader ref count.
- * \param shader Shader to have its ref count decreased.
- */
-GP_EXPORT void gp_shader_unref(gp_shader* shader);
 
 /*!
  * Compile a gp_shader object with a vertext and fragment source code.
@@ -245,17 +222,14 @@ namespace GP
   /*!
    * \brief Wrapper class for ::gp_shader_source.
    */
-  class ShaderSource
+  class ShaderSource : public Object
   {
   public:
     //! Constructor
+    inline ShaderSource(gp_shader_source* source);
+    
+    //! Constructor
     inline ShaderSource();
-    
-    //! Copy Constructor
-    inline ShaderSource(const ShaderSource& other);
-    
-    //! Destructor
-    inline ~ShaderSource();
     
     /*!
      * Store a shader source string in this shader source obect.
@@ -263,30 +237,19 @@ namespace GP
      * \param str Text containing shader source code.
      */
     inline void AddString(GP_SHADER_SOURCE_TYPE type, const char* str);
-    
-    //! Equal operator
-    inline const ShaderSource& operator = (const ShaderSource& other);
-    
-  private:
-    gp_shader_source* mSource;
-    
-    friend class Shader;
   };
   
   /*!
    * \brief Wrapper class for ::gp_shader.
    */
-  class Shader
+  class Shader : public Object
   {
   public:
     //! Constructor
+    inline Shader(gp_shader* shader);
+    
+    //! Constructor
     inline Shader(const Context& context);
-    
-    //! Copy Constructor
-    inline Shader(const Shader& other);
-    
-    //! Destructor
-    inline ~Shader();
     
     /*!
      * Compile this shader program with vertex and fragment source code.
@@ -300,16 +263,6 @@ namespace GP
      * \return Newly created Uniform object.
      */
     inline Uniform CreateUniform(const char* name);
-    
-    //! Equal operator
-    inline const Shader& operator = (const Shader& other);
-    
-  private:
-    gp_shader*        mShader;
-    
-    friend class Pipeline;
-    friend class DrawOperation;
-    friend class Uniform;
   };
   
   /*!
@@ -327,15 +280,6 @@ namespace GP
     
     //! Copy Constructor
     inline Uniform(const Object& other);
-    
-    //! Destructor
-    inline ~Uniform();
-    
-  protected:
-    inline static gp_shader* GetShader(const Shader& shader);
-    
-    friend class Shader;
-    friend class DrawOperation;
   };
   
 #define CXX_UNIFORM(CXXname, Cname, type)\
@@ -358,7 +302,7 @@ namespace GP
      */\
     inline type Get();\
   };\
-  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name(GetShader(shader), name)) {}\
+  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name((gp_shader*)shader.GetObject(), name)) {}\
   void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)mObject, data);}\
   type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)mObject);}
   
@@ -381,8 +325,8 @@ namespace GP
      */
     inline gp_texture* Get();
   };\
-  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform(gp_uniform_texture_new_by_name(GetShader(shader), name)) {}
-  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)mObject, texture.mTexture);}
+  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform(gp_uniform_texture_new_by_name((gp_shader*)shader.GetObject(), name)) {}
+  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)mObject, (gp_texture*)texture.GetObject());}
   gp_texture* UniformTexture::Get() {return 0;}
   
   CXX_UNIFORM(Float, float, float)
@@ -397,43 +341,23 @@ namespace GP
   //
   // Implementation
   //
-  ShaderSource::ShaderSource() : mSource(gp_shader_source_new()) {}
-  ShaderSource::ShaderSource(const ShaderSource& other)
+  ShaderSource::ShaderSource(gp_shader_source* source) : Object((gp_object*)source) {}
+  ShaderSource::ShaderSource() : Object((void*)gp_shader_source_new()) {}
+  void ShaderSource::AddString(GP_SHADER_SOURCE_TYPE type, const char* str)
   {
-    mSource = other.mSource;
-    gp_shader_source_ref(mSource);
-  }
-  ShaderSource::~ShaderSource() {gp_shader_source_unref(mSource);}
-  void ShaderSource::AddString(GP_SHADER_SOURCE_TYPE type, const char* str) {gp_shader_source_add_from_string(mSource, type, str);}
-  const ShaderSource& ShaderSource::operator = (const ShaderSource& other)
-  {
-    gp_shader_source_unref(mSource);
-    mSource = other.mSource;
-    gp_shader_source_ref(mSource);
-    return *this;
+    gp_shader_source_add_from_string((gp_shader_source*)GetObject(), type, str);
   }
   
-  Shader::Shader(const Context& context) : mShader(gp_shader_new(context.mContext)) {}
-  Shader::Shader(const Shader& other)
+  Shader::Shader(gp_shader* shader) : Object((void*)shader) {}
+  Shader::Shader(const Context& context) : Object((gp_object*)gp_shader_new((gp_context*)context.GetObject())) {}
+  void Shader::Compile(const ShaderSource& source)
   {
-    mShader = other.mShader;
-    gp_shader_ref(mShader);
-  }
-  Shader::~Shader() {gp_shader_unref(mShader);}
-  void Shader::Compile(const ShaderSource& source) {gp_shader_compile(mShader, source.mSource);}
-  const Shader& Shader::operator = (const Shader& other)
-  {
-    gp_shader_unref(mShader);
-    mShader = other.mShader;
-    gp_shader_ref(mShader);
-    return *this;
+    gp_shader_compile((gp_shader*)GetObject(), (gp_shader_source*)source.GetObject());
   }
   
   Uniform::Uniform(void* uniform) : Object((void*)uniform) {}
   Uniform::Uniform(gp_uniform* uniform) : Object((gp_object*)uniform) {}
   Uniform::Uniform(const Object& other) : Object(other) {}
-  Uniform::~Uniform() {}
-  gp_shader* Uniform::GetShader(const Shader& shader) {return shader.mShader;}
 }
 #endif // __cplusplus
 

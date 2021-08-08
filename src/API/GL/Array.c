@@ -28,29 +28,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+void _gp_array_data_free(gp_object* object)
+{
+  gp_array_data* data = (gp_array_data*)object;
+  
+  if(data->mData) free(data->mData);
+  free(data);
+}
+
 gp_array_data* gp_array_data_new()
 {
   gp_array_data* data = malloc(sizeof(gp_array_data));
-  
+  _gp_object_init(&data->mObject, _gp_array_data_free);
   data->mData = NULL;
   data->mCount = 0;
-  gp_ref_init(&data->mRef);
   
   return data;
-}
-
-void gp_array_data_ref(gp_array_data* data)
-{
-  gp_ref_inc(&data->mRef);
-}
-
-void gp_array_data_unref(gp_array_data* data)
-{
-  if(gp_ref_dec(&data->mRef))
-  {
-    if(data->mData) free(data->mData);
-    free(data);
-  }
 }
 
 void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count)
@@ -63,28 +56,21 @@ void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count)
   ad->mCount = count;
 }
 
+void _gp_array_free(gp_object* object)
+{
+  gp_array* array = (gp_array*)object;
+  
+  glDeleteBuffers(1, &array->mVBO);
+  free(array);
+}
+
 gp_array* gp_array_new(gp_context* context)
 {
   gp_array* array = malloc(sizeof(gp_array));
-  
+  _gp_object_init(&array->mObject, _gp_array_free);
   glGenBuffers(1, &array->mVBO);
-  gp_ref_init(&array->mRef);
   
   return array;
-}
-
-void gp_array_ref(gp_array* array)
-{
-  gp_ref_inc(&array->mRef);
-}
-
-void gp_array_unref(gp_array* array)
-{
-  if(gp_ref_dec(&array->mRef))
-  {
-    glDeleteBuffers(1, &array->mVBO);
-    free(array);
-  }
 }
 
 void gp_array_set_data(gp_array* array, gp_array_data* data)

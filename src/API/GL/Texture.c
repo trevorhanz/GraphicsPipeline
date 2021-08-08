@@ -28,29 +28,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+void _gp_texture_data_free(gp_object* object)
+{
+  gp_texture_data* data = (gp_texture_data*)object;
+  
+  if(data->mData) free(data->mData);
+  free(data);
+}
+
 gp_texture_data* gp_texture_data_new()
 {
   gp_texture_data* data = malloc(sizeof(gp_texture_data));
+  _gp_object_init(&data->mObject, _gp_texture_data_free);
   data->mData = NULL;
   data->mWidth = 0;
   data->mHeight = 0;
-  gp_ref_init(&data->mRef);
   
   return data;
-}
-
-void gp_texture_data_ref(gp_texture_data* data)
-{
-  gp_ref_inc(&data->mRef);
-}
-
-void gp_texture_data_unref(gp_texture_data* data)
-{
-  if(gp_ref_dec(&data->mRef))
-  {
-    if(data->mData) free(data->mData);
-    free(data);
-  }
 }
 
 void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, unsigned int height)
@@ -72,35 +66,28 @@ void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, u
   td->mHeight = height;
 }
 
+void _gp_texture_free(gp_object* object)
+{
+  gp_texture* texture = (gp_texture*)object;
+  
+  glDeleteTextures(1, &texture->mTexture);
+#ifndef GP_WEB
+  glDeleteBuffers(1, &texture->mPBO);
+#endif
+  free(texture);
+}
+
 gp_texture* gp_texture_new(gp_context* context)
 {
   gp_texture* texture = malloc(sizeof(gp_texture));
-  
+  _gp_object_init(&texture->mObject, _gp_texture_free);
   glGenTextures(1, &texture->mTexture);
-  gp_ref_init(&texture->mRef);
   
 #ifndef GP_WEB
   glGenBuffers(1, &texture->mPBO);
 #endif
   
   return texture;
-}
-
-void gp_texture_ref(gp_texture* texture)
-{
-  gp_ref_inc(&texture->mRef);
-}
-
-void gp_texture_unref(gp_texture* texture)
-{
-  if(gp_ref_dec(&texture->mRef))
-  {
-    glDeleteTextures(1, &texture->mTexture);
-#ifndef GP_WEB
-    glDeleteBuffers(1, &texture->mPBO);
-#endif
-    free(texture);
-  }
 }
 
 void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)

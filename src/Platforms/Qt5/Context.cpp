@@ -24,10 +24,17 @@
 
 gp_context* sContext = 0;
 
+void _gp_context_free(gp_object* object)
+{
+  gp_context* context = (gp_context*)object;
+  
+  delete context;
+}
+
 extern "C" gp_context* gp_qt_context_new()
 {
   gp_context* context = new gp_context;
-  gp_ref_init(&context->mRef);
+  _gp_object_init(&context->mObject, _gp_context_free);
   sContext = context;
   
   QSurfaceFormat format;
@@ -186,19 +193,6 @@ QWidget* gp_window_get_qwidget(gp_window* window)
 extern "C" gp_context* gp_context_new(gp_system* system)
 {
   return gp_qt_context_new();
-}
-
-void gp_context_ref(gp_context* context)
-{
-  gp_ref_inc(&context->mRef);
-}
-
-void gp_context_unref(gp_context* context)
-{
-  if(gp_ref_dec(&context->mRef))
-  {
-    delete context;
-  }
 }
 
 extern "C" void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)

@@ -19,30 +19,24 @@
 
 #include <stdlib.h>
 
+void _gp_window_free(gp_object* object)
+{
+  gp_window* window = (gp_window*)object;
+  
+  _gp_pipeline_free(window->mPipeline);
+  
+  if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+  if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
+  if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
+  if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+  
+  free(window);
+}
+
 gp_window* gp_window_new(gp_context* context)
 {
   return NULL;
-}
-
-void gp_window_ref(gp_window* window)
-{
-  gp_ref_inc(&window->mRef);
-}
-
-void gp_window_unref(gp_window* window)
-{
-  if(gp_ref_dec(&window->mRef))
-  {
-    _gp_pipeline_free(window->mPipeline);
-    
-    if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
-    if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
-    if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
-    if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
-    if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
-    
-    free(window);
-  }
 }
 
 gp_pipeline* gp_window_get_pipeline(gp_window* window)
@@ -57,6 +51,7 @@ void gp_window_redraw(gp_window* window)
 gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow)
 {
   gp_window* window = malloc(sizeof(gp_window));
+  _gp_object_init(&window->mObject, _gp_window_free);
   window->mWindow = awindow;
   window->mClickCB = NULL;
   window->mMoveData = NULL;
@@ -66,7 +61,6 @@ gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow
   window->mKeyData = NULL;
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
-  gp_ref_init(&window->mRef);
   
   ANativeWindow_setBuffersGeometry(awindow, 0, 0, context->mFormat);
 

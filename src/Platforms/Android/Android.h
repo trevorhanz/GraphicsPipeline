@@ -41,16 +41,17 @@ struct _gp_system
 
 struct _gp_context
 {
+  gp_object                             mObject;
   gp_system*                            mParent;
   EGLConfig                             mConfig;
   EGLint                                mFormat;
   EGLContext                            mShare;
   EGLSurface                            mShareSurface;
-  gp_refcounter                         mRef;
 };
 
 struct _gp_window
 {
+  gp_object                             mObject;
   EGLContext                            mContext;
   ANativeWindow*                        mWindow;
   EGLSurface                            mSurface;
@@ -68,7 +69,6 @@ struct _gp_window
   gp_pointer*                           mKeyData;
   gp_event_resize_callback_t            mResizeCB;
   gp_pointer*                           mResizeData;
-  gp_refcounter                         mRef;
 };
 
 struct _gp_timer

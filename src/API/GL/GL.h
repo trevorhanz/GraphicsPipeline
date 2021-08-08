@@ -55,50 +55,51 @@ typedef struct __gp_draw_context _gp_draw_context;
 
 struct _gp_frame_buffer
 {
+  gp_object               mObject;
   GLuint                  mFBO;
   GLuint                  mRBO;
   gp_context*             mContext;
   gp_texture*             mTexture;
   gp_pipeline*            mPipeline;
-  gp_refcounter           mRef;
 };
 
 struct _gp_array_data
 {
+  gp_object               mObject;
   float*                  mData;
   unsigned int            mCount;
-  gp_refcounter           mRef;
 };
 
 struct _gp_array
 {
+  gp_object               mObject;
   GLuint                  mVBO;
-  gp_refcounter           mRef;
 };
 
 struct _gp_texture_data
 {
+  gp_object               mObject;
   float*                  mData;
   unsigned int            mWidth;
   unsigned int            mHeight;
-  gp_refcounter           mRef;
 };
 
 struct _gp_texture
 {
+  gp_object               mObject;
   GLuint                  mTexture;
   GLuint                  mPBO;
-  gp_refcounter           mRef;
 };
 
 struct _gp_shader_source
 {
+  gp_object               mObject;
   gp_list                 mSource;
-  gp_refcounter           mRef;
 };
 
 struct _gp_shader
 {
+  gp_object               mObject;
   GLuint                  mProgram;
   GLuint                  mAttribute;
   gp_refcounter           mRef;
@@ -114,18 +115,12 @@ struct _gp_uniform
   void*                   mData;
 };
 
-typedef struct __gp_operation_data _gp_operation_data;
-
-struct __gp_operation_data
-{
-  void (*free)(_gp_operation_data* data);
-};
+typedef void(*_gp_operation_function)(gp_operation* self, _gp_draw_context* context);
 
 struct _gp_operation
 {
-  void (*func)(_gp_operation_data* data, _gp_draw_context* context);
-  _gp_operation_data*     mData;
-  gp_refcounter           mRef;
+  gp_object               mObject;
+  _gp_operation_function  mFunc;
 };
 
 typedef struct _gp_operation_list gp_operation_list;

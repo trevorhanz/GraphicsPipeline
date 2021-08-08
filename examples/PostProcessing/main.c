@@ -217,64 +217,64 @@ int main(int argc, char* argv[])
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 6);
   gp_array_set_data(array, ad);
-  gp_array_data_unref(ad);
+  gp_object_unref((gp_object*)ad);
   
   ad = gp_array_data_new();
   gp_array_data_set(ad, vertexDataQuad, 8);
   gp_array_set_data(arrayQuad, ad);
-  gp_array_data_unref(ad);
+  gp_object_unref((gp_object*)ad);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   gp_shader_compile(shader, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSourceQuad);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSourceQuad);
   gp_shader_compile(shaderQuad, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSourceBlur);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSourceBlur);
   gp_shader_compile(shaderBlur, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSourceWave);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSourceWave);
   gp_shader_compile(shaderWave, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSourceGaussianVertical);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSourceGaussianVertical);
   gp_shader_compile(shaderGV, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSourceGaussianHorizontal);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSourceGaussianHorizontal);
   gp_shader_compile(shaderGH, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   gp_frame_buffer_attach(fb, texture);
   gp_pipeline* pipeline = gp_frame_buffer_get_pipeline(fb);
   
   gp_operation* clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipeline, clear);
-  gp_operation_unref(clear);
+  gp_object_unref((gp_object*)clear);
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
-  gp_operation_unref(draw);
-  gp_shader_unref(shader);
-  gp_array_unref(array);
+  gp_object_unref((gp_object*)draw);
+  gp_object_unref((gp_object*)shader);
+  gp_object_unref((gp_object*)array);
   
   pipeline = gp_window_get_pipeline(window);
   
@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)texQuad);
   
   //
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
   clear = gp_operation_clear_new();
   gp_pipeline_add_operation(pipelineG, clear);
   gp_operation_clear_set_color(clear, 1, 0, 0, 1);
-  gp_operation_unref(clear);
+  gp_object_unref((gp_object*)clear);
   
   view = gp_operation_viewport_new();
   gp_operation_viewport_set_dimesions(view, 0, 0, 1024, 768);
@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(pipelineG, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)texGV);
   
   gp_uniform* texGH = gp_uniform_texture_new_by_name(shaderGH, "Texture");
@@ -344,7 +344,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)texGH);
   
   //
@@ -369,7 +369,7 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)texWave);
   gp_object_unref((gp_object*)offsetWave);
   
@@ -387,14 +387,14 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
-  gp_operation_unref(draw);
+  gp_object_unref((gp_object*)draw);
   
-  gp_shader_unref(shaderQuad);
-  gp_shader_unref(shaderBlur);
-  gp_shader_unref(shaderGH);
-  gp_shader_unref(shaderGV);
-  gp_shader_unref(shaderWave);
-  gp_array_unref(arrayQuad);
+  gp_object_unref((gp_object*)shaderQuad);
+  gp_object_unref((gp_object*)shaderBlur);
+  gp_object_unref((gp_object*)shaderGH);
+  gp_object_unref((gp_object*)shaderGV);
+  gp_object_unref((gp_object*)shaderWave);
+  gp_object_unref((gp_object*)arrayQuad);
   gp_frame_buffer_redraw(fbG);
   gp_frame_buffer_redraw(fb);
   gp_frame_buffer_redraw(fbG);
@@ -412,10 +412,10 @@ int main(int argc, char* argv[])
   
   gp_system_run(system);
   
-  gp_frame_buffer_unref(fb);
-  gp_frame_buffer_unref(fbG);
-  gp_window_unref(window);
-  gp_context_unref(context);
+  gp_object_unref((gp_object*)fb);
+  gp_object_unref((gp_object*)fbG);
+  gp_object_unref((gp_object*)window);
+  gp_object_unref((gp_object*)context);
   gp_object_unref((gp_object*)timer);
   gp_object_unref((gp_object*)system);
   free(data);

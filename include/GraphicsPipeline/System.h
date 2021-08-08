@@ -158,13 +158,10 @@ namespace GP
   {
   public:
     //! Constructor
-    inline System();
-    
-    //! Constructor
     inline System(gp_system* system);
     
-    //! Destructor
-    inline ~System();
+    //! Constructor
+    inline System();
     
     /*!
      * Start the main loop.
@@ -175,14 +172,6 @@ namespace GP
      * Stop the main loop.
      */
     inline void Stop();
-    
-  private:
-    
-    friend class Context;
-    friend class Timer;
-    friend class IO;
-    friend class ReadIO;
-    friend class WriteIO;
   };
   
   /*!
@@ -199,9 +188,6 @@ namespace GP
     
      //! Copy Constructor
     inline Timer(const Object& other);
-    
-    //! Destructor
-    inline ~Timer();
     
     /*!
      * Sets callback function to be called at timeout.
@@ -242,9 +228,6 @@ namespace GP
     //! Constructor
     inline IO(gp_io* io);
     
-    //! Destructor
-    inline ~IO();
-    
     /*!
      * Sets callback function to be called at timeout.
      * \param callback Callback function to be called.
@@ -283,16 +266,14 @@ namespace GP
   //
   // Implementation
   //
-  System::System() : Object((void*)gp_system_new()) {}
   System::System(gp_system* system) : Object((gp_object*)system) {}
-  System::~System() {}
+  System::System() : Object((void*)gp_system_new()) {}
   void System::Run() {gp_system_run((gp_system*)mObject);}
   void System::Stop() {gp_system_stop((gp_system*)mObject);}
   
   Timer::Timer(gp_timer* timer) : Object((gp_object*)timer) {}
-  Timer::Timer(const System& system) : Object((void*)gp_timer_new((gp_system*)system.mObject)) {}
+  Timer::Timer(const System& system) : Object((void*)gp_timer_new((gp_system*)system.GetObject())) {}
   Timer::Timer(const Object& other) : Object(other) {}
-  Timer::~Timer() {}
   void Timer::SetCallback(std::function<void(Timer&)> callback)
   {
     CallbackData* data = new CallbackData();
@@ -313,7 +294,6 @@ namespace GP
   
   IO::IO(void* io) : Object((void*)io) {}
   IO::IO(gp_io* io) : Object((gp_object*)io) {}
-  IO::~IO() {}
   void IO::SetCallback(std::function<void(IO&)> callback)
   {
     CallbackData* data = new CallbackData();
@@ -330,9 +310,9 @@ namespace GP
     data->mCallback(i);
   }
   
-  ReadIO::ReadIO(const System& system, int fd) : IO((void*)gp_io_read_new((gp_system*)system.mObject, fd)) {}
+  ReadIO::ReadIO(const System& system, int fd) : IO((void*)gp_io_read_new((gp_system*)system.GetObject(), fd)) {}
   
-  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)system.mObject, fd)) {}
+  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)system.GetObject(), fd)) {}
 }
 #endif // __cplusplus
 

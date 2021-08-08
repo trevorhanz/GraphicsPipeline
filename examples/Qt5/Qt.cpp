@@ -57,13 +57,13 @@ int main(int argc, char* argv[])
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 6);
   gp_array_set_data(array, ad);
-  gp_array_data_unref(ad);
+  gp_object_unref((gp_object*)ad);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_FRAGMENT, fragmentSource);
   gp_shader_compile(shader, source);
-  gp_shader_source_unref(source);
+  gp_object_unref((gp_object*)source);
   
   gp_pipeline* pipeline = gp_window_get_pipeline(view);
   
