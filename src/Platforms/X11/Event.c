@@ -255,6 +255,9 @@ gp_pointer* gp_timer_get_userdata(gp_timer* timer)
 
 void gp_timer_arm(gp_timer* timer, double timeout)
 {
+  // Set timeout above 0 to prevent disarming the timer.
+  if(timeout <= 0) timeout = .0000001;
+  
   struct itimerspec it;
   it.it_interval.tv_sec = 0;
   it.it_interval.tv_nsec = 0;

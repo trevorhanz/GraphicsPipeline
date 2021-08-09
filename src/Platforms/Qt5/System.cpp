@@ -86,6 +86,7 @@ extern "C" gp_timer* gp_timer_new(gp_system* system)
   timer->mTimer = new QTimer();
   timer->mTimerCallback = new TimerCallback(timer);
   timer->mUserData = NULL;
+  timer->mTimer->setSingleShot(true);
   
   QObject::connect(timer->mTimer, SIGNAL(timeout(void)), timer->mTimerCallback, SLOT(Callback(void)));
   
