@@ -287,13 +287,32 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
 {
   _gp_operation_draw_data* data = (_gp_operation_draw_data*)operation->mData;
   
-  gp_array_list* a = malloc(sizeof(gp_array_list));
+  gp_array_list* a = NULL;
+  
+  // Search for existing array at index first.
+  gp_list_node* node = gp_list_front(&data->mArrays);
+  while(node != NULL)
+  {
+    a = (gp_array_list*)node;
+    if(a->mIndex == index)
+    {
+      gp_array_unref(a->mArray);
+      break;
+    }
+  }
+  
+  // Create a new node if one wasn't found.
+  if(node == NULL)
+  {
+    a = malloc(sizeof(gp_array_list));
+    gp_list_push_back(&data->mArrays, (gp_list_node*)a);
+  }
+  
   a->mArray = array;
   a->mIndex = index;
   a->mComponents = components;
   a->mStride = stride;
   a->mOffset = offset;
-  gp_list_push_back(&data->mArrays, (gp_list_node*)a);
   
   gp_array_ref(array);
   
