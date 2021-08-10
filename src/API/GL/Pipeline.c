@@ -299,6 +299,8 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
       gp_array_unref(a->mArray);
       break;
     }
+    
+    node = gp_list_node_next(node);
   }
   
   // Create a new node if one wasn't found.
