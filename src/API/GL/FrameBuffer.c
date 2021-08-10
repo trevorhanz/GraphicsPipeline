@@ -80,6 +80,9 @@ void _gp_check_frame_buffer()
 gp_frame_buffer* gp_frame_buffer_new(gp_context* context)
 {
   gp_frame_buffer* fb = malloc(sizeof(gp_frame_buffer));
+  fb->mContext = context;
+  
+  _gp_api_context_make_current(fb->mContext);
   
   glGenFramebuffers(1, &fb->mFBO);
   glGenRenderbuffers(1, &fb->mRBO);
@@ -123,6 +126,8 @@ gp_pipeline* gp_frame_buffer_get_pipeline(gp_frame_buffer* fb)
 
 void gp_frame_buffer_redraw(gp_frame_buffer* fb)
 {
+  _gp_api_context_make_current(fb->mContext);
+  
   int width, height;
   glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO);
   glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
@@ -138,6 +143,8 @@ void gp_frame_buffer_redraw(gp_frame_buffer* fb)
 
 void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture)
 {
+  _gp_api_context_make_current(fb->mContext);
+  
   if(fb->mTexture)
     gp_texture_unref(fb->mTexture);
   fb->mTexture = texture;
@@ -162,6 +169,8 @@ void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture)
 
 void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
 {
+  _gp_api_context_make_current(fb->mContext);
+  
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
   glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);  
@@ -174,5 +183,6 @@ void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
     gp_texture_set_data(fb->mTexture, data);
     gp_texture_data_unref(data);
   }
+  CHECK_GL_ERROR()
 }
 

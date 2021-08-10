@@ -205,3 +205,8 @@ extern "C" void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 {
   sContext->mWorkQueue->AddWork(work, join, data);
 }
+
+extern "C" void _gp_api_context_make_current(gp_context* context)
+{
+  context->mShare->makeCurrent(context->mSurface);
+}

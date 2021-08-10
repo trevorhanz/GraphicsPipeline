@@ -186,6 +186,19 @@ gp_context* gp_context_new(gp_system* system)
   GLXContext ctx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, 0, True, context_attribs);
   context->mShare = ctx;
   
+  //
+  // Create window
+  //
+  XSetWindowAttributes attr;
+  attr.colormap = context->mColorMap;
+  attr.border_pixel = 0;
+  attr.event_mask = 0;
+  
+  context->mWindow = XCreateWindow(context->mDisplay, RootWindow(context->mDisplay, context->mVisualInfo->screen),
+                                   0, 0, GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT,
+                                   0, context->mVisualInfo->depth, InputOutput, context->mVisualInfo->visual,
+                                   CWBorderPixel | CWColormap | CWEventMask, &attr);
+  
   // NOTE: Context needs window first time it is made current.
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
@@ -265,4 +278,9 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
   gp_list_push_back(&sContext->mWork, (gp_list_node*)node);
   pthread_cond_signal(&sContext->mWorkCV);
   pthread_mutex_unlock(&sContext->mWorkMutex);
+}
+
+void _gp_api_context_make_current(gp_context* context)
+{
+  glXMakeCurrent(context->mDisplay, 0, context->mShare);
 }

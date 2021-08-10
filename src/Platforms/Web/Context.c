@@ -179,3 +179,9 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
   if(sContext->mWorkTimer->mTimerID<0)
     gp_timer_arm(sContext->mWorkTimer, .1);
 }
+
+void _gp_api_context_make_current(gp_context* context)
+{
+  // NOTE: Not needed because there will only be one context
+  // that will always be current.
+}

@@ -472,3 +472,7 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
   LeaveCriticalSection(&sContext->mWorkMutex);
 }
 
+void _gp_api_context_make_current(gp_context* context)
+{
+  wglMakeCurrent(GetDC(context->mWindow), context->mShare);
+}

@@ -96,3 +96,8 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
   work(data);
   join(data);
 }
+
+void _gp_api_context_make_current(gp_context* context)
+{
+  // TODO: Implement
+}

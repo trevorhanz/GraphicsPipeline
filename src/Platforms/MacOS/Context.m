@@ -179,3 +179,7 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
   pthread_mutex_unlock(&sContext->mWorkMutex);
 }
 
+void _gp_api_context_make_current(gp_context* context)
+{
+  // TODO: Implement
+}

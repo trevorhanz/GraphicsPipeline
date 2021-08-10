@@ -57,6 +57,7 @@ struct _gp_frame_buffer
 {
   GLuint                  mFBO;
   GLuint                  mRBO;
+  gp_context*             mContext;
   gp_texture*             mTexture;
   gp_pipeline*            mPipeline;
   gp_refcounter           mRef;
@@ -159,6 +160,8 @@ void _gp_api_init_context();
 void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data);
 
 void _gp_api_prepare_window(unsigned int width, unsigned int height);
+
+void _gp_api_context_make_current(gp_context* context);
 
 #ifdef __cplusplus
 }
