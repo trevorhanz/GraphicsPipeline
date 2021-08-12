@@ -38,6 +38,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 const gp_draw_mode GP_MODE_TRIANGLES = GL_TRIANGLES;
 const gp_draw_mode GP_MODE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP;
@@ -334,19 +335,21 @@ typedef struct
 {
   gp_operation            mOperation;
   gp_pipeline*            mPipeline;
-  int                     mX;
-  int                     mY;
-  int                     mWidth;
-  int                     mHeight;
+  int                     mRect[4];     // x, y, width, height
+  int                     mOrigin[4];   // x, y, width, height
 } _gp_operation_viewport;
 
 void _gp_operation_viewport_func(gp_operation* operation, _gp_draw_context* context)
 {
   _gp_operation_viewport* self = (_gp_operation_viewport*)operation;
   
-  glViewport(self->mX, self->mY, self->mWidth, self->mHeight);
+  glGetIntegerv(GL_VIEWPORT, self->mOrigin);
+  
+  glViewport(self->mRect[0], self->mRect[1], self->mRect[2], self->mRect[3]);
   
   _gp_pipeline_execute_with_context(self->mPipeline, context);
+  
+  glViewport(self->mOrigin[0], self->mOrigin[1], self->mOrigin[2], self->mOrigin[3]);
 }
 
 void _gp_operation_viewport_free(gp_object* object)
@@ -362,10 +365,7 @@ gp_operation* gp_operation_viewport_new()
   _gp_object_init(&operation->mOperation.mObject, _gp_operation_viewport_free);
   operation->mOperation.mFunc = _gp_operation_viewport_func;
   operation->mPipeline = _gp_pipeline_new();
-  operation->mX = 0;
-  operation->mY = 0;
-  operation->mWidth = 0;
-  operation->mHeight = 0;
+  memset(operation->mRect, 0, sizeof(int)*4);
   
   return (gp_operation*)operation;
 }
@@ -379,10 +379,10 @@ gp_pipeline* gp_operation_viewport_get_pipeline(gp_operation* operation)
 void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, int width, int height)
 {
   _gp_operation_viewport* self = (_gp_operation_viewport*)operation;
-  self->mX = x;
-  self->mY = y;
-  self->mWidth = width;
-  self->mHeight = height;
+  self->mRect[0] = x;
+  self->mRect[1] = y;
+  self->mRect[2] = width;
+  self->mRect[3] = height;
 }
 
 
