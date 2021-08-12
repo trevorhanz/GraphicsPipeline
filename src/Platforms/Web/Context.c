@@ -30,11 +30,11 @@ gp_context* sContext = 0;
 void gp_window_redraw(gp_window* window);
 
 EM_JS(int, _gp_canvas_get_width, (const char* id), {
-  return document.getElementById(UTF8ToString(id)).width;
+  return document.getElementById(UTF8ToString(id)).getBoundingClientRect().width;
 });
 
 EM_JS(int, _gp_canvas_get_height, (const char* id), {
-  return document.getElementById(UTF8ToString(id)).height;
+  return document.getElementById(UTF8ToString(id)).getBoundingClientRect().height;
 });
 
 EM_JS(void, _gp_canvas_set_width, (const char* id, int value), {
@@ -115,6 +115,8 @@ void _gp_context_build(gp_context* context)
   EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(context->mShare);
   assert(res == EMSCRIPTEN_RESULT_SUCCESS);
   assert(emscripten_webgl_get_current_context() == context->mShare);
+  
+  _gp_api_init_context();
   
   const GLubyte* glVersion = glGetString(GL_VERSION);
   gp_log_info("GL Version: %s", glVersion);

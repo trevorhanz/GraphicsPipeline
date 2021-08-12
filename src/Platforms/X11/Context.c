@@ -276,5 +276,5 @@ void _gp_api_work(void(*work)(void*), void(*join)(void*), void* data)
 
 void _gp_api_context_make_current(gp_context* context)
 {
-  glXMakeCurrent(context->mDisplay, 0, context->mShare);
+  glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
 }
