@@ -180,3 +180,23 @@ void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
   CHECK_GL_ERROR()
 }
 
+void gp_frame_buffer_get_size(gp_frame_buffer* fb, int* width, int* height)
+{
+  _gp_api_context_make_current(fb->mContext);
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
+  
+  if(width)
+  {
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, width);
+  }
+  if(height)
+  {
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, height);
+  }
+  
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  CHECK_GL_ERROR()
+}
+

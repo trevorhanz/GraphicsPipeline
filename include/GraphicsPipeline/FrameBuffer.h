@@ -70,6 +70,14 @@ GP_EXPORT void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture);
  */
 GP_EXPORT void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height);
 
+/*!
+ * Retrieve the size of the frame buffer in pixels.
+ * \param fb Pointer to frame buffer object.
+ * \param width Pointer where the frame buffer width value will be set.  Set as NULL to ignore.
+ * \param height Pointer where the frame buffer height value will be set.  Set as NULL to ignore.
+ */
+GP_EXPORT void gp_frame_buffer_get_size(gp_frame_buffer* fb, int* width, int* height);
+
 //! \} // FrameBuffer
 
 #ifdef __cplusplus
@@ -112,6 +120,13 @@ namespace GP
      * \param height Number of pixels high.
      */
     inline void SetSize(int width, int height);
+    
+    /*!
+     * Retrieve the size of the frame buffer in pixels.
+     * \param width Pointer where the frame buffer width value will be set.  Set as NULL to ignore.
+     * \param height Pointer where the frame buffer height value will be set.  Set as NULL to ignore.
+     */
+    inline void GetSize(int* width, int* height);
   };
   
   //
@@ -123,6 +138,7 @@ namespace GP
   void FrameBuffer::Redraw() {gp_frame_buffer_redraw((gp_frame_buffer*)GetObject());}
   void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach((gp_frame_buffer*)GetObject(), (gp_texture*)texture.GetObject());}
   void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size((gp_frame_buffer*)GetObject(), width, height);}
+  void FrameBuffer::GetSize(int* width, int* height) {gp_frame_buffer_get_size((gp_frame_buffer*)GetObject(), width, height);}
 }
 
 #endif // __cplusplus
