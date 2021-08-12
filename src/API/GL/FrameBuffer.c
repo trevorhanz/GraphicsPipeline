@@ -200,3 +200,17 @@ void gp_frame_buffer_get_size(gp_frame_buffer* fb, int* width, int* height)
   CHECK_GL_ERROR()
 }
 
+void gp_frame_buffer_get_pixel(gp_frame_buffer* fb, int width, int height, gp_color* c)
+{
+  _gp_api_context_make_current(fb->mContext);
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
+  glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
+  
+  glReadPixels(width, height, 1, 1, GL_RGBA, GL_UNSIGNED_INT, c);
+  
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  CHECK_GL_ERROR()
+}
+
+

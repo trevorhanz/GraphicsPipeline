@@ -78,6 +78,14 @@ GP_EXPORT void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int heig
  */
 GP_EXPORT void gp_frame_buffer_get_size(gp_frame_buffer* fb, int* width, int* height);
 
+/*!
+ * Retrieve a pixels value from the frame buffer.
+ * \param fb Pointer to frame buffer object.
+ * \param width Pointer where the frame buffer width value will be set.  Set as NULL to ignore.
+ * \param height Pointer where the frame buffer height value will be set.  Set as NULL to ignore.
+ */
+GP_EXPORT void gp_frame_buffer_get_pixel(gp_frame_buffer* fb, int width, int height, gp_color* c);
+
 //! \} // FrameBuffer
 
 #ifdef __cplusplus

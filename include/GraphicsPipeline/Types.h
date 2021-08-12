@@ -125,6 +125,8 @@ typedef enum
   GP_SHADER_SOURCE_FRAGMENT
 } GP_SHADER_SOURCE_TYPE;
 
+typedef unsigned int gp_color;
+
 /*!
  * \brief Callback function to be used by gp_timer objects.
  * \param timer Pointer to gp_timer object that timed out.
