@@ -110,6 +110,20 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
     _gp_work_done(lParam);
     return 0;
 
+  case WM_GETMINMAXINFO:
+  {
+    gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    if (window)
+    {
+      LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+      lpMMI->ptMinTrackSize.x = window->mMinWidth;
+      lpMMI->ptMinTrackSize.y = window->mMinHeight;
+      lpMMI->ptMaxTrackSize.x = window->mMaxWidth;
+      lpMMI->ptMaxTrackSize.y = window->mMaxHeight;
+    }
+  } return 0;
+
   case WM_LBUTTONDOWN:
     _gp_send_click(hWnd, GP_BUTTON_LEFT, GP_PRESSED, lParam);
     return 0;

@@ -92,6 +92,21 @@ gp_window* gp_window_new_from_native(gp_context* context, ANativeWindow* awindow
   return window;
 }
 
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  // TODO: Implement
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  // TODO: Implement
+}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  // TODO: Implement
+}
+
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
 {
   // TODO: fillout with correct values.

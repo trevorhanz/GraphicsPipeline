@@ -73,7 +73,31 @@ GP_EXPORT gp_pipeline* gp_window_get_pipeline(gp_window* window);
 GP_EXPORT void gp_window_redraw(gp_window* window);
 
 /*!
- * Retrieve the size of the window
+ * Set the minimum size of the window.
+ * \param window Pointer to window object.
+ * \param width New minimum width value pixels. Use -1 for no minimum.
+ * \param height New minimum height value in pixels. Use -1 for no minimum.
+ */
+GP_EXPORT void gp_window_set_min_size(gp_window* window, int width, int height);
+
+/*!
+ * Set the maximum size of the window.
+ * \param window Pointer to window object.
+ * \param width New maximum width value pixels. Use -1 for no maximum.
+ * \param height New maximum height value in pixels. Use -1 for no maximum.
+ */
+GP_EXPORT void gp_window_set_max_size(gp_window* window, int width, int height);
+
+/*!
+ * Set the size of the window.
+ * \param window Pointer to window object.
+ * \param width New width value pixels.
+ * \param height New height value in pixels.
+ */
+GP_EXPORT void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height);
+
+/*!
+ * Retrieve the size of the window.
  * \param window Pointer to window object.
  * \param width Pointer where the window width value will be set.
  * \param height Pointer where the window height value will be set.

@@ -40,6 +40,10 @@ gp_window* gp_window_new(gp_context* context)
   _gp_object_init(&window->mObject, _gp_window_free);
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
+  window->mMinWidth = 0;
+  window->mMinHeight = 0;
+  window->mMaxWidth = 1000000;
+  window->mMaxHeight = 1000000;
   window->mClickCB = NULL;
   window->mClickData = NULL;
   window->mMoveCB = NULL;
@@ -91,7 +95,7 @@ gp_window* gp_window_new(gp_context* context)
   else
   {
     dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;                 // Window Extended Style
-    dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+    dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX;
   }
 
   AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);       // Adjust Window To True Requested Size
@@ -156,6 +160,23 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 void gp_window_redraw(gp_window* window)
 {
   RedrawWindow(window->mWindow, 0, 0, RDW_INVALIDATE);
+}
+
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  window->mMinWidth = (width < 0) ? 0 : width;
+  window->mMinHeight = (height < 0) ? 0 : height;
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  window->mMaxWidth = (width < 0) ? 1000000 : width;
+  window->mMaxHeight = (height < 0) ? 1000000 : height;
+}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  SetWindowPos(window->mWindow, 0, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
 }
 
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)

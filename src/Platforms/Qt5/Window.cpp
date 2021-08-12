@@ -75,6 +75,8 @@ gp_pipeline* _Window::GetPipeline()
 
 void _Window::Draw()
 {
+  if(!isExposed()) return;
+  
   mContext->makeCurrent(this);
   
   glViewport(0, 0, width(), height());
@@ -247,6 +249,21 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 void gp_window_redraw(gp_window* window)
 {
   window->mWindow->Draw();
+}
+
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  window->mWindow->GetWidget()->setMinimumSize(QSize(width, height));
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  window->mWindow->GetWidget()->setMaximumSize(QSize(width, height));
+}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  window->mWindow->GetWidget()->resize(width, height);
 }
 
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)

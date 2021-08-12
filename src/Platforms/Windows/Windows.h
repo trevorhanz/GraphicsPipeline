@@ -61,6 +61,10 @@ struct _gp_window
   HGLRC                 mContext;
   HWND                  mWindow;
   gp_pipeline*          mPipeline;
+  int                   mMinWidth;
+  int                   mMinHeight;
+  int                   mMaxWidth;
+  int                   mMaxHeight;
   
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;

@@ -45,6 +45,22 @@ EM_JS(void, _gp_canvas_set_height, (const char* id, int value), {
   document.getElementById(UTF8ToString(id)).height = value;
 });
 
+EM_JS(void, _gp_canvas_set_min_width, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.minWidth = value + "px";
+});
+
+EM_JS(void, _gp_canvas_set_min_height, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.minHeight = value + "px";
+});
+
+EM_JS(void, _gp_canvas_set_max_width, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.maxWidth = value + "px";
+});
+
+EM_JS(void, _gp_canvas_set_max_height, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.maxHeight = value + "px";
+});
+
 typedef struct
 {
   gp_list_node  mNode;

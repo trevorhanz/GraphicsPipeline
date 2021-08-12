@@ -179,9 +179,6 @@ extern "C" gp_context* gp_qt_context_new()
   
   keys[Qt::Key_Space] = GP_KEY_SPACE;
   
-  
-  gp_log_debug("Loaded %d keys", context->mKeyMap.size());
-  
   return context;
 }
 

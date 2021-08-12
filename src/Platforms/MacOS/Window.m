@@ -88,6 +88,29 @@ void gp_window_redraw(gp_window* window)
   [window->mView setNeedsDisplay:YES];
 }
 
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  NSSize size = [window->mWindow minSize];
+  size.width = width;
+  size.height = height;
+  [window->mWindow setMinSize:size];
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  NSSize size = [window->mWindow maxSize];
+  size.width = width;
+  size.height = height;
+  [window->mWindow setMaxSize:size];}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  NSRect frame = [window->mWindow frame];
+  frame.size.width = width;
+  frame.size.height = height;
+  [window->mWindow setFrame: frame display: YES];
+}
+
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
 {
   NSRect rect = [window->mView frame];

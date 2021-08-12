@@ -17,6 +17,8 @@
 
 #include "X11.h"
 
+#include <X11/Xatom.h>
+
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -136,6 +138,36 @@ void gp_window_redraw(gp_window* window)
   size_t r = write(window->mPipe[1], "x", 1);
   
   window->mDirty = 1;
+}
+
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  XSizeHints* hints = XAllocSizeHints();
+  XGetSizeHints(window->mParent->mDisplay, window->mWindow, hints, XA_WM_NORMAL_HINTS);
+  hints->flags |= PMinSize;
+  hints->min_width = width;
+  hints->min_height = height;
+  XSetWMSizeHints(window->mParent->mDisplay, window->mWindow, hints, XA_WM_NORMAL_HINTS);
+  free(hints);
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  XSizeHints* hints = XAllocSizeHints();
+  XGetSizeHints(window->mParent->mDisplay, window->mWindow, hints, XA_WM_NORMAL_HINTS);
+  hints->flags |= PMaxSize;
+  hints->max_width = width;
+  hints->max_height = height;
+  XSetWMNormalHints(window->mParent->mDisplay, window->mWindow, hints);
+  free(hints);
+}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  XWindowChanges changes;
+  changes.width = width;
+  changes.height = height;
+  XConfigureWindow(window->mParent->mDisplay, window->mWindow, CWWidth | CWHeight, &changes);
 }
 
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)

@@ -36,10 +36,13 @@
 {
   NSRect rect = [mWindow->mView frame];
   
-  gp_event_resize_t resize;
-  resize.width = rect.size.width;
-  resize.height = rect.size.height;
-  mWindow->mResizeCB(&resize, mWindow->mResizeData);
+  if(mWindow->mResizeCB)
+  {
+    gp_event_resize_t resize;
+    resize.width = rect.size.width;
+    resize.height = rect.size.height;
+    mWindow->mResizeCB(&resize, mWindow->mResizeData);
+  }
 }
 
 @end

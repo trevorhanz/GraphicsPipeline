@@ -198,6 +198,24 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
   return window->mPipeline;
 }
 
+void gp_window_set_min_size(gp_window* window, int width, int height)
+{
+  _gp_canvas_set_min_width(&window->mID[1], width);
+  _gp_canvas_set_min_height(&window->mID[1], height);
+}
+
+void gp_window_set_max_size(gp_window* window, int width, int height)
+{
+  _gp_canvas_set_max_width(&window->mID[1], width);
+  _gp_canvas_set_max_height(&window->mID[1], height);
+}
+
+void gp_window_set_size(gp_window* window, unsigned int width, unsigned int height)
+{
+  _gp_canvas_set_width(&window->mID[1], width);
+  _gp_canvas_set_height(&window->mID[1], height);
+}
+
 void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height)
 {
   if(width) *width = _gp_canvas_get_width(&window->mID[1]);
