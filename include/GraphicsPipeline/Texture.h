@@ -70,6 +70,20 @@ GP_EXPORT void gp_texture_set_data(gp_texture* texture, gp_texture_data* data);
  */
 GP_EXPORT void gp_texture_set_data_async(gp_texture* texture, gp_texture_data* data, void (*callback)(void*), void* userdata);
 
+/*!
+ * Set how data will be wrapped along the X axis.
+ * \param texture Pointer to texture object.
+ * \param wrap The new wrapping behavior.
+ */
+GP_EXPORT void gp_texture_set_wrap_x(gp_texture* texture, GP_WRAP wrap);
+
+/*!
+ * Set how data will be wrapped along the Y axis.
+ * \param texture Pointer to texture object.
+ * \param wrap The new wrapping behavior.
+ */
+GP_EXPORT void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap);
+
 //! \} // Texture
 
 #ifdef __cplusplus
@@ -123,6 +137,18 @@ namespace GP
      */
     inline void SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback);
     
+    /*!
+     * Set how data will be wrapped along the X axis.
+     * \param wrap The new wrapping behavior.
+     */
+    inline void SetWrapX(GP_WRAP wrap);
+    
+    /*!
+     * Set how data will be wrapped along the Y axis.
+     * \param wrap The new wrapping behavior.
+     */
+    inline void SetWrapY(GP_WRAP wrap);
+    
   private:
     struct AsyncData
     {
@@ -158,6 +184,8 @@ namespace GP
     async->mCallback(async->mTexture);
     delete async;
   }
+  void Texture::SetWrapX(GP_WRAP wrap) {gp_texture_set_wrap_x((gp_texture*)GetObject(), wrap);}
+  void Texture::SetWrapY(GP_WRAP wrap) {gp_texture_set_wrap_y((gp_texture*)GetObject(), wrap);}
 }
 
 #endif // __cplusplus

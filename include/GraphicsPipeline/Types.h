@@ -108,6 +108,17 @@ typedef struct _gp_operation gp_operation;
 typedef struct _gp_timer gp_timer;
 typedef struct _gp_io gp_io;
 
+/*!
+ * Defines how texture data wraps past the edge of their coordinates.
+ */
+typedef enum
+{
+  GP_WRAP_EDGE,     //!< Clamp data at the edge.
+  GP_WRAP_BORDER,   //!< Data past the edge is clamped to the nearest border.
+  GP_WRAP_REPEAT,   //!< Data will be repeated past the edge.
+  GP_WRAP_MIRROR    //!< Data will be mirored past the edge.
+} GP_WRAP;
+
 typedef enum
 {
   GP_SHADER_SOURCE_VERTEX,

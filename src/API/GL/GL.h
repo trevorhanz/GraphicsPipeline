@@ -89,6 +89,8 @@ struct _gp_texture
   gp_object               mObject;
   GLuint                  mTexture;
   GLuint                  mPBO;
+  GLuint                  mWrapX;
+  GLuint                  mWrapY;
 };
 
 struct _gp_shader_source

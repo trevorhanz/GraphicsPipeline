@@ -82,6 +82,8 @@ gp_texture* gp_texture_new(gp_context* context)
   gp_texture* texture = malloc(sizeof(gp_texture));
   _gp_object_init(&texture->mObject, _gp_texture_free);
   glGenTextures(1, &texture->mTexture);
+  texture->mWrapX = GL_CLAMP_TO_EDGE;
+  texture->mWrapY = GL_CLAMP_TO_EDGE;
   
 #ifndef GP_WEB
   glGenBuffers(1, &texture->mPBO);
@@ -94,8 +96,8 @@ void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)
 {
   glBindTexture(GL_TEXTURE_2D, texture->mTexture);
   
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->mWrapX);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->mWrapY);
   
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -134,6 +136,31 @@ void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 #endif
   glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+}
+
+GLuint _gp_wrap_to_gl(GP_WRAP wrap)
+{
+  switch(wrap)
+  {
+    case GP_WRAP_EDGE:
+      return GL_CLAMP_TO_EDGE;
+    case GP_WRAP_BORDER:
+      return GL_CLAMP_TO_BORDER;
+    case GP_WRAP_REPEAT:
+      return GL_REPEAT;
+    case GP_WRAP_MIRROR:
+      return GL_MIRRORED_REPEAT;
+  }
+}
+
+void gp_texture_set_wrap_x(gp_texture* texture, GP_WRAP wrap)
+{
+  texture->mWrapX = _gp_wrap_to_gl(wrap);
+}
+
+void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap)
+{
+  texture->mWrapY = _gp_wrap_to_gl(wrap);
 }
 
 typedef struct
