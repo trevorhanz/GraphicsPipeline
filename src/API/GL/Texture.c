@@ -145,7 +145,12 @@ GLuint _gp_wrap_to_gl(GP_WRAP wrap)
     case GP_WRAP_EDGE:
       return GL_CLAMP_TO_EDGE;
     case GP_WRAP_BORDER:
+#ifdef GP_GL
       return GL_CLAMP_TO_BORDER;
+#else
+      // NOTE: GL_CLAMP_TO_BORDER is not supported in GLES
+      return GL_CLAMP_TO_EDGE;
+#endif
     case GP_WRAP_REPEAT:
       return GL_REPEAT;
     case GP_WRAP_MIRROR:
