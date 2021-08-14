@@ -210,11 +210,52 @@ namespace GP
     inline void Redraw();
     
     /*!
+     * Set the window's title.
+     * \param width New window title.
+     */
+    inline void SetTitle(const char* title);
+    
+    /*!
+     * Set the minimum size of the window.
+     * \param width New minimum width value pixels. Use -1 for no minimum.
+     * \param height New minimum height value in pixels. Use -1 for no minimum.
+     */
+    inline void SetMinSize(int width, int height);
+    
+    /*!
+     * Set the maximum size of the window.
+     * \param width New maximum width value pixels. Use -1 for no maximum.
+     * \param height New maximum height value in pixels. Use -1 for no maximum.
+     */
+    inline void SetMaxSize(int width, int height);
+    
+    /*!
+     * Set the size of the window.
+     * \param width New width value pixels.
+     * \param height New height value in pixels.
+     */
+    inline void SetSize(unsigned int width, unsigned int height);
+    
+    /*!
      * Retrieve the size of the window
      * \param width Pointer where the window width value will be set.
      * \param height Pointer where the window height value will be set.
      */
     inline void GetSize(unsigned int* width, unsigned int* height);
+    
+    /*!
+     * Set the position of the window.
+     * \param x New X position of the window.
+     * \param y New Y position of the window.
+     */
+    inline void SetPosition(unsigned int x, unsigned int y);
+    
+    /*!
+     * Retrieve the position of the window.
+     * \param x Pointer where the window's x position value will be set.
+     * \param y Pointer where the window's y position value will be set.
+     */
+    inline void GetPosition(unsigned int* x, unsigned int* y);
     
     /*!
      * Set the callback to be used for cursor click events.
@@ -277,7 +318,12 @@ namespace GP
   Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)context.GetObject())) {}
   Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject()));}
   void Window::Redraw() {gp_window_redraw((gp_window*)GetObject());}
+  void Window::SetMinSize(int width, int height) {gp_window_set_min_size((gp_window*)GetObject(), width, height);}
+  void Window::SetMaxSize(int width, int height) {gp_window_set_max_size((gp_window*)GetObject(), width, height);}
+  void Window::SetSize(unsigned int width, unsigned int height) {gp_window_set_size((gp_window*)GetObject(), width, height);}
   void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size((gp_window*)GetObject(), width, height);}
+  void Window::SetPosition(unsigned int x, unsigned int y) {gp_window_set_position((gp_window*)GetObject(), x, y);}
+  void Window::GetPosition(unsigned int* x, unsigned int* y) {gp_window_get_position((gp_window*)GetObject(), x, y);}
   void Window::SetClickCallback(std::function<void(const gp_event_click_t*)> callback)
   {
     auto data = new CallbackData<ClickCallback>();
