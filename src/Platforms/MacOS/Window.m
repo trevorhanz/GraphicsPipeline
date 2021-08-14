@@ -26,6 +26,14 @@ void _gp_window_free(gp_object* object)
   gp_window* window = (gp_window*)object;
   
   _gp_pipeline_free(window->mPipeline);
+  
+  if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+  if(window->mTrackData) gp_object_unref((gp_object*)window->mTrackData);
+  if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
+  if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
+  if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+  
   free(window);
 }
 
@@ -37,14 +45,16 @@ gp_window* gp_window_new(gp_context* context)
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
   window->mClickData = NULL;
-  window->mMoveCB = NULL;
-  window->mMoveData = NULL;
+  window->mTrackCB = NULL;
+  window->mTrackData = NULL;
   window->mEnterCB = NULL;
   window->mEnterData = NULL;
   window->mKeyCB = NULL;
   window->mKeyData = NULL;
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
   
   NSUInteger windowStyle = NSWindowStyleMaskTitled |
                            NSWindowStyleMaskClosable |
@@ -118,6 +128,16 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   if(height) *height = rect.size.height;
 }
 
+void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
+{
+  // TODO: Implement
+}
+
+void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
+{
+  // TODO: Implement
+}
+
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
   void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
   {\
@@ -130,7 +150,8 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
-_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
 _GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)

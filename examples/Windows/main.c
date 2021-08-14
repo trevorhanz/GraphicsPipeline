@@ -69,6 +69,10 @@ int main(int argc, char* argv[])
   gp_window_set_min_size(window1, 640, 480);
   gp_window_set_max_size(window1, 1024, 768);
   
+  unsigned int x, y;
+  gp_window_get_position(window2, &x, &y);
+  gp_window_set_position(window2, x+10, y+10);
+  
   callbackData window1Data;
   callbackData window2Data;
   gp_window_set_resize_callback(window1, window_resize_callback, gp_pointer_new(&window1Data, NULL));

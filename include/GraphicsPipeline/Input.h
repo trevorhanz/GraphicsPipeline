@@ -47,7 +47,7 @@ typedef struct
 {
   int       x;
   int       y;
-} gp_event_move_t;
+} gp_event_track_t;
 
 /*!
  * Structure for mouse enter/leave input.

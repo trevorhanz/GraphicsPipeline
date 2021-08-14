@@ -57,10 +57,11 @@ void _gp_window_free(gp_object* object)
   close(window->mPipe[1]);
 
   if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
-  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+  if(window->mTrackData) gp_object_unref((gp_object*)window->mTrackData);
   if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
   if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
   if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
 
   free(window);
 }
@@ -74,14 +75,16 @@ gp_window* gp_window_new(gp_context* context)
   window->mDirty = 1;
   window->mClickCB = NULL;
   window->mClickData = NULL;
-  window->mMoveCB = NULL;
-  window->mMoveData = NULL;
+  window->mTrackCB = NULL;
+  window->mTrackData = NULL;
   window->mEnterCB = NULL;
   window->mEnterData = NULL;
   window->mKeyCB = NULL;
   window->mKeyData = NULL;
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
   gp_list_push_back(&context->mParent->mWindows, &window->mNode);
   _gp_event_pipe_new(context->mParent->mEvent, window->mPipe);
   
@@ -178,6 +181,27 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   if(height) *height = attributes.height;
 }
 
+void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
+{
+  XWindowChanges changes;
+  changes.x = x;
+  changes.y = y;
+  XConfigureWindow(window->mParent->mDisplay, window->mWindow, CWX | CWY, &changes);
+}
+
+void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
+{
+  Window root = RootWindow(window->mParent->mDisplay, window->mParent->mVisualInfo->screen);
+  Window child;
+  int X, Y;
+  XTranslateCoordinates(window->mParent->mDisplay, window->mWindow, root,
+                        0, 0,
+                        &X, &Y,
+                        &child);
+  if(x) *x = X;
+  if(y) *y = X;
+}
+
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
   void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
   {\
@@ -190,10 +214,11 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
-_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
 _GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
 
 void _gp_window_draw(gp_window* window)
 {

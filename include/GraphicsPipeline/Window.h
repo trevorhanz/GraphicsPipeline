@@ -46,11 +46,21 @@ typedef struct
   int         height;
 } gp_event_resize_t;
 
+/*!
+ * Structure for window movement events.
+ */
+typedef struct
+{
+  int         x;
+  int         y;
+} gp_event_move_t;
+
 typedef void(*gp_event_click_callback_t)(const gp_event_click_t* click, gp_pointer* userData);
-typedef void(*gp_event_move_callback_t)(const gp_event_move_t* move, gp_pointer* userData);
+typedef void(*gp_event_track_callback_t)(const gp_event_track_t* move, gp_pointer* userData);
 typedef void(*gp_event_enter_callback_t)(const gp_event_enter_t* enter, gp_pointer* userData);
 typedef void(*gp_event_key_callback_t)(const gp_event_key_t* key, gp_pointer* userData);
 typedef void(*gp_event_resize_callback_t)(const gp_event_resize_t* resize, gp_pointer* userData);
+typedef void(*gp_event_move_callback_t)(const gp_event_move_t* resize, gp_pointer* userData);
 
 /*!
  * Create a new gp_window object tied to a context.
@@ -105,6 +115,22 @@ GP_EXPORT void gp_window_set_size(gp_window* window, unsigned int width, unsigne
 GP_EXPORT void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* height);
 
 /*!
+ * Set the position of the window.
+ * \param window Pointer to window object.
+ * \param x New X position of the window.
+ * \param y New Y position of the window.
+ */
+GP_EXPORT void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y);
+
+/*!
+ * Retrieve the position of the window.
+ * \param window Pointer to window object.
+ * \param x Pointer where the window's x position value will be set.
+ * \param y Pointer where the window's y position value will be set.
+ */
+GP_EXPORT void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y);
+
+/*!
  * Connect a callback for mouse click input events.
  * \param callback Function callback to be used for input mouse click events. Set to NULL to remove callback.
  * \param userData Pointer to user defined data.
@@ -116,7 +142,7 @@ GP_EXPORT void gp_window_set_click_callback(gp_window* window, gp_event_click_ca
  * \param callback Function callback to be used for input mouse move events. Set to NULL to remove callback.
  * \param userData Pointer to user defined data.
  */
-GP_EXPORT void gp_window_set_move_callback(gp_window* window, gp_event_move_callback_t callback, gp_pointer* userData);
+GP_EXPORT void gp_window_set_track_callback(gp_window* window, gp_event_track_callback_t callback, gp_pointer* userData);
 
 /*!
  * Connect a callback for mouse enter/leave input event.
@@ -138,6 +164,13 @@ GP_EXPORT void gp_window_set_key_callback(gp_window* window, gp_event_key_callba
  * \param userData Pointer to user defined data.
  */
 GP_EXPORT void gp_window_set_resize_callback(gp_window* window, gp_event_resize_callback_t callback, gp_pointer* userData);
+
+/*!
+ * Connect a callback for window movement events.
+ * \param callback Function callback to be used for window movement events. Set to NULL to remove callback.
+ * \param userData Pointer to user defined data.
+ */
+GP_EXPORT void gp_window_set_move_callback(gp_window* window, gp_event_move_callback_t callback, gp_pointer* userData);
 
 //! \} // Window
 
@@ -186,7 +219,7 @@ namespace GP
      * Set the callback to be used for cursor move events.
      * \param callback Callback to be used.
      */
-    inline void SetMoveCallback(std::function<void(const gp_event_move_t*)> callback);
+    inline void SetTrackCallback(std::function<void(const gp_event_track_t*)> callback);
     
     /*!
      * Set the callback to be used for cursor enter events.
@@ -206,12 +239,19 @@ namespace GP
      */
     inline void SetResizeCallback(std::function<void(const gp_event_resize_t*)> callback);
     
+    /*!
+     * Set the callback to be used for cursor move events.
+     * \param callback Callback to be used.
+     */
+    inline void SetMoveCallback(std::function<void(const gp_event_move_t*)> callback);
+    
   private:
     typedef std::function<void(const gp_event_click_t*)>    ClickCallback;
-    typedef std::function<void(const gp_event_move_t*)>     MoveCallback;
+    typedef std::function<void(const gp_event_track_t*)>    TrackCallback;
     typedef std::function<void(const gp_event_enter_t*)>    EnterCallback;
     typedef std::function<void(const gp_event_key_t*)>      KeyCallback;
     typedef std::function<void(const gp_event_resize_t*)>   ResizeCallback;
+    typedef std::function<void(const gp_event_move_t*)>     MoveCallback;
     
     template <typename T>
     static void HandleCallback(const T* click, gp_pointer* userData);
@@ -239,12 +279,12 @@ namespace GP
     gp_window_set_click_callback((gp_window*)GetObject(), HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
-  void Window::SetMoveCallback(std::function<void(const gp_event_move_t*)> callback)
+  void Window::SetTrackCallback(std::function<void(const gp_event_track_t*)> callback)
   {
-    auto data = new CallbackData<MoveCallback>();
+    auto data = new CallbackData<TrackCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_move_callback((gp_window*)GetObject(), HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
+    gp_window_set_track_callback((gp_window*)GetObject(), HandleCallback<gp_event_track_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetEnterCallback(std::function<void(const gp_event_enter_t*)> callback)
@@ -269,6 +309,14 @@ namespace GP
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
     gp_window_set_resize_callback((gp_window*)GetObject(), HandleCallback<gp_event_resize_t>, (gp_pointer*)pointer);
+    gp_object_unref(pointer);
+  }
+  void Window::SetMoveCallback(std::function<void(const gp_event_move_t*)> callback)
+  {
+    auto data = new CallbackData<MoveCallback>();
+    data->mCallback = callback;
+    auto pointer = Pointer(data).GetObject();
+    gp_window_set_move_callback((gp_window*)GetObject(), HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   template <typename T>

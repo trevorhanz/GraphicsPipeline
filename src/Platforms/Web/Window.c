@@ -46,16 +46,16 @@ EM_BOOL _gp_window_click_callback(int eventType, const EmscriptenMouseEvent* mou
   return EM_TRUE;
 }
 
-EM_BOOL _gp_window_move_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
+EM_BOOL _gp_window_track_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
 {
   gp_window* window = (gp_window*)userData;
   
-  gp_event_move_t input;
+  gp_event_track_t input;
   input.x = mouseEvent->targetX;
   input.y = mouseEvent->targetY;
-  if(window->mMoveCB)
+  if(window->mTrackCB)
   {
-    window->mMoveCB(&input, window->mMoveData);
+    window->mTrackCB(&input, window->mTrackData);
   }
   
   return EM_TRUE;
@@ -116,10 +116,11 @@ void _gp_window_free(gp_object* object)
   _gp_pipeline_free(window->mPipeline);
   
   if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
-  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
+  if(window->mTrackData) gp_object_unref((gp_object*)window->mTrackData);
   if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
   if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
   if(window->mResizeData) gp_object_unref((gp_object*)window->mResizeData);
+  if(window->mMoveData) gp_object_unref((gp_object*)window->mMoveData);
   
   free(window);
 }
@@ -131,14 +132,16 @@ void _gp_window_build(gp_window* window)
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
   window->mClickData = NULL;
-  window->mMoveCB = NULL;
-  window->mMoveData = NULL;
+  window->mTrackCB = NULL;
+  window->mTrackData = NULL;
   window->mEnterCB = NULL;
   window->mEnterData = NULL;
   window->mKeyCB = NULL;
   window->mKeyData = NULL;
   window->mResizeCB = NULL;
   window->mResizeData = NULL;
+  window->mMoveCB = NULL;
+  window->mMoveData = NULL;
   
   EM_ASM({
     let element = document.getElementById(UTF8ToString($0));
@@ -151,12 +154,13 @@ void _gp_window_build(gp_window* window)
   
   emscripten_set_mouseup_callback(window->mID, window, EM_TRUE, _gp_window_click_callback);
   emscripten_set_mousedown_callback(window->mID, window, EM_TRUE, _gp_window_click_callback);
-  emscripten_set_mousemove_callback(window->mID, window, EM_TRUE, _gp_window_move_callback);
+  emscripten_set_mousemove_callback(window->mID, window, EM_TRUE, _gp_window_track_callback);
   emscripten_set_mouseenter_callback(window->mID, window, EM_TRUE, _gp_window_enter_callback);
   emscripten_set_mouseleave_callback(window->mID, window, EM_TRUE, _gp_window_enter_callback);
   emscripten_set_keyup_callback(window->mID, window, EM_TRUE, _gp_window_key_callback);
   emscripten_set_keydown_callback(window->mID, window, EM_TRUE, _gp_window_key_callback);
   emscripten_set_resize_callback(window->mID, window, EM_TRUE, _gp_window_resize_callback);
+  // TODO: Get canvas position changes.
   
   gp_window_redraw(window);
 }
@@ -222,6 +226,18 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   if(height) *height = _gp_canvas_get_height(&window->mID[1]);
 }
 
+void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
+{
+  _gp_canvas_set_left(&window->mID[1], x);
+  _gp_canvas_set_top(&window->mID[1], y);
+}
+
+void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
+{
+  if(x) *x = _gp_canvas_get_left(&window->mID[1]);
+  if(y) *y = _gp_canvas_get_top(&window->mID[1]);
+}
+
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
   void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
   {\
@@ -234,10 +250,11 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
-_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
 _GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
 
 void _gp_window_redraw_callback(void* data)
 {

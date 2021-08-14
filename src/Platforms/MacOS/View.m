@@ -109,12 +109,14 @@
 
 - (void) mouseMoved:(NSEvent *)event
 {
-  if(mWindow->mMoveCB)
+  if(mWindow->mTrackCB)
   {
-    gp_event_move_t move;
+    NSRect frame = [mWindow->mView frame];
+    
+    gp_event_track_t move;
     move.x = [event locationInWindow].x;
-    move.y = [event locationInWindow].y;
-    mWindow->mMoveCB(&move, mWindow->mMoveData);
+    move.y = frame.size.height - [event locationInWindow].y;
+    mWindow->mTrackCB(&move, mWindow->mTrackData);
   }
 }
 
@@ -166,11 +168,13 @@
 {
   if(mWindow->mClickCB)
   {
+    NSRect frame = [mWindow->mView frame];
+    
     gp_event_click_t click;
     click.button = button;
     click.state = state;
     click.x = position.x;
-    click.y = position.y;
+    click.y = frame.size.height - position.y;
     mWindow->mClickCB(&click, mWindow->mClickData);
   }
 }

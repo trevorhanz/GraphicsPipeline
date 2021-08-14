@@ -21,17 +21,21 @@
 #include "Window.h"
 #include "Platforms/Defaults.h"
 
+#include <QStackedLayout>
+
 _Window::_Window(gp_context* parent, QOpenGLContext* share)
   : mClickCB(NULL),
   mClickData(NULL),
-  mMoveCB(NULL),
-  mMoveData(NULL),
+  mTrackCB(NULL),
+  mTrackData(NULL),
   mEnterCB(NULL),
   mEnterData(NULL),
   mKeyCB(NULL),
   mKeyData(NULL),
   mResizeCB(NULL),
   mResizeData(NULL),
+  mMoveCB(NULL),
+  mMoveData(NULL),
   mParent(parent),
   mContext(new QOpenGLContext(this)),
   mPipeline(_gp_pipeline_new())
@@ -43,9 +47,15 @@ _Window::_Window(gp_context* parent, QOpenGLContext* share)
   mContext->setShareContext(share);
   mContext->create();
   
-  mContainer = QWidget::createWindowContainer(this);
+  mContainer = new _WindowContainer(this);
   mContainer->resize(GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT);
   mContainer->show();
+  
+  QWidget* base = QWidget::createWindowContainer(this, mContainer);
+  
+  QLayout* layout = new QStackedLayout();
+  layout->addWidget(base);
+  mContainer->setLayout(layout);
   
   mContext->makeCurrent(this);
   
@@ -55,10 +65,11 @@ _Window::_Window(gp_context* parent, QOpenGLContext* share)
 _Window::~_Window()
 {
   if(mClickData) gp_object_unref((gp_object*)mClickData);
-  if(mMoveData) gp_object_unref((gp_object*)mMoveData);
+  if(mTrackData) gp_object_unref((gp_object*)mTrackData);
   if(mEnterData) gp_object_unref((gp_object*)mEnterData);
   if(mKeyData) gp_object_unref((gp_object*)mKeyData);
   if(mResizeData) gp_object_unref((gp_object*)mResizeData);
+  if(mMoveData) gp_object_unref((gp_object*)mMoveData);
   
   _gp_pipeline_free(mPipeline);
 }
@@ -95,12 +106,12 @@ void _Window::mouseMoveEvent(QMouseEvent* event)
 {
   QPointF point = event->localPos();
   
-  gp_event_move_t input;
+  gp_event_track_t input;
   input.x = point.x();
   input.y = point.y();
-  if(mMoveCB)
+  if(mTrackCB)
   {
-    mMoveCB(&input, mMoveData);
+    mTrackCB(&input, mTrackData);
   }
 }
 
@@ -200,12 +211,29 @@ bool _Window::event(QEvent* event)
         input.enter = (event->type()==QEvent::Enter)?1:0;
         mEnterCB(&input, mEnterData);
       }
-    }
+    } break;
     default:
       break;
   }
   
   return QWindow::event(event);
+}
+
+_WindowContainer::_WindowContainer(_Window* window)
+  : mWindow(window)
+{
+}
+
+void _WindowContainer::moveEvent(QMoveEvent* event)
+{
+  if(mWindow->mMoveCB)
+  {
+    QMoveEvent* move = (QMoveEvent*)event;
+    gp_event_move_t input;
+    input.x = move->pos().x();
+    input.y = move->pos().y();
+    mWindow->mMoveCB(&input, mWindow->mMoveData);
+  }
 }
 
 void _gp_window_free(gp_object* object)
@@ -236,10 +264,11 @@ gp_window* gp_window_new(gp_context* context)
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
-_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
+_GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)
 _GP_SET_WINDOW_CALLBACK(resize, mResizeCB, mResizeData)
+_GP_SET_WINDOW_CALLBACK(move, mMoveCB, mMoveData)
 
 gp_pipeline* gp_window_get_pipeline(gp_window* window)
 {
@@ -272,6 +301,16 @@ void gp_window_get_size(gp_window* window, unsigned int* width, unsigned int* he
   if(height) *height = window->mWindow->height();
 }
 
+void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
+{
+  window->mWindow->GetWidget()->move(x, y);
+}
+
+void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
+{
+  if(x) *x = window->mWindow->GetWidget()->geometry().x();
+  if(y) *y = window->mWindow->GetWidget()->geometry().y();
+}
 
 
 

@@ -32,6 +32,7 @@
 
 - (instancetype) initWithWindow:(gp_window*)window;
 - (void) windowDidResize:(NSNotification *)notification;
+- (void) windowDidMove:(NSNotification *)notification;
 
 @end
 

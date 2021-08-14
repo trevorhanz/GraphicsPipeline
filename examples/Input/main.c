@@ -46,9 +46,9 @@ void mouse_click_callback(const gp_event_click_t* click, gp_pointer* userData)
   gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
 }
 
-void mouse_move_callback(const gp_event_move_t* move, gp_pointer* userData)
+void mouse_track_callback(const gp_event_track_t* track, gp_pointer* userData)
 {
-  gp_log("Move: %d, %d", move->x, move->y);
+  gp_log("Track: %d, %d", track->x, track->y);
 }
 
 void mouse_enter_callback(const gp_event_enter_t* enter, gp_pointer* userData)
@@ -65,7 +65,12 @@ void key_callback(const gp_event_key_t* key, gp_pointer* userData)
 
 void window_resize_callback(const gp_event_resize_t* resize, gp_pointer* userData)
 {
-  gp_log("Resize: %dx%d", resize->width, resize->height);
+  gp_log("Resize: %d, %d", resize->width, resize->height);
+}
+
+void window_move_callback(const gp_event_move_t* move, gp_pointer* userData)
+{
+  gp_log("Move: %dx%d", move->x, move->y);
 }
 
 int main(int argc, char* argv[])
@@ -79,10 +84,11 @@ int main(int argc, char* argv[])
   gp_shader* shader = gp_shader_new(context);
   
   gp_window_set_click_callback(window, mouse_click_callback, NULL);
-  gp_window_set_move_callback(window, mouse_move_callback, NULL);
+  gp_window_set_track_callback(window, mouse_track_callback, NULL);
   gp_window_set_enter_callback(window, mouse_enter_callback, NULL);
   gp_window_set_key_callback(window, key_callback, NULL);
   gp_window_set_resize_callback(window, window_resize_callback, NULL);
+  gp_window_set_move_callback(window, window_move_callback, NULL);
   
   gp_array_data* ad = gp_array_data_new();
   gp_array_data_set(ad, vertexData, 6);

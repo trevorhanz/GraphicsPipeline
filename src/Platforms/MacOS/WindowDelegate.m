@@ -34,14 +34,29 @@
 
 - (void) windowDidResize:(NSNotification *)notification
 {
-  NSRect rect = [mWindow->mView frame];
-  
   if(mWindow->mResizeCB)
   {
+    NSRect rect = [mWindow->mView frame];
+    
     gp_event_resize_t resize;
     resize.width = rect.size.width;
     resize.height = rect.size.height;
     mWindow->mResizeCB(&resize, mWindow->mResizeData);
+  }
+}
+
+- (void) windowDidMove:(NSNotification *)notification
+{
+  if(mWindow->mMoveCB)
+  {
+    NSRect screen = [[NSScreen mainScreen] frame];
+    NSRect rect = [mWindow->mView frame];
+    NSPoint position = [mWindow->mWindow convertRectToScreen:rect].origin;
+    
+    gp_event_move_t move;
+    move.x = position.x;
+    move.y = screen.size.height-(position.y+rect.size.height);
+    mWindow->mMoveCB(&move, mWindow->mMoveData);
   }
 }
 

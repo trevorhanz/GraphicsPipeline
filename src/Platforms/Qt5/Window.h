@@ -41,14 +41,16 @@ public:
   
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
-  gp_event_move_callback_t    mMoveCB;
-  gp_pointer*                 mMoveData;
+  gp_event_track_callback_t   mTrackCB;
+  gp_pointer*                 mTrackData;
   gp_event_enter_callback_t   mEnterCB;
   gp_pointer*                 mEnterData;
   gp_event_key_callback_t     mKeyCB;
   gp_pointer*                 mKeyData;
   gp_event_resize_callback_t  mResizeCB;
   gp_pointer*                 mResizeData;
+  gp_event_move_callback_t    mMoveCB;
+  gp_pointer*                 mMoveData;
   
 protected:
   void exposeEvent(QExposeEvent* event) override;
@@ -67,6 +69,17 @@ private:
   QOpenGLContext*       mContext;
   QWidget*              mContainer;
   gp_pipeline*          mPipeline;
+};
+
+class _WindowContainer : public QWidget
+{
+  Q_OBJECT
+public:
+  _WindowContainer(_Window* window);
+  void moveEvent(QMoveEvent* event) override;
+  
+private:
+  _Window*                    mWindow;
 };
 
 #endif // __GP_QT_WINDOW_H__

@@ -60,14 +60,16 @@ struct _gp_window
   gp_pipeline*                          mPipeline;
   gp_event_click_callback_t             mClickCB;
   gp_pointer*                           mClickData;
-  gp_event_move_callback_t              mMoveCB;
-  gp_pointer*                           mMoveData;
+  gp_event_track_callback_t             mTrackCB;
+  gp_pointer*                           mTrackData;
   gp_event_enter_callback_t             mEnterCB;
   gp_pointer*                           mEnterData;
   gp_event_key_callback_t               mKeyCB;
   gp_pointer*                           mKeyData;
   gp_event_resize_callback_t            mResizeCB;
   gp_pointer*                           mResizeData;
+  gp_event_move_callback_t              mMoveCB;
+  gp_pointer*                           mMoveData;
 };
 
 struct _gp_timer
@@ -90,5 +92,10 @@ void _gp_canvas_set_min_width(const char* id, int value);
 void _gp_canvas_set_min_height(const char* id, int value);
 void _gp_canvas_set_max_width(const char* id, int value);
 void _gp_canvas_set_max_height(const char* id, int value);
+
+void _gp_canvas_set_top(const char* id, int value);
+void _gp_canvas_set_left(const char* id, int value);
+int _gp_canvas_get_top(const char* id);
+int _gp_canvas_get_left(const char* id);
 
 #endif // __GP_WEB_COMMON_H__

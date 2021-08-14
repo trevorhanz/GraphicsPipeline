@@ -85,6 +85,19 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
     }
   } return 0;
 
+  case WM_MOVE:
+  {
+    gp_window* window = (gp_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (window->mMoveCB)
+    {
+      gp_event_move_t move;
+      move.x = LOWORD(lParam);
+      move.y = HIWORD(lParam);
+      window->mMoveCB(&move, window->mMoveData);
+    }
+  } return 0;
+
+
   case WM_DESTROY:
     return 0;
   
@@ -162,12 +175,12 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
       }
     }
 
-    if (window->mMoveCB)
+    if (window->mTrackCB)
     {
-      gp_event_move_t move;
-      move.x = GET_X_LPARAM(lParam);
-      move.y = GET_Y_LPARAM(lParam);
-      window->mMoveCB(&move, window->mMoveData);
+      gp_event_track_t track;
+      track.x = GET_X_LPARAM(lParam);
+      track.y = GET_Y_LPARAM(lParam);
+      window->mTrackCB(&track, window->mTrackData);
     }
   } return 0;
   case WM_MOUSELEAVE:

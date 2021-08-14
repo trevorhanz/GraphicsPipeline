@@ -61,6 +61,22 @@ EM_JS(void, _gp_canvas_set_max_height, (const char* id, int value), {
   document.getElementById(UTF8ToString(id)).style.maxHeight = value + "px";
 });
 
+EM_JS(void, _gp_canvas_set_top, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.top = value + "px";
+});
+
+EM_JS(void, _gp_canvas_set_left, (const char* id, int value), {
+  document.getElementById(UTF8ToString(id)).style.left = value + "px";
+});
+
+EM_JS(int, _gp_canvas_get_top, (const char* id), {
+  return document.getElementById(UTF8ToString(id)).getBoundingClientRect().top;
+});
+
+EM_JS(int, _gp_canvas_get_left, (const char* id), {
+  return document.getElementById(UTF8ToString(id)).getBoundingClientRect().left;
+});
+
 typedef struct
 {
   gp_list_node  mNode;

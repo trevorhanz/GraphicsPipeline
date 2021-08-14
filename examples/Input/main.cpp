@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
   window.SetClickCallback([&](const gp_event_click_t* click){
     gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
   });
-  window.SetMoveCallback([&](const gp_event_move_t* move){
-    gp_log("Move: %d, %d", move->x, move->y);
+  window.SetTrackCallback([&](const gp_event_track_t* track){
+    gp_log("Track: %d, %d", track->x, track->y);
   });
   window.SetEnterCallback([&](const gp_event_enter_t* enter){
     if(enter->enter) gp_log("Enter");
@@ -70,6 +70,9 @@ int main(int argc, char* argv[])
   window.SetResizeCallback([&](const gp_event_resize_t* resize){
     gp_log("Resize: %dx%d", resize->width, resize->height);
     window.Redraw();
+  });
+  window.SetMoveCallback([&](const gp_event_move_t* move){
+    gp_log("Move: %d, %d", move->x, move->y);
   });
   
   ArrayData ad;

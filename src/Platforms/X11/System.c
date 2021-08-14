@@ -286,13 +286,13 @@ void _gp_system_process_events(gp_io* io)
       case MotionNotify:
       {
         gp_window* window = _gp_system_find_window(system, event.xbutton.window);
-        if(window && window->mMoveCB)
+        if(window && window->mTrackCB)
         {
-          gp_event_move_t input;
+          gp_event_track_t input;
           input.x = event.xmotion.x;
           input.y = event.xmotion.y;
           
-          window->mMoveCB(&input, window->mMoveData);
+          window->mTrackCB(&input, window->mTrackData);
         }
       } break;
       case EnterNotify:
@@ -336,6 +336,22 @@ void _gp_system_process_events(gp_io* io)
           input.height = event.xconfigure.height;
           
           window->mResizeCB(&input, window->mResizeData);
+        }
+        
+        if(window && window->mMoveCB)
+        {
+          gp_event_move_t input;
+          
+          input.x = event.xconfigure.width;
+          input.y = event.xconfigure.height;
+          Window root = RootWindow(window->mParent->mDisplay, window->mParent->mVisualInfo->screen);
+          Window child;
+          XTranslateCoordinates(window->mParent->mDisplay, window->mWindow, root,
+                                0, 0,
+                                &input.x, &input.y,
+                                &child);
+          
+          window->mMoveCB(&input, window->mMoveData);
         }
       } break;
     }
