@@ -64,7 +64,7 @@ gp_window* gp_window_new(gp_context* context)
   styleMask:windowStyle backing:NSBackingStoreBuffered defer:NO]
   autorelease];
   [window->mWindow cascadeTopLeftFromPoint:NSMakePoint(20,20)];
-  [window->mWindow setTitle:@"GP Window"];
+  [window->mWindow setTitle:@GP_DEFAULT_WINDOW_TITLE];
   
   // Set delegate
   id delegate = [[WindowDelegate alloc] initWithWindow:window];
@@ -96,6 +96,11 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 void gp_window_redraw(gp_window* window)
 {
   [window->mView setNeedsDisplay:YES];
+}
+
+void gp_window_set_title(gp_window* window, const char* title)
+{
+  [window->mWindow setTitle:[NSString stringWithCString:title encoding:NSUTF8StringEncoding]];
 }
 
 void gp_window_set_min_size(gp_window* window, int width, int height)

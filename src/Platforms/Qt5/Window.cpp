@@ -49,6 +49,7 @@ _Window::_Window(gp_context* parent, QOpenGLContext* share)
   
   mContainer = new _WindowContainer(this);
   mContainer->resize(GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT);
+  mContainer->setWindowTitle(GP_DEFAULT_WINDOW_TITLE);
   mContainer->show();
   
   QWidget* base = QWidget::createWindowContainer(this, mContainer);
@@ -278,6 +279,11 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 void gp_window_redraw(gp_window* window)
 {
   window->mWindow->Draw();
+}
+
+void gp_window_set_title(gp_window* window, const char* title)
+{
+  window->mWindow->GetWidget()->setWindowTitle(title);
 }
 
 void gp_window_set_min_size(gp_window* window, int width, int height)

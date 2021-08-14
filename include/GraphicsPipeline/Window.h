@@ -83,6 +83,13 @@ GP_EXPORT gp_pipeline* gp_window_get_pipeline(gp_window* window);
 GP_EXPORT void gp_window_redraw(gp_window* window);
 
 /*!
+ * Set the window's title.
+ * \param window Pointer to window object.
+ * \param width New window title.
+ */
+GP_EXPORT void gp_window_set_title(gp_window* window, const char* title);
+
+/*!
  * Set the minimum size of the window.
  * \param window Pointer to window object.
  * \param width New minimum width value pixels. Use -1 for no minimum.

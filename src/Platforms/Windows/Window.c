@@ -113,7 +113,7 @@ gp_window* gp_window_new(gp_context* context)
   // Create The Window
   if (!(hWnd = CreateWindowEx(dwExStyle,                            // Extended Style For The Window
     "GraphicsPipeline",                                           // Class Name
-    "WindowTitle",                                                // Window Title
+    GP_DEFAULT_WINDOW_TITLE,                                      // Window Title
     dwStyle |                                                     // Defined Window Style
     WS_CLIPSIBLINGS |                                             // Required Window Style
     WS_CLIPCHILDREN,                                              // Required Window Style
@@ -170,6 +170,11 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 void gp_window_redraw(gp_window* window)
 {
   RedrawWindow(window->mWindow, 0, 0, RDW_INVALIDATE);
+}
+
+void gp_window_set_title(gp_window* window, const char* title)
+{
+  SetWindowTextA(window->mWindow, title);
 }
 
 void gp_window_set_min_size(gp_window* window, int width, int height)

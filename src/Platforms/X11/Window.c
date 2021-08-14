@@ -117,7 +117,7 @@ gp_window* gp_window_new(gp_context* context)
   glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
   window->mContext = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, context->mShare,
                                               True, context_attribs );
-  XStoreName(context->mDisplay, window->mWindow, "GraphicsPipeline");
+  XStoreName(context->mDisplay, window->mWindow, GP_DEFAULT_WINDOW_TITLE);
   XFlush(context->mDisplay);
   glXMakeCurrent(context->mDisplay, window->mWindow, window->mContext);
   XFlush(context->mDisplay);
@@ -141,6 +141,11 @@ void gp_window_redraw(gp_window* window)
   size_t r = write(window->mPipe[1], "x", 1);
   
   window->mDirty = 1;
+}
+
+void gp_window_set_title(gp_window* window, const char* title)
+{
+  XStoreName(window->mParent->mDisplay, window->mWindow, title);
 }
 
 void gp_window_set_min_size(gp_window* window, int width, int height)

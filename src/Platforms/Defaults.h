@@ -18,6 +18,7 @@
 #ifndef __GP_DEFAULTS_H__
 #define __GP_DEFAULTS_H__
 
+#define GP_DEFAULT_WINDOW_TITLE                   "GraphicsPipeline"
 #define GP_DEFAULT_WINDOW_WIDTH                   1024
 #define GP_DEFAULT_WINDOW_HEIGHT                  768
 
