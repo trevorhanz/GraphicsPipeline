@@ -175,6 +175,26 @@ void gp_window_set_title(gp_window* window, const char* title)
   SetWindowTextA(window->mWindow, title);
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  DWORD dwExStyle;
+  DWORD dwStyle;
+
+  switch (type)
+  {
+  case GP_WINDOW_TYPE_NORMAL:
+    dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+    dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX;
+    break;
+  case GP_WINDOW_TYPE_UTILITY:
+    dwExStyle = WS_EX_APPWINDOW;
+    dwStyle = WS_POPUP;
+    break;
+  }
+  SetWindowLong(window->mWindow, GWL_STYLE, dwStyle);
+  SetWindowLong(window->mWindow, GWL_EXSTYLE, dwExStyle);
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   window->mMinWidth = (width < 0) ? 0 : width;

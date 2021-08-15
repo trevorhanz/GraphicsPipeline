@@ -207,6 +207,11 @@ void gp_window_set_title(gp_window* window, const char* title)
   // NOTE: Not applicable to Web.
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  // NOTE: Not applicable to Web.
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   _gp_canvas_set_min_width(&window->mID[1], width);

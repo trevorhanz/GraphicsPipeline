@@ -285,6 +285,19 @@ void gp_window_set_title(gp_window* window, const char* title)
   window->mWindow->GetWidget()->setWindowTitle(title);
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  switch(type)
+  {
+    case GP_WINDOW_TYPE_NORMAL:
+      window->mWindow->GetWidget()->setWindowFlags(Qt::Widget);
+      break;
+    case GP_WINDOW_TYPE_UTILITY:
+      window->mWindow->GetWidget()->setWindowFlags(Qt::Popup);
+      break;
+  }
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   window->mWindow->GetWidget()->setMinimumSize(QSize(width, height));

@@ -119,12 +119,27 @@ typedef enum
   GP_WRAP_MIRROR    //!< Data will be mirored past the edge.
 } GP_WRAP;
 
+/*!
+ * Defines window behaviors.
+ */
 typedef enum
 {
-  GP_SHADER_SOURCE_VERTEX,
-  GP_SHADER_SOURCE_FRAGMENT
+  GP_WINDOW_TYPE_NORMAL,        //!< Standard window type.
+  GP_WINDOW_TYPE_UTILITY        //!< Support window with no decoration.  Often used for pop-up dialogs.
+} GP_WINDOW_TYPE;
+
+/*!
+ * Defines purpose of shader code.
+ */
+typedef enum
+{
+  GP_SHADER_SOURCE_VERTEX,      //!< Vertex shader code.
+  GP_SHADER_SOURCE_FRAGMENT     //!< Fragment shader code.
 } GP_SHADER_SOURCE_TYPE;
 
+/*!
+ * Storage for a single color value.
+ */
 typedef unsigned int gp_color;
 
 /*!

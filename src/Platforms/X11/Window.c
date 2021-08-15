@@ -147,6 +147,30 @@ void gp_window_set_title(gp_window* window, const char* title)
   XStoreName(window->mParent->mDisplay, window->mWindow, title);
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  Atom a = XInternAtom(window->mParent->mDisplay, "_NET_WM_WINDOW_TYPE", True);
+  long value = 0;
+  
+  XSetWindowAttributes attr;
+  attr.override_redirect = False;
+  
+  switch(type)
+  {
+    case GP_WINDOW_TYPE_NORMAL:
+      value = XInternAtom(window->mParent->mDisplay, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+      break;
+    case GP_WINDOW_TYPE_UTILITY:
+      value = XInternAtom(window->mParent->mDisplay, "_NET_WM_WINDOW_TYPE_TOOLBAR", False);
+      attr.override_redirect = True;
+      break;
+  }
+  
+  XChangeWindowAttributes(window->mParent->mDisplay, window->mWindow, CWOverrideRedirect, &attr);
+  
+  XChangeProperty(window->mParent->mDisplay, window->mWindow, a, XA_ATOM, 32, PropModeReplace, (unsigned char*)&value, 1);
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   XSizeHints* hints = XAllocSizeHints();

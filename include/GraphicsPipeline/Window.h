@@ -85,9 +85,16 @@ GP_EXPORT void gp_window_redraw(gp_window* window);
 /*!
  * Set the window's title.
  * \param window Pointer to window object.
- * \param width New window title.
+ * \param title New window title.
  */
 GP_EXPORT void gp_window_set_title(gp_window* window, const char* title);
+
+/*!
+ * Set the window's type.  The default is GP_WINDOW_TYPE_NORMAL.
+ * \param window Pointer to window object.
+ * \param type New window type.
+ */
+GP_EXPORT void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type);
 
 /*!
  * Set the minimum size of the window.
@@ -150,7 +157,7 @@ GP_EXPORT void gp_window_show(gp_window* window);
 GP_EXPORT void gp_window_hide(gp_window* window);
 
 /*!
- * Make the window hidden.  Nothing happens if the window is already hidden.
+ * Retrieve whether or not the window is shown.
  * \param window Pointer to window object.
  * \return Returns 1 if the window is visible, else it returns 0.
  */
@@ -235,6 +242,12 @@ namespace GP
     inline void SetTitle(const char* title);
     
     /*!
+     * Set the window's type.
+     * \param type New window type.
+     */
+    inline void SetType(GP_WINDOW_TYPE type);
+    
+    /*!
      * Set the minimum size of the window.
      * \param width New minimum width value pixels. Use -1 for no minimum.
      * \param height New minimum height value in pixels. Use -1 for no minimum.
@@ -287,7 +300,7 @@ namespace GP
     inline void Hide();
     
     /*!
-     * Make the window hidden.  Nothing happens if the window is already hidden.
+     * Retrieve whether or not the window is shown.
      * \return Returns true if the window is visible.
      */
     inline bool GetShown();
@@ -353,6 +366,8 @@ namespace GP
   Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)context.GetObject())) {}
   Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject()));}
   void Window::Redraw() {gp_window_redraw((gp_window*)GetObject());}
+  void Window::SetTitle(const char* title) {gp_window_set_title((gp_window*)GetObject(), title);}
+  void Window::SetType(GP_WINDOW_TYPE type) {gp_window_set_type((gp_window*)GetObject(), type);}
   void Window::SetMinSize(int width, int height) {gp_window_set_min_size((gp_window*)GetObject(), width, height);}
   void Window::SetMaxSize(int width, int height) {gp_window_set_max_size((gp_window*)GetObject(), width, height);}
   void Window::SetSize(unsigned int width, unsigned int height) {gp_window_set_size((gp_window*)GetObject(), width, height);}

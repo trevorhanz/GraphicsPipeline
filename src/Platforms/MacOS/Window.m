@@ -103,6 +103,21 @@ void gp_window_set_title(gp_window* window, const char* title)
   [window->mWindow setTitle:[NSString stringWithCString:title encoding:NSUTF8StringEncoding]];
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  switch(type)
+  {
+    case GP_WINDOW_TYPE_NORMAL:
+      window->mWindow.styleMask |= NSWindowStyleMaskTitled;
+      window->mWindow.styleMask &= ~NSWindowStyleMaskBorderless;
+      break;
+    case GP_WINDOW_TYPE_UTILITY:
+      window->mWindow.styleMask &= ~NSWindowStyleMaskTitled;
+      window->mWindow.styleMask |= NSWindowStyleMaskBorderless;
+      break;
+  }
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   NSSize size = [window->mWindow minSize];

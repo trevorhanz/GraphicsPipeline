@@ -67,6 +67,8 @@ int main(int argc, char* argv[])
   gp_window_set_title(window1, "Example Window 1");
   gp_window_set_title(window2, "Example Window 2");
   
+  gp_window_set_type(window2, GP_WINDOW_TYPE_UTILITY);
+  
   gp_window_set_size(window1, 1024, 768);
   gp_window_set_size(window2, 640, 480);
   gp_window_set_min_size(window1, 640, 480);

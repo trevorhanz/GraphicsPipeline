@@ -102,6 +102,11 @@ void gp_window_set_title(gp_window* window, const char* title)
   // TODO: Implement
 }
 
+void gp_window_set_type(gp_window* window, GP_WINDOW_TYPE type)
+{
+  // TODO: Implement.
+}
+
 void gp_window_set_min_size(gp_window* window, int width, int height)
 {
   // TODO: Implement
