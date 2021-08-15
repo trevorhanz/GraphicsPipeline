@@ -261,6 +261,16 @@ void _gp_system_process_events(gp_io* io)
           }
         }
         break;
+      case MapNotify:
+      {
+        gp_window* window = _gp_system_find_window(system, event.xmap.window);
+        window->mState |= GP_MAPPED;
+      }
+      case UnmapNotify:
+      {
+        gp_window* window = _gp_system_find_window(system, event.xmap.window);
+        window->mState &= ~GP_MAPPED;
+      }
       case ButtonPress:
       case ButtonRelease:
       {

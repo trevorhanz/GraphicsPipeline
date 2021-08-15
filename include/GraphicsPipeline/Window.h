@@ -138,6 +138,25 @@ GP_EXPORT void gp_window_set_position(gp_window* window, unsigned int x, unsigne
 GP_EXPORT void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y);
 
 /*!
+ * Make the window visible.  Nothing happens if the window is already visible.
+ * \param window Pointer to window object.
+ */
+GP_EXPORT void gp_window_show(gp_window* window);
+
+/*!
+ * Make the window hidden.  Nothing happens if the window is already hidden.
+ * \param window Pointer to window object.
+ */
+GP_EXPORT void gp_window_hide(gp_window* window);
+
+/*!
+ * Make the window hidden.  Nothing happens if the window is already hidden.
+ * \param window Pointer to window object.
+ * \return Returns 1 if the window is visible, else it returns 0.
+ */
+GP_EXPORT int gp_window_get_shown(gp_window* window);
+
+/*!
  * Connect a callback for mouse click input events.
  * \param callback Function callback to be used for input mouse click events. Set to NULL to remove callback.
  * \param userData Pointer to user defined data.
@@ -258,6 +277,22 @@ namespace GP
     inline void GetPosition(unsigned int* x, unsigned int* y);
     
     /*!
+     * Make the window visible.  Nothing happens if the window is already visible.
+     */
+    inline void Show();
+    
+    /*!
+     * Make the window hidden.  Nothing happens if the window is already hidden.
+     */
+    inline void Hide();
+    
+    /*!
+     * Make the window hidden.  Nothing happens if the window is already hidden.
+     * \return Returns true if the window is visible.
+     */
+    inline bool GetShown();
+    
+    /*!
      * Set the callback to be used for cursor click events.
      * \param callback Callback to be used.
      */
@@ -324,6 +359,9 @@ namespace GP
   void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size((gp_window*)GetObject(), width, height);}
   void Window::SetPosition(unsigned int x, unsigned int y) {gp_window_set_position((gp_window*)GetObject(), x, y);}
   void Window::GetPosition(unsigned int* x, unsigned int* y) {gp_window_get_position((gp_window*)GetObject(), x, y);}
+  void Window::Show() {gp_window_show((gp_window*)GetObject());}
+  void Window::Hide() {gp_window_hide((gp_window*)GetObject());}
+  bool Window::GetShown() {return (bool)gp_window_get_shown((gp_window*)GetObject());}
   void Window::SetClickCallback(std::function<void(const gp_event_click_t*)> callback)
   {
     auto data = new CallbackData<ClickCallback>();

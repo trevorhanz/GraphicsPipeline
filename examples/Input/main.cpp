@@ -100,6 +100,8 @@ int main(int argc, char* argv[])
   operation.SetVerticies(3);
   pipeline.AddOperation(operation);
   
+  window.Show();
+  
   system.Run();
   
   return EXIT_SUCCESS;

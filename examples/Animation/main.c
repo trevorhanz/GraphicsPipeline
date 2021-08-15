@@ -174,6 +174,8 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)array);
   gp_object_unref((gp_object*)texture);
   
+  gp_window_show(window);
+  
   gp_system_run(system);
   
   gp_object_unref((gp_object*)window);

@@ -135,6 +135,22 @@ void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
   if(y) *y = 0;
 }
 
+void gp_window_show(gp_window* window)
+{
+  // TODO: Implement
+}
+
+void gp_window_hide(gp_window* window)
+{
+  // TODO: Implement
+}
+
+int gp_window_get_shown(gp_window* window)
+{
+  // TODO: Implement
+  return 1;
+}
+
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
   void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
   {\

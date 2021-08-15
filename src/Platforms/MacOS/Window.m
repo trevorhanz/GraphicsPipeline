@@ -78,7 +78,7 @@ gp_window* gp_window_new(gp_context* context)
   [window->mWindow makeFirstResponder:window->mView];
   [window->mWindow setInitialFirstResponder:window->mView];
   [window->mWindow setAcceptsMouseMovedEvents:YES];
-  [window->mWindow makeKeyAndOrderFront:window->mWindow];
+  //[window->mWindow makeKeyAndOrderFront:window->mWindow];
   [window->mView setWindow:window];
   [window->mView display];
   [[window->mView openGLContext] makeCurrentContext];
@@ -141,6 +141,21 @@ void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
 void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
 {
   // TODO: Implement
+}
+
+void gp_window_show(gp_window* window)
+{
+  [window->mWindow setIsVisible:YES];
+}
+
+void gp_window_hide(gp_window* window)
+{
+  [window->mWindow setIsVisible:NO];
+}
+
+int gp_window_get_shown(gp_window* window)
+{
+  return [window->mWindow isVisible];
 }
 
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\

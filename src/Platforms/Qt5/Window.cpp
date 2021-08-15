@@ -50,7 +50,6 @@ _Window::_Window(gp_context* parent, QOpenGLContext* share)
   mContainer = new _WindowContainer(this);
   mContainer->resize(GP_DEFAULT_WINDOW_WIDTH, GP_DEFAULT_WINDOW_HEIGHT);
   mContainer->setWindowTitle(GP_DEFAULT_WINDOW_TITLE);
-  mContainer->show();
   
   QWidget* base = QWidget::createWindowContainer(this, mContainer);
   
@@ -318,5 +317,18 @@ void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
   if(y) *y = window->mWindow->GetWidget()->geometry().y();
 }
 
+void gp_window_show(gp_window* window)
+{
+  window->mWindow->GetWidget()->show();
+}
 
+void gp_window_hide(gp_window* window)
+{
+  window->mWindow->GetWidget()->hide();
+}
+
+int gp_window_get_shown(gp_window* window)
+{
+  return !window->mWindow->GetWidget()->isHidden();
+}
 

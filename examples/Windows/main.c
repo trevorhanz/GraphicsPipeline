@@ -127,6 +127,13 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)shader);
   gp_object_unref((gp_object*)array);
   
+  // Test different show functions.
+  if(gp_window_get_shown(window1))
+    gp_window_hide(window1);
+  else
+    gp_window_show(window1);
+  gp_window_show(window2);
+  
   gp_system_run(system);
   
   gp_object_unref((gp_object*)window1);

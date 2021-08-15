@@ -157,8 +157,6 @@ gp_window* gp_window_new(gp_context* context)
   window->mWindow = hWnd;
   window->mContext = hRC;
 
-  ShowWindow(window->mWindow, SW_SHOW);
-
   return window;
 }
 
@@ -212,6 +210,21 @@ void gp_window_set_position(gp_window* window, unsigned int x, unsigned int y)
 void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
 {
   // TODO: Implement
+}
+
+void gp_window_show(gp_window* window)
+{
+  ShowWindow(window->mWindow, SW_SHOW);
+}
+
+void gp_window_hide(gp_window* window)
+{
+  ShowWindow(window->mWindow, SW_HIDE);
+}
+
+int gp_window_get_shown(gp_window* window)
+{
+  return IsWindowVisible(window->mWindow);
 }
 
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\

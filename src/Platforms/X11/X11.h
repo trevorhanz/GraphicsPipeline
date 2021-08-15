@@ -34,6 +34,8 @@
 
 #include <pthread.h>
 
+#define GP_MAPPED         0x01
+
 #define GP_OBJECT_FROM_LIST_NODE(node) (gp_object*)(((char*)node)-sizeof(gp_object))
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
@@ -93,6 +95,8 @@ struct _gp_window
   uint8_t                 mDirty;
   int                     mPipe[2];
   gp_io*                  mWake;
+  uint8_t                 mState;
+  
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
   gp_event_track_callback_t   mTrackCB;

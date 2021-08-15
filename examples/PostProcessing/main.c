@@ -410,6 +410,8 @@ int main(int argc, char* argv[])
   gp_timer_arm(timer, 0.01);
   gp_object_unref((gp_object*)pointer);
   
+  gp_window_show(window);
+  
   gp_system_run(system);
   
   gp_object_unref((gp_object*)fb);

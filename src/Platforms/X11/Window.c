@@ -73,6 +73,7 @@ gp_window* gp_window_new(gp_context* context)
   window->mParent = context;
   window->mPipeline = _gp_pipeline_new();
   window->mDirty = 1;
+  window->mState = 0;
   window->mClickCB = NULL;
   window->mClickData = NULL;
   window->mTrackCB = NULL;
@@ -120,8 +121,6 @@ gp_window* gp_window_new(gp_context* context)
   XStoreName(context->mDisplay, window->mWindow, GP_DEFAULT_WINDOW_TITLE);
   XFlush(context->mDisplay);
   glXMakeCurrent(context->mDisplay, window->mWindow, window->mContext);
-  XFlush(context->mDisplay);
-  XMapRaised(context->mDisplay, window->mWindow);
   XFlush(context->mDisplay);
   
   XSetWMProtocols(context->mDisplay, window->mWindow, &context->mParent->mDeleteMessage, 1);
@@ -205,6 +204,27 @@ void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
                         &child);
   if(x) *x = X;
   if(y) *y = X;
+}
+
+void gp_window_show(gp_window* window)
+{
+  if(gp_window_get_shown(window)) return;
+  
+  XMapRaised(window->mParent->mDisplay, window->mWindow);
+  XFlush(window->mParent->mDisplay);
+}
+
+void gp_window_hide(gp_window* window)
+{
+  if(!gp_window_get_shown(window)) return;
+  
+  XUnmapWindow(window->mParent->mDisplay, window->mWindow);
+  XFlush(window->mParent->mDisplay);
+}
+
+int gp_window_get_shown(gp_window* window)
+{
+  return window->mState & GP_MAPPED;
 }
 
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\

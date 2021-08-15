@@ -80,6 +80,8 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)shader);
   gp_object_unref((gp_object*)array);
   
+  gp_window_show(window);
+  
   gp_system_run(system);
   
   gp_object_unref((gp_object*)window);

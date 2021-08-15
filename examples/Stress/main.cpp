@@ -201,6 +201,8 @@ public:
   
   void Run()
   {
+    mWindow.Show();
+    
     gettimeofday(&mBeginFrame, NULL);
     
     Timer timer(mSystem);
