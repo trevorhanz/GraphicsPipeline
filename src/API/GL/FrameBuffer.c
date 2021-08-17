@@ -207,7 +207,7 @@ void gp_frame_buffer_get_pixel(gp_frame_buffer* fb, int width, int height, gp_co
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
   glBindRenderbuffer(GL_RENDERBUFFER, fb->mRBO); 
   
-  glReadPixels(width, height, 1, 1, GL_RGBA, GL_UNSIGNED_INT, c);
+  glReadPixels(width, height, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (uint8_t*)c);
   
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   CHECK_GL_ERROR()
