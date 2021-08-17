@@ -90,7 +90,7 @@ void _Window::Draw()
   
   mContext->makeCurrent(this);
   
-  glViewport(0, 0, width(), height());
+  _gp_api_prepare_window(width(), height());
   
   _gp_pipeline_execute(mPipeline);
   

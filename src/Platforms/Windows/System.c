@@ -109,6 +109,12 @@ static LRESULT CALLBACK _gp_WndProc(HWND    hWnd,                   // Handle Fo
       HDC hDC = BeginPaint(hWnd, &ps);
       wglMakeCurrent(hDC, window->mContext);
 
+      RECT rect;
+      if (GetClientRect(window->mWindow, &rect))
+      {
+        _gp_api_prepare_window(rect.right - rect.left, rect.bottom - rect.top);
+      }
+
       _gp_pipeline_execute(window->mPipeline);
 
       SwapBuffers(GetDC(window->mWindow));

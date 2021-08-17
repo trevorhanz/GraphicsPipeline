@@ -62,6 +62,9 @@
   
   [[self openGLContext] makeCurrentContext];
   
+  NSRect frame = [mWindow->mView frame];
+  _gp_api_prepare_window(frame.size.width, frame.size.height);
+  
   _gp_pipeline_execute(mWindow->mPipeline);
   
   [[self openGLContext] flushBuffer];
