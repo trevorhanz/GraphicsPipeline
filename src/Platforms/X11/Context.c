@@ -72,7 +72,7 @@ void* _gp_work_thread(void* data)
 
 void _gp_work_done(gp_io* io)
 {
-  gp_context* context = (gp_context*)gp_io_get_userdata(io);
+  gp_context* context = (gp_context*)gp_pointer_get_pointer(gp_io_get_userdata(io));
   
   for(;;)
   {
