@@ -65,6 +65,20 @@ void gp_list_remove(gp_list* list, gp_list_node* node)
   node->mPrev = 0;
 }
 
+unsigned int gp_list_size(gp_list* list)
+{
+  unsigned int result = 0;
+  
+  gp_list_node* node = list->mBegin;
+  while(node)
+  {
+    ++result;
+    node = node->mNext;
+  }
+  
+  return result;
+}
+
 gp_list_node* gp_list_find(gp_list* list, gp_list_node_compare func, void* userdata)
 {
   gp_list_node* node = list->mBegin;

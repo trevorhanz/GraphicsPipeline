@@ -44,6 +44,8 @@ void gp_list_push_front(gp_list* list, gp_list_node* node);
 void gp_list_push_back(gp_list* list, gp_list_node* node);
 void gp_list_remove(gp_list* list, gp_list_node* node);
 
+unsigned int gp_list_size(gp_list* list);
+
 gp_list_node* gp_list_find(gp_list* list, gp_list_node_compare func, void* userdata);
 
 gp_list_node* gp_list_front(gp_list* list);
