@@ -259,6 +259,9 @@ endif(EMSCRIPTEN)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+set(GraphicsPipeline_DIR ${PROJECT_BINARY_DIR}/cmake/ CACHE INTERNAL "" FORCE)
+set(GraphicsPipeline_IN_TREE ON CACHE INTERNAL "" FORCE)
+
 configure_package_config_file(../cmake/GraphicsPipelineConfig.cmake.in
   ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfig.cmake
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
@@ -268,6 +271,8 @@ write_basic_package_version_file(
     VERSION 0.0.0
     COMPATIBILITY SameMajorVersion
 )
+
+set(EXPORT_TARGETS GP_Interface GP_Native)
 
 install(FILES ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfig.cmake
               ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineVersion.cmake
@@ -280,12 +285,14 @@ install(TARGETS GP_Interface
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
 install(EXPORT GraphicsPipelineInterface NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+
 install(TARGETS GP_Native
         EXPORT GraphicsPipelineNative
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
 install(EXPORT GraphicsPipelineNative NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+
 if(GP_BUILD_QT5)
   install(TARGETS GP_Qt5
           EXPORT GraphicsPipelineQt5
@@ -293,7 +300,7 @@ if(GP_BUILD_QT5)
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT devel
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
   install(EXPORT GraphicsPipelineQt5 NAMESPACE GP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
+  set(EXPORT_TARGETS ${EXPORT_TARGETS} GP_Qt5)
 endif(GP_BUILD_QT5)
 
-set(GraphicsPipeline_DIR ${PROJECT_BINARY_DIR}/cmake/ CACHE INTERNAL "" FORCE)
-set(GraphicsPipeline_IN_TREE ON CACHE INTERNAL "" FORCE)
+export(TARGETS ${EXPORT_TARGETS} NAMESPACE GP:: FILE ${GraphicsPipeline_DIR}/GraphicsPipelineTargets.cmake)
