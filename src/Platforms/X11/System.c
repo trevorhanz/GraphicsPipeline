@@ -265,12 +265,12 @@ void _gp_system_process_events(gp_io* io)
       {
         gp_window* window = _gp_system_find_window(system, event.xmap.window);
         window->mState |= GP_MAPPED;
-      }
+      } break;
       case UnmapNotify:
       {
         gp_window* window = _gp_system_find_window(system, event.xmap.window);
         window->mState &= ~GP_MAPPED;
-      }
+      } break;
       case ButtonPress:
       case ButtonRelease:
       {

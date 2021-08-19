@@ -227,7 +227,7 @@ void gp_window_get_position(gp_window* window, unsigned int* x, unsigned int* y)
                         &X, &Y,
                         &child);
   if(x) *x = X;
-  if(y) *y = X;
+  if(y) *y = Y;
 }
 
 void gp_window_show(gp_window* window)
