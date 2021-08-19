@@ -160,12 +160,26 @@ GLuint _gp_wrap_to_gl(GP_WRAP wrap)
 
 void gp_texture_set_wrap_x(gp_texture* texture, GP_WRAP wrap)
 {
-  texture->mWrapX = _gp_wrap_to_gl(wrap);
+  GLuint w = _gp_wrap_to_gl(wrap);
+  if(w == texture->mWrapX) return;
+  
+  texture->mWrapX = w;
+  
+  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->mWrapX);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap)
 {
-  texture->mWrapY = _gp_wrap_to_gl(wrap);
+  GLuint w = _gp_wrap_to_gl(wrap);
+  if(w == texture->mWrapX) return;
+  
+  texture->mWrapY = w;
+  
+  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->mWrapY);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 typedef struct
