@@ -79,6 +79,10 @@ void DebugCallbackFunction(GLenum source,
   }\
 }
 
+void _gp_notification_null(gp_operation* self)
+{
+}
+
 typedef struct
 {
   gp_operation            mOperation;
@@ -98,6 +102,9 @@ gp_operation* gp_operation_clear_new()
   _gp_operation_clear* operation = malloc(sizeof(_gp_operation_clear));
   _gp_object_init(&operation->mOperation.mObject, (gp_object_free)free);
   operation->mOperation.mFunc = _gp_operation_clear_func;
+  operation->mOperation.mPipeline = 0;
+  operation->mOperation.mAdded = _gp_notification_null;
+  operation->mOperation.mRemoved = _gp_notification_null;
   
   operation->mColor[0] = 0;
   operation->mColor[1] = 0;
@@ -233,11 +240,21 @@ void _gp_operation_draw_free(gp_object* object)
   free(d);
 }
 
+void _gp_operation_draw_removed(gp_operation* self)
+{
+  _gp_operation_draw* d = (_gp_operation_draw*)self;
+  d->mVAO = 0;  // TODO: delete VAO
+  d->mDirty = 1;
+}
+
 gp_operation* gp_operation_draw_new()
 {
   _gp_operation_draw* operation = malloc(sizeof(_gp_operation_draw));
   _gp_object_init(&operation->mOperation.mObject, _gp_operation_draw_free);
   operation->mOperation.mFunc = _gp_operation_draw_func;
+  operation->mOperation.mPipeline = 0;
+  operation->mOperation.mAdded = _gp_notification_null;
+  operation->mOperation.mRemoved = _gp_operation_draw_removed;
   gp_list_init(&operation->mUniforms);
   gp_list_init(&operation->mArrays);
   operation->mShader = NULL;
@@ -364,6 +381,9 @@ gp_operation* gp_operation_viewport_new()
   _gp_operation_viewport* operation = malloc(sizeof(_gp_operation_viewport));
   _gp_object_init(&operation->mOperation.mObject, _gp_operation_viewport_free);
   operation->mOperation.mFunc = _gp_operation_viewport_func;
+  operation->mOperation.mPipeline = 0;
+  operation->mOperation.mAdded = _gp_notification_null;
+  operation->mOperation.mRemoved = _gp_notification_null;
   operation->mPipeline = _gp_pipeline_new();
   memset(operation->mRect, 0, sizeof(int)*4);
   
@@ -390,6 +410,14 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
   gp_operation_list* list = malloc(sizeof(gp_operation_list));
   
+  if(operation->mPipeline)
+  {
+    gp_pipeline_remove_operation(operation->mPipeline, operation);
+  }
+  
+  operation->mPipeline = pipeline;
+  operation->mAdded(operation);
+  
   list->mOperation = operation;
   gp_object_ref((gp_object*)operation);
   gp_list_push_back(&pipeline->mOperations, (gp_list_node*)list);
@@ -405,6 +433,9 @@ void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation
   gp_list_node* node = gp_list_find(&pipeline->mOperations, _gp_list_find_operation, (void*)operation);
   if(node)
   {
+    operation->mRemoved(operation);
+    operation->mPipeline = 0;
+    
     gp_list_remove(&pipeline->mOperations, node);
     gp_object_unref((gp_object*)operation);
     free(node);

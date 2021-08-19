@@ -55,6 +55,46 @@ void window_resize_callback(const gp_event_resize_t* resize, gp_pointer* userDat
   gp_window_redraw(data->window);
 }
 
+typedef struct
+{
+  gp_window*        window1;
+  gp_window*        window2;
+  gp_operation*     draw;
+  int               state;
+} timerCallbackData;
+
+void window_timer_callback(gp_timer* timer)
+{
+  timerCallbackData* data = (timerCallbackData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
+  if(data->state == 0)
+  {
+    gp_log("Add Operation to Window1");
+    gp_pipeline* pipeline = gp_window_get_pipeline(data->window1);
+    gp_pipeline_add_operation(pipeline, data->draw);
+    gp_window_redraw(data->window1);
+    ++data->state;
+  }
+  else if(data->state == 1)
+  {
+    gp_log("Move Operation to Window2");
+    gp_pipeline* pipeline = gp_window_get_pipeline(data->window2);
+    gp_pipeline_add_operation(pipeline, data->draw);
+    gp_window_redraw(data->window1);
+    gp_window_redraw(data->window2);
+    ++data->state;
+  }
+  else if(data->state == 2)
+  {
+    gp_log("Remove Operation from Window2");
+    gp_pipeline* pipeline = gp_window_get_pipeline(data->window2);
+    gp_pipeline_remove_operation(pipeline, data->draw);
+    gp_window_redraw(data->window2);
+    data->state = 0;
+  }
+  
+  gp_timer_arm(timer, 1.0);
+}
+
 int main(int argc, char* argv[])
 {
   gp_system* system = gp_system_new();
@@ -109,25 +149,36 @@ int main(int argc, char* argv[])
   gp_uniform_vec2_set(window2Data.size, size);
   
   gp_pipeline* pipeline = gp_window_get_pipeline(window1);
+  gp_operation* clear = gp_operation_clear_new();
+  gp_pipeline_add_operation(pipeline, clear);
+  gp_object_unref((gp_object*)clear);
+  
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_set_uniform(draw, window1Data.size);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
-  gp_object_unref((gp_object*)draw);
   
   pipeline = gp_window_get_pipeline(window2);
-  draw = gp_operation_draw_new();
-  gp_operation_draw_set_shader(draw, shader);
-  gp_operation_draw_set_uniform(draw, window2Data.size);
-  gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
-  gp_operation_draw_set_verticies(draw, 3);
-  gp_pipeline_add_operation(pipeline, draw);
-  gp_object_unref((gp_object*)draw);
+  clear = gp_operation_clear_new();
+  gp_pipeline_add_operation(pipeline, clear);
+  gp_object_unref((gp_object*)clear);
   
   gp_object_unref((gp_object*)shader);
   gp_object_unref((gp_object*)array);
+  
+  timerCallbackData* data = malloc(sizeof(timerCallbackData));
+  data->window1 = window1;
+  data->window2 = window2;
+  data->draw = draw;
+  data->state = 1;
+  gp_pointer* pointer = gp_pointer_new(data, free);
+  gp_timer* timer = gp_timer_new(system);
+  gp_timer_set_callback(timer, window_timer_callback);
+  gp_timer_set_userdata(timer, pointer);
+  gp_timer_arm(timer, 1.0);
+  gp_object_unref((gp_object*)pointer);
   
   // Test different show functions.
   if(gp_window_get_shown(window1))

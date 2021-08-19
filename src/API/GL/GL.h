@@ -118,11 +118,15 @@ struct _gp_uniform
 };
 
 typedef void(*_gp_operation_function)(gp_operation* self, _gp_draw_context* context);
+typedef void(*_gp_notification)(gp_operation* self);
 
 struct _gp_operation
 {
   gp_object               mObject;
   _gp_operation_function  mFunc;
+  gp_pipeline*            mPipeline;
+  _gp_notification        mAdded;
+  _gp_notification        mRemoved;
 };
 
 typedef struct _gp_operation_list gp_operation_list;
