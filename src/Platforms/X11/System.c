@@ -233,9 +233,9 @@ gp_window* _gp_system_find_window(gp_system* system, Window window)
   return NULL;
 }
 
-void _gp_system_process_events(gp_io* io)
+void _gp_system_process_events(gp_io* io, gp_pointer* userdata)
 {
-  gp_system* system = (gp_system*)gp_io_get_userdata(io);
+  gp_system* system = (gp_system*)gp_pointer_get_pointer(userdata);
   
   XEvent event;
   
@@ -374,9 +374,10 @@ void gp_system_run(gp_system* system)
   
   int fd = XConnectionNumber(system->mDisplay);
   
+  gp_pointer* pointer = gp_pointer_new(system, 0);
   gp_io* io = gp_io_read_new(system, fd);
-  gp_io_set_callback(io, _gp_system_process_events);
-  gp_io_set_userdata(io, (void*)system);
+  gp_io_set_callback(io, _gp_system_process_events, pointer);
+  gp_object_unref((gp_object*)pointer);
   
   _gp_event_run(system->mEvent);
   

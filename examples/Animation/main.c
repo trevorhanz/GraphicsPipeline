@@ -65,11 +65,11 @@ typedef struct
   float position[2];
 } animation_data;
 
-void TimerCallback(gp_timer* timer)
+void TimerCallback(gp_timer* timer, gp_pointer* userdata)
 {
   gp_timer_arm(timer, TIMEOUT);
   
-  animation_data* data = gp_pointer_get_pointer(gp_timer_get_userdata(timer));
+  animation_data* data = gp_pointer_get_pointer(userdata);
   
   data->position[0] += data->direction[0]*TIMEOUT;
   data->position[1] += data->direction[1]*TIMEOUT;
@@ -118,8 +118,7 @@ int main(int argc, char* argv[])
   gp_pointer* pointer = gp_pointer_new(data, 0);
   
   gp_timer* timer = gp_timer_new(system);
-  gp_timer_set_callback(timer, TimerCallback);
-  gp_timer_set_userdata(timer, pointer);
+  gp_timer_set_callback(timer, TimerCallback, pointer);
   gp_timer_arm(timer, TIMEOUT);
   gp_object_unref((gp_object*)pointer);
   

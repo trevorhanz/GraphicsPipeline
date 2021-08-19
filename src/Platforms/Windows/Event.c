@@ -25,13 +25,10 @@
 
 #include "Windows.h"
 
-void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
+void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback, gp_pointer* userdata)
 {
   timer->mCallback = callback;
-}
-
-void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
-{
+  
   if (timer->mUserData) gp_object_unref((gp_object*)timer->mUserData);
 
   timer->mUserData = userdata;
@@ -39,17 +36,12 @@ void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
   if (timer->mUserData) gp_object_ref((gp_object*)timer->mUserData);
 }
 
-gp_pointer* gp_timer_get_userdata(gp_timer* timer)
-{
-  return timer->mUserData;
-}
-
 void _gp_timer_callback(HWND hwnd, UINT msg, UINT_PTR timerId, DWORD dwTime)
 {
   gp_timer* timer = (gp_timer*)timerId;
   KillTimer(hwnd, timerId);
 
-  timer->mCallback(timer);
+  timer->mCallback(timer, timer->mUserData);
 }
 
 void gp_timer_arm(gp_timer* timer, double timeout)
@@ -62,22 +54,14 @@ void gp_timer_disarm(gp_timer* timer)
   KillTimer(timer->mSystem->mInternalWindow, (UINT_PTR)timer);
 }
 
-void gp_io_set_callback(gp_io* io, gp_io_callback callback)
+void gp_io_set_callback(gp_io* io, gp_io_callback callback, gp_pointer* userdata)
 {
   io->mCallback = callback;
-}
-
-void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
-{
+  
   if (io->mUserData) gp_object_unref((gp_object*)io->mUserData);
 
   io->mUserData = userdata;
 
   if (io->mUserData) gp_object_ref((gp_object*)io->mUserData);
-}
-
-gp_pointer* gp_io_get_userdata(gp_io* io)
-{
-  return io->mUserData;
 }
 

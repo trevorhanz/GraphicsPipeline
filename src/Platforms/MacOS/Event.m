@@ -17,19 +17,10 @@
 
 #include "MacOS.h"
 
-void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
+void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback, gp_pointer* userdata)
 {
   [timer->mTimer SetCallback:callback];
-}
-
-void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
-{
   [timer->mTimer SetUserData:userdata];
-}
-
-gp_pointer* gp_timer_get_userdata(gp_timer* timer)
-{
-  return [timer->mTimer GetUserData];
 }
 
 void gp_timer_arm(gp_timer* timer, double seconds)
@@ -42,21 +33,13 @@ void gp_timer_disarm(gp_timer* timer)
   [timer->mTimer Disarm];
 }
 
-void gp_io_set_callback(gp_io* io, gp_io_callback callback)
+void gp_io_set_callback(gp_io* io, gp_io_callback callback, gp_pointer* userdata)
 {
   io->mCallback = callback;
-}
-
-void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
-{
+  
   if(io->mUserData) gp_object_unref((gp_object*)io->mUserData);
   
   io->mUserData = userdata;
   
   if(io->mUserData) gp_object_ref((gp_object*)io->mUserData);
-}
-
-gp_pointer* gp_io_get_userdata(gp_io* io)
-{
-  return io->mUserData;
 }

@@ -25,9 +25,9 @@
 #include "../../API/GL/GL.h"
 #include "Platforms/Defaults.h"
 
-void _gp_window_wake_callback(gp_io* io)
+void _gp_window_wake_callback(gp_io* io, gp_pointer* userdata)
 {
-  gp_window* window = (gp_window*)gp_pointer_get_pointer(gp_io_get_userdata(io));
+  gp_window* window = (gp_window*)gp_pointer_get_pointer(userdata);
   for(;;)
   {
     char ch;
@@ -91,8 +91,7 @@ gp_window* gp_window_new(gp_context* context)
   
   gp_pointer* pointer = gp_pointer_new(window, 0);
   window->mWake = gp_io_read_new(context->mParent, window->mPipe[0]);
-  gp_io_set_callback(window->mWake, _gp_window_wake_callback);
-  gp_io_set_userdata(window->mWake, pointer);
+  gp_io_set_callback(window->mWake, _gp_window_wake_callback, pointer);
   gp_object_unref((gp_object*)pointer);
   
   XSetWindowAttributes attr;

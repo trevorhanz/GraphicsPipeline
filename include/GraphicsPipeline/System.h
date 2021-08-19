@@ -66,22 +66,9 @@ GP_EXPORT gp_timer* gp_timer_new(gp_system* system);
  * Set the callback to be used when the gp_timer timesout.
  * \param timer Pointer to timer object.
  * \param callback Callback function to be called at timeout.
- */
-GP_EXPORT void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback);
-
-/*!
- * Set user defined data to be associated with a gp_timer object.
- * \param timer Pointer to timer object.
  * \param userdata Pointer to user defined data.
  */
-GP_EXPORT void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata);
-
-/*!
- * Get user defined data to be associated with a gp_timer object.
- * \param timer Pointer to timer object.
- * \return Pointer to user defined data.
- */
-GP_EXPORT gp_pointer* gp_timer_get_userdata(gp_timer* timer);
+GP_EXPORT void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback, gp_pointer* userdata);
 
 /*!
  * Start the timer count down.
@@ -123,21 +110,7 @@ GP_EXPORT gp_io* gp_io_write_new(gp_system* system, int fd);
  * \param callback Callback function to be called for events.
  * \param userdata Pointer to be passed to callback function.
  */
-GP_EXPORT void gp_io_set_callback(gp_io* io, gp_io_callback callback);
-
-/*!
- * Set user defined data to be associated with a gp_timer object.
- * \param io Pointer to io object.
- * \param userdata Pointer to user defined data.
- */
-GP_EXPORT void gp_io_set_userdata(gp_io* io, gp_pointer* userdata);
-
-/*!
- * Get user defined data to be associated with a gp_timer object.
- * \param io Pointer to io object.
- * \return Pointer to user defined data.
- */
-GP_EXPORT gp_pointer* gp_io_get_userdata(gp_io* io);
+GP_EXPORT void gp_io_set_callback(gp_io* io, gp_io_callback callback, gp_pointer* userdata);
 
 //! \} // System
 
@@ -207,7 +180,7 @@ namespace GP
     inline void Disarm();
     
   private:
-    inline static void HandleTimeout(gp_timer* timer);
+    inline static void HandleTimeout(gp_timer* timer, gp_pointer* userdata);
     
     struct CallbackData
     {
@@ -235,7 +208,7 @@ namespace GP
     inline void SetCallback(std::function<void(IO&)> callback);
     
   private:
-    inline static void HandleUpdate(gp_io* io);
+    inline static void HandleUpdate(gp_io* io, gp_pointer* userdata);
     
     struct CallbackData
     {
@@ -279,13 +252,12 @@ namespace GP
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_timer_set_callback((gp_timer*)mObject, HandleTimeout);
-    gp_timer_set_userdata((gp_timer*)mObject, (gp_pointer*)pointer);
+    gp_timer_set_callback((gp_timer*)mObject, HandleTimeout, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
-  void Timer::HandleTimeout(gp_timer* timer)
+  void Timer::HandleTimeout(gp_timer* timer, gp_pointer* userdata)
   {
-    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
+    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(userdata);
     Timer t = timer;
     data->mCallback(t);
   }
@@ -299,13 +271,12 @@ namespace GP
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_io_set_callback((gp_io*)mObject, HandleUpdate);
-    gp_io_set_userdata((gp_io*)mObject, (gp_pointer*)pointer);
+    gp_io_set_callback((gp_io*)mObject, HandleUpdate, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
-  void IO::HandleUpdate(gp_io* io)
+  void IO::HandleUpdate(gp_io* io, gp_pointer* userdata)
   {
-    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(gp_io_get_userdata(io));
+    CallbackData* data = (CallbackData*)gp_pointer_get_pointer(userdata);
     IO i = io;
     data->mCallback(i);
   }

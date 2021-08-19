@@ -79,7 +79,7 @@ gp_io* gp_io_read_new(gp_system*  system, int fd)
   _gp_object_init(&io->mObject, _gp_io_free);
   io->mHandle = [[NSFileHandle alloc] initWithFileDescriptor:fd];
   io->mHandle.readabilityHandler = ^(NSFileHandle* fh){
-    io->mCallback(io);
+    io->mCallback(io, io->mUserData);
   };
   io->mUserData = NULL;
   
@@ -91,7 +91,7 @@ gp_io* gp_io_write_new(gp_system* system, int fd)
   gp_io* io = malloc(sizeof(gp_io));
   io->mHandle = [[NSFileHandle alloc] initWithFileDescriptor:fd];
   io->mHandle.writeabilityHandler = ^(NSFileHandle* fh){
-    io->mCallback(io);
+    io->mCallback(io, io->mUserData);
   };
   
   return io;

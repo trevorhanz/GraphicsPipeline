@@ -26,7 +26,7 @@
 #include <unistd.h>
 #endif
 
-void IOCallback(gp_io* io)
+void IOCallback(gp_io* io, gp_pointer* userdata)
 {
   char buffer[256];
   read(0, buffer, 256);
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   gp_system* system = gp_system_new();
   
   gp_io* io = gp_io_read_new(system, 0); // STDIN
-  gp_io_set_callback(io, IOCallback);
+  gp_io_set_callback(io, IOCallback, 0);
   
   gp_system_run(system);
   

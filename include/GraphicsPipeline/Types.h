@@ -145,14 +145,16 @@ typedef unsigned int gp_color;
 /*!
  * \brief Callback function to be used by gp_timer objects.
  * \param timer Pointer to gp_timer object that timed out.
+ * \param userdata Pointer to user defined data.
  */
-typedef void(*gp_timer_callback)(gp_timer* timer);
+typedef void(*gp_timer_callback)(gp_timer* timer, gp_pointer* userdata);
 
 /*!
  * \brief Callback function to be used by gp_io objects.
  * \param io Pointer to gp_io object with fd that is ready.
+ * * \param userdata Pointer to user defined data.
  */
-typedef void(*gp_io_callback)(gp_io* io);
+typedef void(*gp_io_callback)(gp_io* io, gp_pointer* userdata);
 
 /*!
  * \brief Callback function for custom dealocation.

@@ -85,9 +85,9 @@ typedef struct
   void*         mData;
 } _gp_work_item;
 
-void _gp_work_timeout(gp_timer* timer)
+void _gp_work_timeout(gp_timer* timer, gp_pointer* userdata)
 {
-  gp_context* context = (gp_context*)gp_timer_get_userdata(timer);
+  gp_context* context = (gp_context*)gp_pointer_get_pointer(userdata);
   
   _gp_work_item* work = (_gp_work_item*)gp_list_front(&context->mWork);
   if(work != NULL)
@@ -122,8 +122,7 @@ void _gp_context_build(gp_context* context)
 {
   gp_pointer* pointer = gp_pointer_new(context, 0);
   context->mWorkTimer = gp_timer_new(context->mParent);
-  gp_timer_set_callback(context->mWorkTimer, _gp_work_timeout);
-  gp_timer_set_userdata(context->mWorkTimer, pointer);
+  gp_timer_set_callback(context->mWorkTimer, _gp_work_timeout, pointer);
   gp_list_init(&context->mWork);
   gp_object_unref((gp_object*)pointer);
   

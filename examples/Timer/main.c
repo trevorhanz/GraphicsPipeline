@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void TimerCallback(gp_timer* timer)
+void TimerCallback(gp_timer* timer, gp_pointer* userdata)
 {
   printf("Timeout\n");
   gp_timer_arm(timer, 1.0);
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   gp_system* system = gp_system_new();
   
   gp_timer* timer = gp_timer_new(system);
-  gp_timer_set_callback(timer, TimerCallback);
+  gp_timer_set_callback(timer, TimerCallback, 0);
   gp_timer_arm(timer, 1.0);
   
   gp_system_run(system);

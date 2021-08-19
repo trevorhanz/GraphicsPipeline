@@ -17,13 +17,10 @@
 
 #include "Qt.h"
 
-extern "C" void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
+extern "C" void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback, gp_pointer* userdata)
 {
   timer->mTimerCallback->mCallback = callback;
-}
-
-extern "C" void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
-{
+  
   if(timer->mUserData)
   {
     gp_object_unref((gp_object*)timer->mUserData);
@@ -37,11 +34,6 @@ extern "C" void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
   }
 }
 
-extern "C" gp_pointer* gp_timer_get_userdata(gp_timer* timer)
-{
-  return timer->mUserData;
-}
-
 extern "C" void gp_timer_arm(gp_timer* timer, double timeout)
 {
   timer->mTimer->start(timeout*1000);
@@ -52,13 +44,10 @@ extern "C" void gp_timer_disarm(gp_timer* timer)
   timer->mTimer->stop();
 }
 
-extern "C" void gp_io_set_callback(gp_io* io, gp_io_callback callback)
+extern "C" void gp_io_set_callback(gp_io* io, gp_io_callback callback, gp_pointer* userdata)
 {
   io->mIOCallback->mCallback = callback;
-}
-
-extern "C" void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
-{
+  
   if(io->mUserData)
   {
     gp_object_unref((gp_object*)io->mUserData);
@@ -70,11 +59,6 @@ extern "C" void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
   {
     gp_object_ref((gp_object*)io->mUserData);
   }
-}
-
-extern "C" gp_pointer* gp_io_get_userdata(gp_io* io)
-{
-    return io->mUserData;
 }
 
 

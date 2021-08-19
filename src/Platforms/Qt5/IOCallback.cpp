@@ -15,6 +15,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
+#include "Qt.h"
 #include "IOCallback.h"
 
 IOCallback::IOCallback(gp_io* io)
@@ -26,5 +27,5 @@ IOCallback::IOCallback(gp_io* io)
 
 void IOCallback::Callback()
 {
-  mCallback(mIO);
+  mCallback(mIO, mIO->mUserData);
 }

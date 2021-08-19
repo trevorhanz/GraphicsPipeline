@@ -149,7 +149,7 @@ void _gp_event_run(_gp_event* event)
         gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &readfds))
         {
-          io->mCallback(io);
+          io->mCallback(io, io->mUserData);
         }
         node = gp_list_node_next(node);
       }
@@ -160,7 +160,7 @@ void _gp_event_run(_gp_event* event)
         gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &writefds))
         {
-          io->mCallback(io);
+          io->mCallback(io, io->mUserData);
         }
         node = gp_list_node_next(node);
       }
@@ -173,7 +173,7 @@ void _gp_event_run(_gp_event* event)
         {
           uint64_t buff;
           size_t r = read(timer->mFD, &buff, sizeof(uint64_t));
-          timer->mCallback((gp_timer*)GP_OBJECT_FROM_LIST_NODE(node));
+          timer->mCallback((gp_timer*)GP_OBJECT_FROM_LIST_NODE(node), timer->mUserData);
         }
         node = gp_list_node_next(node);
       }
@@ -228,13 +228,10 @@ gp_timer* _gp_event_timer_new(_gp_event* event)
   return timer;
 }
 
-void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback)
+void gp_timer_set_callback(gp_timer* timer, gp_timer_callback callback, gp_pointer* userdata)
 {
   timer->mTimer.mCallback = callback;
-}
-
-void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
-{
+  
   if(timer->mTimer.mUserData)
   {
     gp_object_unref((gp_object*)timer->mTimer.mUserData);
@@ -246,11 +243,6 @@ void gp_timer_set_userdata(gp_timer* timer, gp_pointer* userdata)
   {
     gp_object_ref((gp_object*)timer->mTimer.mUserData);
   }
-}
-
-gp_pointer* gp_timer_get_userdata(gp_timer* timer)
-{
-  return timer->mTimer.mUserData;
 }
 
 void gp_timer_arm(gp_timer* timer, double timeout)
@@ -328,13 +320,10 @@ gp_io* _gp_event_io_write_new(_gp_event* event, int fd)
   return io;
 }
 
-void gp_io_set_callback(gp_io* io, gp_io_callback callback)
+void gp_io_set_callback(gp_io* io, gp_io_callback callback, gp_pointer* userdata)
 {
   io->mCallback = callback;
-}
-
-void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
-{
+  
   if(io->mUserData)
   {
     gp_object_unref((gp_object*)io->mUserData);
@@ -346,11 +335,6 @@ void gp_io_set_userdata(gp_io* io, gp_pointer* userdata)
   {
     gp_object_ref((gp_object*)io->mUserData);
   }
-}
-
-gp_pointer* gp_io_get_userdata(gp_io* io)
-{
-  return io->mUserData;
 }
 
 void _gp_event_pipe_new(_gp_event* event, int* fds)

@@ -61,7 +61,7 @@
 
 - (void) HandleTimeout:(NSTimer *)timer
 {
-  mCallback(mGPTimer);
+  mCallback(mGPTimer, mUserData);
 }
 
 - (void)SetCallback:(gp_timer_callback)callback
@@ -76,11 +76,6 @@
   mUserData = userdata;
   
   if(mUserData) gp_object_ref((gp_object*)mUserData);
-}
-
-- (gp_pointer*)GetUserData
-{
-  return mUserData;
 }
 
 @end

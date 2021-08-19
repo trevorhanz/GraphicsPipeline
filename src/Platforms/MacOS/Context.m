@@ -62,9 +62,9 @@ void* _gp_work_thread(void* data)
   return NULL;
 }
 
-void _gp_work_done(gp_io* io)
+void _gp_work_done(gp_io* io, gp_pointer* userdata)
 {
-  gp_context* context = (gp_context*)gp_pointer_get_pointer(gp_io_get_userdata(io));
+  gp_context* context = (gp_context*)gp_pointer_get_pointer(userdata);
   
   for(;;)
   {
@@ -147,8 +147,7 @@ gp_context* gp_context_new(gp_system* system)
   
   gp_pointer* pointer = gp_pointer_new(context, 0);
   context->mWorkIO = gp_io_read_new(system, context->mWorkPipe[0]);
-  gp_io_set_callback(context->mWorkIO, _gp_work_done);
-  gp_io_set_userdata(context->mWorkIO, pointer);
+  gp_io_set_callback(context->mWorkIO, _gp_work_done, pointer);
   gp_object_unref((gp_object*)pointer);
   gp_list_init(&context->mWork);
   gp_list_init(&context->mFinished);

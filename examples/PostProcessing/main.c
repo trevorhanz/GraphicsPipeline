@@ -183,9 +183,9 @@ typedef struct
   gp_window*            window;
 } TimeoutData;
 
-void TimeoutFunc(gp_timer* timer)
+void TimeoutFunc(gp_timer* timer, gp_pointer* userdata)
 {
-  TimeoutData* data = (TimeoutData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
+  TimeoutData* data = (TimeoutData*)gp_pointer_get_pointer(userdata);
   
   gp_uniform_float_set(data->offsetWave, gp_uniform_float_get(data->offsetWave)+.01);
   
@@ -405,8 +405,7 @@ int main(int argc, char* argv[])
   gp_pointer* pointer = gp_pointer_new(data, free);
   
   gp_timer* timer = gp_timer_new(system);
-  gp_timer_set_callback(timer, &TimeoutFunc);
-  gp_timer_set_userdata(timer, pointer);
+  gp_timer_set_callback(timer, &TimeoutFunc, pointer);
   gp_timer_arm(timer, 0.01);
   gp_object_unref((gp_object*)pointer);
   

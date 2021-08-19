@@ -63,9 +63,9 @@ typedef struct
   int               state;
 } timerCallbackData;
 
-void window_timer_callback(gp_timer* timer)
+void window_timer_callback(gp_timer* timer, gp_pointer* userdata)
 {
-  timerCallbackData* data = (timerCallbackData*)gp_pointer_get_pointer(gp_timer_get_userdata(timer));
+  timerCallbackData* data = (timerCallbackData*)gp_pointer_get_pointer(userdata);
   if(data->state == 0)
   {
     gp_log("Add Operation to Window1");
@@ -175,8 +175,7 @@ int main(int argc, char* argv[])
   data->state = 1;
   gp_pointer* pointer = gp_pointer_new(data, free);
   gp_timer* timer = gp_timer_new(system);
-  gp_timer_set_callback(timer, window_timer_callback);
-  gp_timer_set_userdata(timer, pointer);
+  gp_timer_set_callback(timer, window_timer_callback, pointer);
   gp_timer_arm(timer, 1.0);
   gp_object_unref((gp_object*)pointer);
   
