@@ -63,152 +63,45 @@ GP_EXPORT gp_shader* gp_shader_new(gp_context* context);
  */
 GP_EXPORT void gp_shader_compile(gp_shader* shader, gp_shader_source* source);
 
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_texture_new_by_name(gp_shader* shader, const char* name);
+#define GP_UNIFORM_DEFINITION(uname, typeName, description)\
+  /*!\
+   Create a new gp_uniform for a gp_shader object with type of uname.\
+   \param shader Shader object used to create the gp_uniform object.\
+   \param name Name of the uniform variable in the shader code.\
+   \return Newly created gp_uniform object.\
+   */\
+  GP_EXPORT gp_uniform* gp_uniform_##uname##_new_by_name(gp_shader* shader, const char* name);\
+  \
+  /*!\
+   Set description data into a gp_uniform object of type uname. \
+   \param uniform Uniform object to have data loaded. \
+   \param data Pointer to array of data to be loaded. \
+   */\
+  GP_EXPORT void gp_uniform_##uname##_set(gp_uniform* uniform, typeName data);\
+  \
+  /*!\
+   Get description data from a gp_uniform object of type uname.\
+   \param uniform Uniform object of typeName uname.\
+   */\
+  GP_EXPORT typeName gp_uniform_##uname##_get(gp_uniform* uniform);
 
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_float_new_by_name(gp_shader* shader, const char* name);
+GP_UNIFORM_DEFINITION(texture, gp_texture*, gp_texture)
 
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_vec2_new_by_name(gp_shader* shader, const char* name);
+GP_UNIFORM_DEFINITION(float, float, float)
+GP_UNIFORM_DEFINITION(vec2, float*, float[2])
+GP_UNIFORM_DEFINITION(vec3, float*, float[3])
+GP_UNIFORM_DEFINITION(vec4, float*, float[4])
+GP_UNIFORM_DEFINITION(mat3, float*, float[3][3])
+GP_UNIFORM_DEFINITION(mat4, float*, float[4][4])
 
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_vec3_new_by_name(gp_shader* shader, const char* name);
+GP_UNIFORM_DEFINITION(double, double, double)
+GP_UNIFORM_DEFINITION(dvec2, double*, double[2])
+GP_UNIFORM_DEFINITION(dvec3, double*, double[3])
+GP_UNIFORM_DEFINITION(dvec4, double*, double[4])
+GP_UNIFORM_DEFINITION(dmat3, double*, double[3][3])
+GP_UNIFORM_DEFINITION(dmat4, double*, double[4][4])
 
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_vec4_new_by_name(gp_shader* shader, const char* name);
-
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_mat3_new_by_name(gp_shader* shader, const char* name);
-
-/*!
- * Create a new gp_uniform for a gp_shader object.
- * \param shader Shader object used to create the gp_uniform object.
- * \param name Name of the uniform variable in the shader code.
- * \return Newly created gp_uniform object.
- */
-GP_EXPORT gp_uniform* gp_uniform_mat4_new_by_name(gp_shader* shader, const char* name);
-
-/*!
- * Set texture data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param texture Texture object to be used.
- */
-GP_EXPORT void gp_uniform_texture_set(gp_uniform* uniform, gp_texture* texture);
-
-/*!
- * Set float data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_float_set(gp_uniform* uniform, float data);
-
-/*!
- * Set float[2] data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_vec2_set(gp_uniform* uniform, float* data);
-
-/*!
- * Set float[3] data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_vec3_set(gp_uniform* uniform, float* data);
-
-/*!
- * Set float[4] data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_vec4_set(gp_uniform* uniform, float* data);
-
-/*!
- * Set float[3][3] data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_mat3_set(gp_uniform* uniform, float* data);
-
-/*!
- * Set float[4][4] data into a gp_uniform object.
- * \param uniform Uniform object to have data loaded.
- * \param data Pointer to array of data to be loaded.
- */
-GP_EXPORT void gp_uniform_mat4_set(gp_uniform* uniform, float* data);
-
-/*!
- * Get texture object from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT gp_texture* gp_uniform_texture_get(gp_uniform* uniform);
-
-/*!
- * Get float data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float gp_uniform_float_get(gp_uniform* uniform);
-
-/*!
- * Get float[2] data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float* gp_uniform_vec2_get(gp_uniform* uniform);
-
-/*!
- * Get float[3] data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float* gp_uniform_vec3_get(gp_uniform* uniform);
-
-/*!
- * Get float[4] data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float* gp_uniform_vec4_get(gp_uniform* uniform);
-
-/*!
- * Get float[3][3] data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float* gp_uniform_mat3_get(gp_uniform* uniform);
-
-/*!
- * Get float[4][4] data from a gp_uniform object.
- * \param uniform Uniform object of type float.
- */
-GP_EXPORT float* gp_uniform_mat4_get(gp_uniform* uniform);
+#undef GP_UNIFORM_DEFINITION
 
 //! \} // Shader
 
@@ -335,6 +228,13 @@ namespace GP
   CXX_UNIFORM(Vec4, vec4, float*)
   CXX_UNIFORM(Mat3, mat3, float*)
   CXX_UNIFORM(Mat4, mat4, float*)
+  
+  CXX_UNIFORM(Double, double, double)
+  CXX_UNIFORM(DVec2, dvec2, double*)
+  CXX_UNIFORM(DVec3, dvec3, double*)
+  CXX_UNIFORM(DVec4, dvec4, double*)
+  CXX_UNIFORM(DMat3, dmat3, double*)
+  CXX_UNIFORM(DMat4, dmat4, double*)
   
 #undef CXX_UNIFORM
   

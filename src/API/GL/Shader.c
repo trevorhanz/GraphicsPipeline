@@ -231,6 +231,33 @@ void _gp_uniform_load_mat4(gp_uniform* uniform, _gp_draw_context* context)
   glUniformMatrix4fv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
 }
 
+#ifdef GP_GL
+void _gp_uniform_load_double(gp_uniform* uniform, _gp_draw_context* context) {glUniform1d(uniform->mLocation, *(double*)uniform->mData);}
+void _gp_uniform_load_dvec2(gp_uniform* uniform, _gp_draw_context* context)
+{
+  double* data = uniform->mData;
+  glUniform2d(uniform->mLocation, data[0], data[1]);
+}
+void _gp_uniform_load_dvec3(gp_uniform* uniform, _gp_draw_context* context)
+{
+  double* data = uniform->mData;
+  glUniform3f(uniform->mLocation, data[0], data[1], data[2]);
+}
+void _gp_uniform_load_dvec4(gp_uniform* uniform, _gp_draw_context* context)
+{
+  double* data = uniform->mData;
+  glUniform4d(uniform->mLocation, data[0], data[1], data[2], data[3]);
+}
+void _gp_uniform_load_dmat3(gp_uniform* uniform, _gp_draw_context* context)
+{
+  glUniformMatrix3dv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
+}
+void _gp_uniform_load_dmat4(gp_uniform* uniform, _gp_draw_context* context)
+{
+  glUniformMatrix4dv(uniform->mLocation, 1, GL_FALSE, uniform->mData);
+}
+#endif
+
 void _gp_uniform_default_free(gp_object* object)
 {
   gp_uniform* uniform = (gp_uniform*)object;
@@ -278,10 +305,26 @@ UNIFORM_NEW_BY_NAME(vec4, sizeof(float)*4)
 UNIFORM_NEW_BY_NAME(mat3, sizeof(float)*9)
 UNIFORM_NEW_BY_NAME(mat4, sizeof(float)*16)
 
+#ifdef GP_GL
+UNIFORM_NEW_BY_NAME(double, sizeof(double))
+UNIFORM_NEW_BY_NAME(dvec2, sizeof(double)*2)
+UNIFORM_NEW_BY_NAME(dvec3, sizeof(double)*3)
+UNIFORM_NEW_BY_NAME(dvec4, sizeof(double)*4)
+UNIFORM_NEW_BY_NAME(dmat3, sizeof(double)*9)
+UNIFORM_NEW_BY_NAME(dmat4, sizeof(double)*16)
+#endif
+
 #undef UNIFORM_NEW_BY_NAME
 
 #define UNIFORM_SET_FLOATPTR(type, size)\
   void gp_uniform_##type##_set(gp_uniform* uniform, float* data)\
+  {\
+    assert(uniform->mOperation == _gp_uniform_load_##type);\
+    memcpy(uniform->mData, data, size);\
+  }
+  
+#define UNIFORM_SET_DOUBLEPTR(type, size)\
+  void gp_uniform_##type##_set(gp_uniform* uniform, double* data)\
   {\
     assert(uniform->mOperation == _gp_uniform_load_##type);\
     memcpy(uniform->mData, data, size);\
@@ -315,6 +358,20 @@ float gp_uniform_float_get(gp_uniform* uniform)
   return *(float*)uniform->mData;
 }
 
+#ifdef GP_GL
+void gp_uniform_double_set(gp_uniform* uniform, double data)
+{
+  assert(uniform->mOperation == _gp_uniform_load_float);
+  memcpy(uniform->mData, &data, sizeof(double));
+}
+
+double gp_uniform_double_get(gp_uniform* uniform)
+{
+  assert(uniform->mOperation == _gp_uniform_load_float);
+  return *(double*)uniform->mData;
+}
+#endif
+
 UNIFORM_SET_FLOATPTR(vec2, sizeof(float)*2)
 UNIFORM_SET_FLOATPTR(vec3, sizeof(float)*3)
 UNIFORM_SET_FLOATPTR(vec4, sizeof(float)*4)
@@ -327,5 +384,19 @@ UNIFORM_GET(vec3, float*)
 UNIFORM_GET(vec4, float*)
 UNIFORM_GET(mat3, float*)
 UNIFORM_GET(mat4, float*)
+
+#ifdef GP_GL
+UNIFORM_SET_DOUBLEPTR(dvec2, sizeof(double)*2)
+UNIFORM_SET_DOUBLEPTR(dvec3, sizeof(double)*3)
+UNIFORM_SET_DOUBLEPTR(dvec4, sizeof(double)*4)
+UNIFORM_SET_DOUBLEPTR(dmat3, sizeof(double)*9)
+UNIFORM_SET_DOUBLEPTR(dmat4, sizeof(double)*16)
+
+UNIFORM_GET(dvec2, double*)
+UNIFORM_GET(dvec3, double*)
+UNIFORM_GET(dvec4, double*)
+UNIFORM_GET(dmat3, double*)
+UNIFORM_GET(dmat4, double*)
+#endif
 
 #undef UNIFORM_SET_FLOATPTR
