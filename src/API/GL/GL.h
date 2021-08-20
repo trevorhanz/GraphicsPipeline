@@ -123,18 +123,11 @@ typedef void(*_gp_notification)(gp_operation* self);
 struct _gp_operation
 {
   gp_object               mObject;
+  gp_list_node            mNode;
   _gp_operation_function  mFunc;
   gp_pipeline*            mPipeline;
   _gp_notification        mAdded;
   _gp_notification        mRemoved;
-};
-
-typedef struct _gp_operation_list gp_operation_list;
-
-struct _gp_operation_list
-{
-  gp_list_node            mNode;
-  gp_operation*           mOperation;
 };
 
 struct _gp_pipeline

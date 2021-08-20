@@ -40,6 +40,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#define GP_OBJECT_FROM_LIST_NODE(node) (gp_object*)(((char*)node)-sizeof(gp_object))
+
 const gp_draw_mode GP_MODE_TRIANGLES = GL_TRIANGLES;
 const gp_draw_mode GP_MODE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP;
 
@@ -408,8 +410,6 @@ void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, 
 
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
-  gp_operation_list* list = malloc(sizeof(gp_operation_list));
-  
   if(operation->mPipeline)
   {
     gp_pipeline_remove_operation(operation->mPipeline, operation);
@@ -418,27 +418,19 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   operation->mPipeline = pipeline;
   operation->mAdded(operation);
   
-  list->mOperation = operation;
   gp_object_ref((gp_object*)operation);
-  gp_list_push_back(&pipeline->mOperations, (gp_list_node*)list);
-}
-
-int _gp_list_find_operation(gp_list_node* node, void* userdata)
-{
-  return ((gp_operation_list*)node)->mOperation == (gp_operation*)userdata;
+  gp_list_push_back(&pipeline->mOperations, (gp_list_node*)&operation->mNode);
 }
 
 void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
-  gp_list_node* node = gp_list_find(&pipeline->mOperations, _gp_list_find_operation, (void*)operation);
-  if(node)
+  if(operation->mPipeline == pipeline)
   {
     operation->mRemoved(operation);
     operation->mPipeline = 0;
     
-    gp_list_remove(&pipeline->mOperations, node);
+    gp_list_remove(&pipeline->mOperations, &operation->mNode);
     gp_object_unref((gp_object*)operation);
-    free(node);
   }
 }
 
@@ -455,10 +447,9 @@ void _gp_pipeline_free(gp_pipeline* pipeline)
   gp_list_node* node = gp_list_front(&pipeline->mOperations);
   while(node)
   {
-    gp_operation_list* op = (gp_operation_list*)node;
+    gp_operation* op = (gp_operation*)GP_OBJECT_FROM_LIST_NODE(node);
     node = gp_list_node_next(node);
-    gp_object_unref((gp_object*)op->mOperation);
-    free(op);
+    gp_object_unref((gp_object*)op);
   }
   free(pipeline);
 }
@@ -495,12 +486,13 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
 
 void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
 {
-  gp_operation_list* list = (gp_operation_list*)gp_list_front(&pipeline->mOperations);
-  while(list != NULL)
+  gp_list_node* node = gp_list_front(&pipeline->mOperations);
+  while(node != NULL)
   {
-    list->mOperation->mFunc(list->mOperation, context);
+    gp_operation* op = (gp_operation*)GP_OBJECT_FROM_LIST_NODE(node);
+    op->mFunc(op, context);
     
-    list = (gp_operation_list*)gp_list_node_next((gp_list_node*)list);
+    node = gp_list_node_next((gp_list_node*)&op->mNode);
   }
 }
 
