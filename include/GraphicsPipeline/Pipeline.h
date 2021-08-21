@@ -82,10 +82,17 @@ GP_EXPORT void gp_operation_draw_set_uniform(gp_operation* operation, gp_uniform
  * \param array New array object to be added.
  * \param index Layout index used to attach the array object.
  * \param components Number of components for each element.
+ * \param type Data type for each element.
  * \param stride Byte offset between consecutive elements.
  * \param offset Byte offset of first element.
  */
-GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset);
+GP_EXPORT void gp_operation_draw_add_array_by_index(gp_operation* operation,
+                                                    gp_array* array,
+                                                    int index,
+                                                    int components,
+                                                    GP_DATA_TYPE type,
+                                                    int stride,
+                                                    int offset);
 
 /*!
  * Set the number of verticies in the draw operation.
@@ -201,10 +208,11 @@ namespace GP
      * \param array New array object to be added.
      * \param index Layout index used to attach the array object.
      * \param components Number of components for each element.
+     * \param type Data type for each emement.
      * \param stride Byte offset between consecutive elements.
      * \param offset Byte offset of first element.
      */
-    inline void AddArrayByIndex(const Array& array, int index, int components, int stride = 0, int offset = 0);
+    inline void AddArrayByIndex(const Array& array, int index, int components, GP_DATA_TYPE type = GP_DATA_TYPE_FLOAT, int stride = 0, int offset = 0);
     
     /*!
      * Set the number of verticies in the draw operation.
@@ -289,9 +297,9 @@ namespace GP
   {
     gp_operation_draw_set_uniform((gp_operation*)GetObject(), (gp_uniform*)uniform.GetObject());
   }
-  void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, int stride, int offset)
+  void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, GP_DATA_TYPE type, int stride, int offset)
   {
-    gp_operation_draw_add_array_by_index((gp_operation*)GetObject(), (gp_array*)array.GetObject(), index, components, stride, offset);
+    gp_operation_draw_add_array_by_index((gp_operation*)GetObject(), (gp_array*)array.GetObject(), index, components, type, stride, offset);
   }
   void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies((gp_operation*)GetObject(), count);}
   void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(), mode);}

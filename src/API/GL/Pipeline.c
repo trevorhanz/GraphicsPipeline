@@ -125,6 +125,7 @@ struct _gp_array_list
   gp_array*               mArray;
   int                     mIndex;
   int                     mComponents;
+  GLuint                  mType;
   int                     mStride;
   uintptr_t               mOffset;
 };
@@ -190,7 +191,7 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
     
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(array->mIndex);
-    glVertexAttribPointer(array->mIndex, array->mComponents, GL_FLOAT, GL_FALSE, array->mStride, (void*)array->mOffset);
+    glVertexAttribPointer(array->mIndex, array->mComponents, array->mType, GL_FALSE, array->mStride, (void*)array->mOffset);
     
     node = gp_list_node_next(node);
   }
@@ -275,7 +276,13 @@ void gp_operation_draw_set_shader(gp_operation* operation, gp_shader* shader)
 #endif
 }
 
-void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* array, int index, int components, int stride, int offset)
+void gp_operation_draw_add_array_by_index(gp_operation* operation,
+                                          gp_array* array,
+                                          int index,
+                                          int components,
+                                          GP_DATA_TYPE type,
+                                          int stride,
+                                          int offset)
 {
   _gp_operation_draw* self = (_gp_operation_draw*)operation;
   
@@ -302,9 +309,22 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation, gp_array* arr
     gp_list_push_back(&self->mArrays, (gp_list_node*)a);
   }
   
+  static const GLuint types[] =
+  {
+    GL_UNSIGNED_BYTE,
+    GL_INT,
+    GL_FLOAT,
+#ifdef GP_GL
+    GL_DOUBLE
+#else
+    GL_FLOAT
+#endif
+  };
+  
   a->mArray = array;
   a->mIndex = index;
   a->mComponents = components;
+  a->mType = types[type];
   a->mStride = stride;
   a->mOffset = offset;
   

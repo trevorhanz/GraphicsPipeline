@@ -41,12 +41,12 @@ extern "C" {
 GP_EXPORT gp_array_data* gp_array_data_new();
 
 /*!
- * Store float array in array data object.
+ * Store array of data in array data object.
  * \param ad Array data object to be used.
- * \param data Pointer to array of floats.
- * \param count Number of elements in data array.
+ * \param data Pointer to array of data to be stored.
+ * \param size Size of the data to be stored in bytes.
  */
-GP_EXPORT void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count);
+GP_EXPORT void gp_array_data_set(gp_array_data* ad, void* data, unsigned int size);
 
 /*!
  * Create a new gp_array object tied to a context.
@@ -89,11 +89,11 @@ namespace GP
     inline ArrayData();
     
     /*!
-     * Store float array in array data object.
-     * \param data Pointer to array of floats.
-     * \param count Number of elements in data array.
+     * Store array of data in array data object.
+     * \param data Pointer to array of data to be stored.
+     * \param size Size of the data to be stored in bytes.
      */
-    inline void Set(float* data, unsigned int count);
+    inline void Set(void* data, unsigned int size);
   };
   
   /*!
@@ -134,7 +134,7 @@ namespace GP
   //
   ArrayData::ArrayData(gp_array_data* data) : Object((gp_object*)data) {}
   ArrayData::ArrayData() : Object((void*)gp_array_data_new()) {}
-  void ArrayData::Set(float* data, unsigned int count) {gp_array_data_set((gp_array_data*)GetObject(), data, count);}
+  void ArrayData::Set(void* data, unsigned int size) {gp_array_data_set((gp_array_data*)GetObject(), data, size);}
   
   Array::Array(gp_array* array) : Object((void*)array) {}
   Array::Array(const Context& context) : Object((gp_object*)gp_array_new((gp_context*)context.GetObject())) {}

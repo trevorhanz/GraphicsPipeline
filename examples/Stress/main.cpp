@@ -115,7 +115,7 @@ public:
     Array arrayQuad(mContext);
     
     ArrayData ad;
-    ad.Set(vertexDataQuad, 8);
+    ad.Set(vertexDataQuad, 8*sizeof(float));
     arrayQuad.SetData(ad);
     
     ShaderSource source;
@@ -136,7 +136,7 @@ public:
       {
         data[i] = (rand()%1000)/500.0-1.0;
       }
-      ads[a].Set(&data[0], data.size());
+      ads[a].Set(&data[0], data.size()*sizeof(float));
     }
 #endif
 

@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   Shader shader(context);
   
   ArrayData ad;
-  ad.Set(vertexData, 6);
+  ad.Set(vertexData, 6*sizeof(float));
   array.SetData(ad);
   
   ShaderSource source;

@@ -74,8 +74,8 @@ struct _gp_frame_buffer
 struct _gp_array_data
 {
   gp_object               mObject;
-  float*                  mData;
-  unsigned int            mCount;
+  void*                   mData;
+  unsigned int            mSize;
 };
 
 struct _gp_array

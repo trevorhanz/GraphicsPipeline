@@ -41,19 +41,17 @@ gp_array_data* gp_array_data_new()
   gp_array_data* data = malloc(sizeof(gp_array_data));
   _gp_object_init(&data->mObject, _gp_array_data_free);
   data->mData = NULL;
-  data->mCount = 0;
+  data->mSize = 0;
   
   return data;
 }
 
-void gp_array_data_set(gp_array_data* ad, float* data, unsigned int count)
+void gp_array_data_set(gp_array_data* ad, void* data, unsigned int size)
 {
-  const size_t size = sizeof(float)*count;
-  
   if(ad->mData == NULL) ad->mData = malloc(size);
   
   memcpy(ad->mData, data, size);
-  ad->mCount = count;
+  ad->mSize = size;
 }
 
 void _gp_array_free(gp_object* object)
@@ -77,7 +75,7 @@ void gp_array_set_data(gp_array* array, gp_array_data* data)
 {
   glBindBuffer(GL_ARRAY_BUFFER, array->mVBO);
   
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*data->mCount, data->mData, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, data->mSize, data->mData, GL_STATIC_DRAW);
 }
 
 typedef struct
@@ -94,7 +92,7 @@ void _gp_array_async_func(void* userdata)
   
   glBindBuffer(GL_ARRAY_BUFFER, async->mArray->mVBO);
   
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*async->mData->mCount, async->mData->mData, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, async->mData->mSize, async->mData->mData, GL_STATIC_DRAW);
 }
 
 void _gp_array_join_func(void* userdata)

@@ -49,7 +49,7 @@ int main(int argv, char* argc[])
   Web::Window window2(context, "#WebWindow2");
   
   ArrayData ad;
-  ad.Set(vertexData, 6);
+  ad.Set(vertexData, 6*sizeof(float));
   array.SetData(ad);
   
   ShaderSource source;

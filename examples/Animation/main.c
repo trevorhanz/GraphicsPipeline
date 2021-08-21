@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)pointer);
   
   gp_array_data* ad = gp_array_data_new();
-  gp_array_data_set(ad, vertexData, 30);
+  gp_array_data_set(ad, vertexData, 30*sizeof(float));
   gp_array_set_data(array, ad);
   gp_object_unref((gp_object*)ad);
   
@@ -189,8 +189,8 @@ int main(int argc, char* argv[])
   gp_operation_draw_set_uniform(draw, data->colorShift);
   gp_operation_draw_set_uniform(draw, tex);
   gp_operation_draw_set_uniform(draw, cm);
-  gp_operation_draw_add_array_by_index(draw, array, 0, 3, sizeof(float)*5, 0);
-  gp_operation_draw_add_array_by_index(draw, array, 1, 2, sizeof(float)*5, sizeof(float)*3);
+  gp_operation_draw_add_array_by_index(draw, array, 0, 3, GP_DATA_TYPE_FLOAT, sizeof(float)*5, 0);
+  gp_operation_draw_add_array_by_index(draw, array, 1, 2, GP_DATA_TYPE_FLOAT, sizeof(float)*5, sizeof(float)*3);
   gp_operation_draw_set_verticies(draw, 6);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLES);
   gp_pipeline_add_operation(pipeline, draw);

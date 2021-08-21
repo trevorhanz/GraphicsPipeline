@@ -215,12 +215,12 @@ int main(int argc, char* argv[])
   gp_shader* shaderGH = gp_shader_new(context);
   
   gp_array_data* ad = gp_array_data_new();
-  gp_array_data_set(ad, vertexData, 6);
+  gp_array_data_set(ad, vertexData, 6*sizeof(float));
   gp_array_set_data(array, ad);
   gp_object_unref((gp_object*)ad);
   
   ad = gp_array_data_new();
-  gp_array_data_set(ad, vertexDataQuad, 8);
+  gp_array_data_set(ad, vertexDataQuad, 8*sizeof(float));
   gp_array_set_data(arrayQuad, ad);
   gp_object_unref((gp_object*)ad);
   
@@ -269,7 +269,7 @@ int main(int argc, char* argv[])
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
-  gp_operation_draw_add_array_by_index(draw, array, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, array, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   gp_object_unref((gp_object*)draw);
@@ -291,7 +291,7 @@ int main(int argc, char* argv[])
   
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shaderQuad);
-  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_uniform(draw, texQuad);
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
@@ -326,7 +326,7 @@ int main(int argc, char* argv[])
   
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shaderGV);
-  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_uniform(draw, texGV);
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
   
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shaderGH);
-  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_uniform(draw, texGH);
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
   
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shaderWave);
-  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_uniform(draw, texWave);
   gp_operation_draw_set_uniform(draw, offsetWave);
   gp_operation_draw_set_verticies(draw, 4);
@@ -383,7 +383,7 @@ int main(int argc, char* argv[])
   
   draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shaderBlur);
-  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, 0, 0);
+  gp_operation_draw_add_array_by_index(draw, arrayQuad, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_verticies(draw, 4);
   gp_operation_draw_set_mode(draw, GP_MODE_TRIANGLE_STRIP);
   gp_pipeline_add_operation(view_pipeline, draw);
