@@ -190,7 +190,7 @@ void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)
   
   static const GLuint formats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA};
   static const GLuint internalFormats[3][4] = {
-    {GL_R8, GL_RG8, GL_RGB32F, GL_RGBA8}, 
+    {GL_R8, GL_RG8, GL_RGB8, GL_RGBA8}, 
     {GL_R32I, GL_RG32I, GL_RGB32I, GL_RGBA32I},
     {GL_R32F, GL_RG32F, GL_RGB32F, GL_RGBA32F}
   };
