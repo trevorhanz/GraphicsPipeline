@@ -157,7 +157,7 @@ public:
         data[i*4+2] = (rand()%1000)/1000.0f;
         data[i*4+3] = 1.0f;
       }
-      mTDs[t].Set(&data[0], TEX_WIDTH, TEX_HEIGHT);
+      mTDs[t].Set2D(&data[0], GP_FORMAT_RGBA, GP_DATA_TYPE_FLOAT, TEX_WIDTH, TEX_HEIGHT);
     }
 #endif
   

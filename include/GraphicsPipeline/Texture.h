@@ -40,13 +40,35 @@ extern "C" {
 GP_EXPORT gp_texture_data* gp_texture_data_new();
 
 /*!
- * Store float data in texture data object.
+ * Store 1D data in texture data object.  If the platform doesn't support
+ * 1D textures, the data is converted to a 2D texture with a hieght of 1.
  * \param td Texture data object to be used.
- * \param data Pointer to an array of floats.
+ * \param data Pointer to an array of data to be stored.
+ * \param format Number of values per color value.
+ * \param type The data type for data values.
+ * \param width Number of elements in data width.
+ */
+GP_EXPORT void gp_texture_data_set_1d(gp_texture_data* td,
+                                      void* data,
+                                      GP_FORMAT format,
+                                      GP_DATA_TYPE type,
+                                      unsigned int width);
+
+/*!
+ * Store 2D data in texture data object.
+ * \param td Texture data object to be used.
+ * \param data Pointer to an array of data to be stored.
+ * \param format Number of values per color value.
+ * \param type The data type for data values.
  * \param width Number of elements in data width.
  * \param height Number of elements in data height.
  */
-GP_EXPORT void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, unsigned int height);
+GP_EXPORT void gp_texture_data_set_2d(gp_texture_data* td,
+                                      void* data,
+                                      GP_FORMAT format,
+                                      GP_DATA_TYPE type,
+                                      unsigned int width,
+                                      unsigned int height);
 
 /*!
  * Create a new gp_texture object tied to a context.
@@ -104,12 +126,24 @@ namespace GP
     inline TextureData();
     
     /*!
-     * Store float data in texture data object.
-     * \param data Pointer to an array of floats.
+     * Store 1D data in texture data object.  If the platform doesn't support
+     * 1D textures, the data is converted to a 2D texture with a hieght of 1.
+     * \param data Pointer to an array to be stored.
+     * \param format Number of values per color value.
+     * \param type The data type for data values.
+     * \param width Number of elements in data width.
+     */
+    inline void Set1D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width);
+    
+    /*!
+     * Store 2D data in texture data object.
+     * \param data Pointer to an array of data to be stored.
+     * \param format Number of values per color value.
+     * \param type The data type for data values.
      * \param width Number of elements in data width.
      * \param height Number of elements in data height.
      */
-    inline void Set(float* data, unsigned int width, unsigned int height);
+    inline void Set2D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height);
   };
   
   /*!
@@ -163,9 +197,13 @@ namespace GP
   //
   TextureData::TextureData(gp_texture_data* data) : Object((gp_object*)data) {}
   TextureData::TextureData() : Object((void*)gp_texture_data_new()) {}
-  void TextureData::Set(float* data, unsigned int width, unsigned int height)
+  void TextureData::Set1D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width)
   {
-    gp_texture_data_set((gp_texture_data*)GetObject(), data, width, height);
+    gp_texture_data_set_1d((gp_texture_data*)GetObject(), data, format, type, width);
+  }
+  void TextureData::Set2D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height)
+  {
+    gp_texture_data_set_2d((gp_texture_data*)GetObject(), data, format, type, width, height);
   }
   
   Texture::Texture(gp_texture* texture) : Object((void*)texture) {}

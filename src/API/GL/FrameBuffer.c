@@ -29,14 +29,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define CHECK_GL_ERROR() \
-{\
-  GLenum err;\
-  while((err = glGetError()) != GL_NO_ERROR) {\
-    gp_log_error("GL ERROR (%d) at: %s:%d", err, __FILE__, __LINE__);\
-  }\
-}
-
 void _gp_check_frame_buffer()
 {
   int ret = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -152,7 +144,7 @@ void gp_frame_buffer_attach(gp_frame_buffer* fb, gp_texture* texture)
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   
   gp_texture_data* data = gp_texture_data_new();
-  gp_texture_data_set(data, 0, width, height);
+  gp_texture_data_set_2d(data, 0, GP_FORMAT_RGBA, GP_DATA_TYPE_FLOAT, width, height);
   gp_texture_set_data(fb->mTexture, data);
   gp_object_unref((gp_object*)data);
   
@@ -174,7 +166,7 @@ void gp_frame_buffer_set_size(gp_frame_buffer* fb, int width, int height)
   if(fb->mTexture)
   {
     gp_texture_data* data = gp_texture_data_new();
-    gp_texture_data_set(data, 0, width, height);
+    gp_texture_data_set_2d(data, 0, GP_FORMAT_RGBA, GP_DATA_TYPE_FLOAT, width, height);
     gp_texture_set_data(fb->mTexture, data);
     gp_object_unref((gp_object*)data);
   }

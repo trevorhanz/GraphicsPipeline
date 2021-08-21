@@ -73,14 +73,6 @@ void DebugCallbackFunction(GLenum source,
 }
 #endif
 
-#define CHECK_GL_ERROR() \
-{\
-  GLenum err;\
-  while((err = glGetError()) != GL_NO_ERROR) {\
-    gp_log_error("GL ERROR (%d) at: %s:%d", err, __FILE__, __LINE__);\
-  }\
-}
-
 void _gp_notification_null(gp_operation* self)
 {
 }

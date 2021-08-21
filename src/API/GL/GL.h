@@ -38,6 +38,14 @@
 #include <GLES3/gl3.h>
 #endif // GP_GL
 
+#define CHECK_GL_ERROR() \
+{\
+  GLenum err;\
+  while((err = glGetError()) != GL_NO_ERROR) {\
+    gp_log_error("GL ERROR (%d) at: %s:%d", err, __FILE__, __LINE__);\
+  }\
+}
+
 struct _gp_texture_cache_list
 {
   gp_list_node            mNode;
@@ -79,7 +87,10 @@ struct _gp_array
 struct _gp_texture_data
 {
   gp_object               mObject;
-  float*                  mData;
+  void*                   mData;
+  GLuint                  mDimensions;
+  GP_FORMAT               mFormat;
+  GP_DATA_TYPE            mType;
   unsigned int            mWidth;
   unsigned int            mHeight;
 };
@@ -87,6 +98,7 @@ struct _gp_texture_data
 struct _gp_texture
 {
   gp_object               mObject;
+  GLuint                  mDimensions;
   GLuint                  mTexture;
   GLuint                  mPBO;
   GLuint                  mWrapX;

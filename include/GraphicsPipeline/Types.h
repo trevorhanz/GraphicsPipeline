@@ -138,6 +138,28 @@ typedef enum
 } GP_SHADER_SOURCE_TYPE;
 
 /*!
+ * Defines color format.
+ */
+typedef enum
+{
+  GP_FORMAT_R       = 1,        //!< Only the Red component.
+  GP_FORMAT_RG      = 2,        //!< Only the Red and Green components.
+  GP_FORMAT_RGB     = 3,        //!< Only the Red, Green and Blue components.
+  GP_FORMAT_RGBA    = 4         //!< Full Red, Green, Blue and Alpha components.
+} GP_FORMAT;
+
+/*!
+ * Defines different data types.
+ */
+typedef enum
+{
+  GP_DATA_TYPE_UBYTE,           //!< Unsigned 8-bit Interger
+  GP_DATA_TYPE_INT,             //!< 32-bit Interger
+  GP_DATA_TYPE_FLOAT,           //!< 32-bit Float
+  GP_DATA_TYPE_DOUBLE           //!< 64-bit Float
+} GP_DATA_TYPE;
+
+/*!
  * Storage for a single color value.
  */
 typedef unsigned int gp_color;

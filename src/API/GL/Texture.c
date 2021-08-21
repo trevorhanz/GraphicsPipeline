@@ -28,6 +28,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+size_t _gp_data_type_to_size(GP_DATA_TYPE type)
+{
+  switch(type)
+  {
+    case GP_DATA_TYPE_UBYTE:
+      return sizeof(uint8_t);
+    case GP_DATA_TYPE_INT:
+      return sizeof(int);
+    case GP_DATA_TYPE_FLOAT:
+      return sizeof(float);
+    case GP_DATA_TYPE_DOUBLE:
+      return sizeof(double);
+  }
+}
+
 void _gp_texture_data_free(gp_object* object)
 {
   gp_texture_data* data = (gp_texture_data*)object;
@@ -41,15 +56,59 @@ gp_texture_data* gp_texture_data_new()
   gp_texture_data* data = malloc(sizeof(gp_texture_data));
   _gp_object_init(&data->mObject, _gp_texture_data_free);
   data->mData = NULL;
+  data->mFormat = GP_FORMAT_R;
+  data->mType = GP_DATA_TYPE_UBYTE;
   data->mWidth = 0;
   data->mHeight = 0;
   
   return data;
 }
 
-void gp_texture_data_set(gp_texture_data* td, float* data, unsigned int width, unsigned int height)
+void gp_texture_data_set_1d(gp_texture_data* td,
+                            void* data,
+                            GP_FORMAT format,
+                            GP_DATA_TYPE type,
+                            unsigned int width)
 {
-  const size_t size = sizeof(float)*4*width*height;
+  // NOTE: Only desktop GL supports 1D textures.
+  // If not supported, generate 1D textures as 2D.
+#ifdef GP_GL
+  td->mDimensions = GL_TEXTURE_1D;
+#else
+  td->mDimensions = GL_TEXTURE_2D;
+#endif
+  td->mFormat = format;
+  td->mType = type;
+  
+  const size_t size = _gp_data_type_to_size(type)*format*width;
+  
+  if(data == NULL)
+  {
+    if(td->mData != NULL) free(td->mData);
+    td->mData = NULL;
+  }
+  else
+  {
+    if(td->mData == NULL) td->mData = malloc(size);
+    
+    memcpy(td->mData, data, size);
+  }
+  td->mWidth = width;
+  td->mHeight = 1;
+}
+
+void gp_texture_data_set_2d(gp_texture_data* td,
+                            void* data,
+                            GP_FORMAT format,
+                            GP_DATA_TYPE type,
+                            unsigned int width,
+                            unsigned int height)
+{
+  td->mDimensions = GL_TEXTURE_2D;
+  td->mFormat = format;
+  td->mType = type;
+  
+  const size_t size = _gp_data_type_to_size(type)*format*width*height;
   
   if(data == NULL)
   {
@@ -94,48 +153,111 @@ gp_texture* gp_texture_new(gp_context* context)
 
 void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)
 {
-  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+  glBindTexture(data->mDimensions, texture->mTexture);
   
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->mWrapX);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->mWrapY);
+  glTexParameteri(data->mDimensions, GL_TEXTURE_WRAP_S, texture->mWrapX);
+  glTexParameteri(data->mDimensions, GL_TEXTURE_WRAP_T, texture->mWrapY);
   
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(data->mDimensions, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(data->mDimensions, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   
   GLvoid* d = data->mData;
 #ifndef GP_WEB
   d = 0;
   
+  const size_t size = _gp_data_type_to_size(data->mType)*data->mFormat*data->mWidth*data->mHeight;
+  
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, texture->mPBO);
-  glBufferData(GL_PIXEL_UNPACK_BUFFER, data->mWidth*data->mHeight*4*sizeof(float), 0, GL_STREAM_DRAW);
+  glBufferData(GL_PIXEL_UNPACK_BUFFER, size, 0, GL_STREAM_DRAW);
   
   if(data->mData != 0)
   {
-    GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, data->mWidth*data->mHeight*4*sizeof(float), GL_MAP_WRITE_BIT);
+    GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size, GL_MAP_WRITE_BIT);
     if(ptr)
     {
         // update data directly on the mapped buffer
-        memcpy(ptr, data->mData, sizeof(float)*data->mWidth*data->mHeight*4);
+        memcpy(ptr, data->mData, size);
         glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);  // release pointer to mapping buffer
+        CHECK_GL_ERROR()
     }
   }
 #endif
   
-  glTexImage2D(GL_TEXTURE_2D,
-    0,                            // Level of detail (mip-level) (0 is base image)
-    GL_RGBA32F,                   // Internal format
-    data->mWidth,                 // Width
-    data->mHeight,                // Height
-    0,                            // Border
-    GL_RGBA,                      // Image format
-    GL_FLOAT,                     // Image type
-    (GLvoid*)d                    // data
-  );
+  GLuint internalFormat = 0;
+  GLuint format = 0;
+  GLuint type = 0;
+  
+  static const GLuint formats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA};
+  static const GLuint internalFormats[3][4] = {
+    {GL_R8, GL_RG8, GL_RGB32F, GL_RGBA8}, 
+    {GL_R32I, GL_RG32I, GL_RGB32I, GL_RGBA32I},
+    {GL_R32F, GL_RG32F, GL_RGB32F, GL_RGBA32F}
+  };
+  
+  format = formats[data->mFormat-1];
+  switch(data->mType)
+  {
+    case GP_DATA_TYPE_UBYTE:
+      type = GL_UNSIGNED_BYTE;
+      internalFormat = internalFormats[0][data->mFormat-1];
+      break;
+    case GP_DATA_TYPE_INT:
+      type = GL_INT;
+      internalFormat = internalFormats[1][data->mFormat-1];
+      break;
+    case GP_DATA_TYPE_FLOAT:
+      type = GL_FLOAT;
+      internalFormat = internalFormats[2][data->mFormat-1];
+      break;
+    case GP_DATA_TYPE_DOUBLE:
+      // NOTE: Only desktop GL supports GL_DOUBLE.
+      // If not supported, convert to GL_FLOAT.
+#ifdef GP_GL
+      type = GL_DOUBLE;
+#else
+      type = GL_FLOAT;
+#endif
+      internalFormat = internalFormats[2][data->mFormat-1];
+      break;
+  }
+  
+  switch(data->mDimensions)
+  {
+#ifdef GP_GL
+    case GL_TEXTURE_1D:
+      glTexImage1D(data->mDimensions,
+        0,                            // Level of detail (mip-level) (0 is base image)
+        internalFormat,               // Internal format
+        data->mWidth,                 // Width
+        0,                            // Border
+        format,                       // Image format
+        type,                         // Image type
+        (GLvoid*)d                    // data
+      );
+      break;
+#endif
+    case GL_TEXTURE_2D:
+      glTexImage2D(data->mDimensions,
+        0,                            // Level of detail (mip-level) (0 is base image)
+        internalFormat,               // Internal format
+        data->mWidth,                 // Width
+        data->mHeight,                // Height
+        0,                            // Border
+        format,                       // Image format
+        type,                         // Image type
+        (GLvoid*)d                    // data
+      );
+      break;
+  }
   
 #ifndef GP_WEB
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 #endif
-  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+  glBindTexture(data->mDimensions, texture->mTexture);
+  
+  texture->mDimensions = data->mDimensions;
+  
+  CHECK_GL_ERROR()
 }
 
 GLuint _gp_wrap_to_gl(GP_WRAP wrap)
@@ -194,42 +316,7 @@ void _gp_texture_async_func(void* data)
 {
   _gp_texture_async* async = (_gp_texture_async*)data;
   
-  glBindTexture(GL_TEXTURE_2D, async->mTexture->mTexture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  
-  GLvoid* d = async->mData->mData;
-#ifndef GP_WEB
-  d = 0;
-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, async->mTexture->mPBO);
-  glBufferData(GL_PIXEL_UNPACK_BUFFER, async->mData->mWidth*async->mData->mHeight*4*sizeof(float), 0, GL_STREAM_DRAW);
-  GLubyte* ptr = (GLubyte*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, async->mData->mWidth*async->mData->mHeight*4*sizeof(float), GL_MAP_WRITE_BIT);
-  if(ptr)
-  {
-    // update data directly on the mapped buffer
-    memcpy(ptr, async->mData->mData, async->mData->mWidth*async->mData->mHeight*4*sizeof(float));
-    glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);  // release pointer to mapping buffer
-  }
-#endif
-  
-  glTexImage2D(GL_TEXTURE_2D,
-    0,                            // Level of detail (mip-level) (0 is base image)
-    GL_RGBA32F,                   // Internal format
-    async->mData->mWidth,         // Width
-    async->mData->mHeight,        // Height
-    0,                            // Border
-    GL_RGBA,                      // Image format
-    GL_FLOAT,                     // Image type
-    (GLvoid*)d                    // data
-  );
-  
-#ifndef GP_WEB
-  glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-#endif
-  glBindTexture(GL_TEXTURE_2D, 0);
+  gp_texture_set_data(async->mTexture, async->mData);
 }
 
 void _gp_texture_join_func(void* data)

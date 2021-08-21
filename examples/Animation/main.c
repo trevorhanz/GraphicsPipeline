@@ -39,10 +39,13 @@ const char* fragmentSource = GLSL(
   precision highp float;
   in vec2 uv;
   uniform sampler2D Texture;
+  uniform sampler2D Colormap;
+  uniform float ColorShift;
   out vec4 fragColor;
   void main()
   {
-    fragColor = texture(Texture, uv);
+    float value = texture(Texture, uv).r+ColorShift;
+    fragColor = vec4(texture(Colormap, vec2(value, .5)).rgb, 1.0);
   });
 float vertexData[] = {
   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -59,10 +62,12 @@ typedef struct
 {
   gp_window* window;
   gp_uniform* offset;
+  gp_uniform* colorShift;
   struct timeval beginFrame;
   int frame;
   float direction[2];
   float position[2];
+  float shift;
 } animation_data;
 
 void TimerCallback(gp_timer* timer, gp_pointer* userdata)
@@ -80,6 +85,9 @@ void TimerCallback(gp_timer* timer, gp_pointer* userdata)
     data->direction[1] *= -1;
   
   gp_uniform_vec2_set(data->offset, data->position);
+  
+  data->shift += .01;
+  gp_uniform_float_set(data->colorShift, data->shift);
   
   gp_window_redraw(data->window);
   
@@ -105,6 +113,7 @@ int main(int argc, char* argv[])
   gp_window* window = gp_window_new(context);
   gp_array* array = gp_array_new(context);
   gp_texture* texture = gp_texture_new(context);
+  gp_texture* colormap = gp_texture_new(context);
   gp_shader* shader = gp_shader_new(context);
   
   animation_data* data = malloc(sizeof(animation_data));
@@ -114,6 +123,7 @@ int main(int argc, char* argv[])
   data->direction[1] = .5;
   data->position[0] = 0;
   data->position[1] = 0;
+  data->shift = 0;
   gettimeofday(&data->beginFrame, NULL);
   gp_pointer* pointer = gp_pointer_new(data, 0);
   
@@ -128,15 +138,25 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)ad);
   
   float textureData[] = {
-    1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f
-  };
+    1.0f, .5f, 1.0f,
+    .5f, .0f, .5f,
+    1.0f, .5f, 1.0f};
   gp_texture_data* td = gp_texture_data_new();
-  gp_texture_data_set(td, textureData, 2, 2);
+  gp_texture_data_set_2d(td, textureData, GP_FORMAT_R, GP_DATA_TYPE_FLOAT, 3, 3);
   gp_texture_set_data(texture, td);
   gp_object_unref((gp_object*)td);
+  
+  unsigned char colormapData[] = {
+    255, 0, 0,
+    0, 255, 0,
+    0, 0, 255,
+    0, 255, 255,
+  };
+  gp_texture_data* cd = gp_texture_data_new();
+  gp_texture_data_set_2d(cd, colormapData, GP_FORMAT_RGB, GP_DATA_TYPE_UBYTE, 4, 1);
+  gp_texture_set_data(colormap, cd);
+  gp_texture_set_wrap_x(colormap, GP_WRAP_MIRROR);
+  gp_object_unref((gp_object*)cd);
   
   gp_shader_source* source = gp_shader_source_new();
   gp_shader_source_add_from_string(source, GP_SHADER_SOURCE_VERTEX, vertexSource);
@@ -147,9 +167,15 @@ int main(int argc, char* argv[])
   gp_uniform* tex = gp_uniform_texture_new_by_name(shader, "Texture");
   gp_uniform_texture_set(tex, texture);
   
+  gp_uniform* cm = gp_uniform_texture_new_by_name(shader, "Colormap");
+  gp_uniform_texture_set(cm, colormap);
+  
   float o[] = {0.0f, 0.0f};
   data->offset = gp_uniform_vec2_new_by_name(shader, "Offset");
   gp_uniform_vec2_set(data->offset, o);
+  
+  data->colorShift = gp_uniform_float_new_by_name(shader, "ColorShift");
+  gp_uniform_float_set(data->colorShift, 0);
   
   gp_pipeline* pipeline = gp_window_get_pipeline(window);
   
@@ -160,7 +186,9 @@ int main(int argc, char* argv[])
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
   gp_operation_draw_set_uniform(draw, data->offset);
+  gp_operation_draw_set_uniform(draw, data->colorShift);
   gp_operation_draw_set_uniform(draw, tex);
+  gp_operation_draw_set_uniform(draw, cm);
   gp_operation_draw_add_array_by_index(draw, array, 0, 3, sizeof(float)*5, 0);
   gp_operation_draw_add_array_by_index(draw, array, 1, 2, sizeof(float)*5, sizeof(float)*3);
   gp_operation_draw_set_verticies(draw, 6);
@@ -168,6 +196,7 @@ int main(int argc, char* argv[])
   gp_pipeline_add_operation(pipeline, draw);
   gp_object_unref((gp_object*)draw);
   gp_object_unref((gp_object*)tex);
+  gp_object_unref((gp_object*)cm);
   
   gp_object_unref((gp_object*)shader);
   gp_object_unref((gp_object*)array);
