@@ -35,10 +35,6 @@ extern "C" {
  * \{
  */
 
-typedef unsigned int gp_draw_mode;
-extern const gp_draw_mode GP_MODE_TRIANGLES;
-extern const gp_draw_mode GP_MODE_TRIANGLE_STRIP;
-
 /*!
  * Create a new clear operation.
  * \return Pointer to new operation.
@@ -106,7 +102,7 @@ GP_EXPORT void gp_operation_draw_set_verticies(gp_operation* operation, int coun
  * \param operation Draw operation for which to change the draw mode.
  * \param mode The drawing mode to use.
  */
-GP_EXPORT void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode);
+GP_EXPORT void gp_operation_draw_set_mode(gp_operation* operation, GP_DRAW_MODE mode);
 
 /*!
  * Create a new viewport operation.
@@ -224,7 +220,7 @@ namespace GP
      * Set the draw mode for a draw operation.
      * \param mode The drawing mode to use.
      */
-    inline void SetMode(gp_draw_mode mode);
+    inline void SetMode(GP_DRAW_MODE mode);
   };
   
   /*!
@@ -302,7 +298,7 @@ namespace GP
     gp_operation_draw_add_array_by_index((gp_operation*)GetObject(), (gp_array*)array.GetObject(), index, components, type, stride, offset);
   }
   void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies((gp_operation*)GetObject(), count);}
-  void DrawOperation::SetMode(gp_draw_mode mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(), mode);}
+  void DrawOperation::SetMode(GP_DRAW_MODE mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(), mode);}
   
   ViewportOperation::ViewportOperation()
     : Operation(gp_operation_viewport_new())

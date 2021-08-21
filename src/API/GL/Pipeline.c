@@ -42,9 +42,6 @@
 
 #define GP_OBJECT_FROM_LIST_NODE(node) (gp_object*)(((char*)node)-sizeof(gp_object))
 
-const gp_draw_mode GP_MODE_TRIANGLES = GL_TRIANGLES;
-const gp_draw_mode GP_MODE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP;
-
 // Apple doesn't seem to have support for debug callbacks
 #if !defined(__APPLE__) && defined(GP_GL)
 void DebugCallbackFunction(GLenum source,
@@ -149,7 +146,7 @@ typedef struct
   gp_list                 mArrays;
   gp_list                 mUniforms;
   unsigned int            mVerticies;
-  gp_draw_mode            mMode;
+  GP_DRAW_MODE            mMode;
 } _gp_operation_draw;
 
 void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
@@ -200,7 +197,15 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
   }
 #endif
   
-  glDrawArrays(self->mMode, 0, self->mVerticies);
+  static const GLuint draw_modes[] =
+  {
+    GL_TRIANGLES,
+    GL_TRIANGLE_STRIP,
+    GL_LINES,
+    GL_LINE_STRIP
+  };
+  
+  glDrawArrays(draw_modes[self->mMode], 0, self->mVerticies);
   CHECK_GL_ERROR();
 }
 
@@ -258,7 +263,7 @@ gp_operation* gp_operation_draw_new()
   operation->mDirty = 1;
 #endif
   operation->mVerticies = 0;
-  operation->mMode = GL_TRIANGLES;
+  operation->mMode = GP_MODE_TRIANGLES;
   
   return (gp_operation*)operation;
 }
@@ -356,7 +361,7 @@ void gp_operation_draw_set_verticies(gp_operation* operation, int count)
   self->mVerticies = count;
 }
 
-void gp_operation_draw_set_mode(gp_operation* operation, gp_draw_mode mode)
+void gp_operation_draw_set_mode(gp_operation* operation, GP_DRAW_MODE mode)
 {
   _gp_operation_draw* self = (_gp_operation_draw*)operation;
   self->mMode = mode;

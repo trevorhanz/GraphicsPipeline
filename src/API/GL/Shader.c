@@ -205,6 +205,8 @@ void _gp_uniform_load_texture(gp_uniform* uniform, _gp_draw_context* context)
   glActiveTexture(GL_TEXTURE0+index);
   glBindTexture(texture->mDimensions, texture->mTexture);
   glUniform1i(uniform->mLocation, index);
+  
+  CHECK_GL_ERROR()
 }
 void _gp_uniform_load_int(gp_uniform* uniform, _gp_draw_context* context) {glUniform1i(uniform->mLocation, *(int*)uniform->mData);}
 void _gp_uniform_load_float(gp_uniform* uniform, _gp_draw_context* context) {glUniform1f(uniform->mLocation, *(float*)uniform->mData);}

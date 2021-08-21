@@ -141,6 +141,7 @@ gp_texture* gp_texture_new(gp_context* context)
   gp_texture* texture = malloc(sizeof(gp_texture));
   _gp_object_init(&texture->mObject, _gp_texture_free);
   glGenTextures(1, &texture->mTexture);
+  texture->mDimensions = GL_TEXTURE_2D;
   texture->mWrapX = GL_CLAMP_TO_EDGE;
   texture->mWrapY = GL_CLAMP_TO_EDGE;
   

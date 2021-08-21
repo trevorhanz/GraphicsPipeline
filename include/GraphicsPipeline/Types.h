@@ -160,6 +160,17 @@ typedef enum
 } GP_DATA_TYPE;
 
 /*!
+ * Defines draw operations.
+ */
+typedef enum
+{
+  GP_MODE_TRIANGLES,            //!< Every three points is rendered as a triangle.
+  GP_MODE_TRIANGLE_STRIP,       //!< Every point is rendered as a triangle with the previous two points.
+  GP_MODE_LINES,                //!< Every two points is rendered as a line.
+  GP_MODE_LINE_STRIP            //!< Every point is rendered as a line with the previous point.
+} GP_DRAW_MODE;
+
+/*!
  * Storage for a single color value.
  */
 typedef unsigned int gp_color;
