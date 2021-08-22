@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 size_t _gp_data_type_to_size(GP_DATA_TYPE type)
 {
