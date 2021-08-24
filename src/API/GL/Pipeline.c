@@ -188,7 +188,14 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
     
     // Specify the layout of the vertex data
     glEnableVertexAttribArray(array->mIndex);
-    glVertexAttribPointer(array->mIndex, array->mComponents, array->mType, GL_FALSE, array->mStride, (void*)array->mOffset);
+#ifdef GP_GL
+    if(array->mType == GL_DOUBLE)
+    {
+      glVertexAttribLPointer(array->mIndex, array->mComponents, array->mType, array->mStride, (void*)array->mOffset);
+    }
+    else
+#endif
+      glVertexAttribPointer(array->mIndex, array->mComponents, array->mType, GL_FALSE, array->mStride, (void*)array->mOffset);
     
     node = gp_list_node_next(node);
   }

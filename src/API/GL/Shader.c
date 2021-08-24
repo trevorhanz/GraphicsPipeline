@@ -244,7 +244,7 @@ void _gp_uniform_load_dvec2(gp_uniform* uniform, _gp_draw_context* context)
 void _gp_uniform_load_dvec3(gp_uniform* uniform, _gp_draw_context* context)
 {
   double* data = uniform->mData;
-  glUniform3f(uniform->mLocation, data[0], data[1], data[2]);
+  glUniform3d(uniform->mLocation, data[0], data[1], data[2]);
 }
 void _gp_uniform_load_dvec4(gp_uniform* uniform, _gp_draw_context* context)
 {
