@@ -364,13 +364,13 @@ float gp_uniform_float_get(gp_uniform* uniform)
 #ifdef GP_GL
 void gp_uniform_double_set(gp_uniform* uniform, double data)
 {
-  assert(uniform->mOperation == _gp_uniform_load_float);
+  assert(uniform->mOperation == _gp_uniform_load_double);
   memcpy(uniform->mData, &data, sizeof(double));
 }
 
 double gp_uniform_double_get(gp_uniform* uniform)
 {
-  assert(uniform->mOperation == _gp_uniform_load_float);
+  assert(uniform->mOperation == _gp_uniform_load_double);
   return *(double*)uniform->mData;
 }
 #endif
