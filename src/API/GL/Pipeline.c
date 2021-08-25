@@ -206,6 +206,7 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
   
   static const GLuint draw_modes[] =
   {
+    GL_POINTS,
     GL_TRIANGLES,
     GL_TRIANGLE_STRIP,
     GL_LINES,

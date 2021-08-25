@@ -164,6 +164,7 @@ typedef enum
  */
 typedef enum
 {
+  GP_MODE_POINTS,               //!< Every point is rendered as a sparate quad.
   GP_MODE_TRIANGLES,            //!< Every three points is rendered as a triangle.
   GP_MODE_TRIANGLE_STRIP,       //!< Every point is rendered as a triangle with the previous two points.
   GP_MODE_LINES,                //!< Every two points is rendered as a line.
