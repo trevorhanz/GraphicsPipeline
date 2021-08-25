@@ -289,9 +289,9 @@ void gp_texture_set_wrap_x(gp_texture* texture, GP_WRAP wrap)
   
   texture->mWrapX = w;
   
-  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->mWrapX);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(texture->mDimensions, texture->mTexture);
+  glTexParameteri(texture->mDimensions, GL_TEXTURE_WRAP_S, texture->mWrapX);
+  glBindTexture(texture->mDimensions, 0);
 }
 
 void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap)
@@ -301,9 +301,9 @@ void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap)
   
   texture->mWrapY = w;
   
-  glBindTexture(GL_TEXTURE_2D, texture->mTexture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->mWrapY);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(texture->mDimensions, texture->mTexture);
+  glTexParameteri(texture->mDimensions, GL_TEXTURE_WRAP_T, texture->mWrapY);
+  glBindTexture(texture->mDimensions, 0);
 }
 
 typedef struct
