@@ -26,6 +26,8 @@
 _Window::_Window(gp_context* parent, QOpenGLContext* share)
   : mClickCB(NULL),
   mClickData(NULL),
+  mScrollCB(NULL),
+  mScrollData(NULL),
   mTrackCB(NULL),
   mTrackData(NULL),
   mEnterCB(NULL),
@@ -65,6 +67,7 @@ _Window::_Window(gp_context* parent, QOpenGLContext* share)
 _Window::~_Window()
 {
   if(mClickData) gp_object_unref((gp_object*)mClickData);
+  if(mScrollData) gp_object_unref((gp_object*)mScrollData);
   if(mTrackData) gp_object_unref((gp_object*)mTrackData);
   if(mEnterData) gp_object_unref((gp_object*)mEnterData);
   if(mKeyData) gp_object_unref((gp_object*)mKeyData);
@@ -198,6 +201,19 @@ void _Window::resizeEvent(QResizeEvent* event)
   }
 }
 
+void _Window::wheelEvent(QWheelEvent* event)
+{
+  if(mScrollCB)
+  {
+    gp_event_scroll_t input;
+    input.scroll = event->angleDelta().ry()/120;
+    
+    if(input.scroll == 0) return;
+    
+    mScrollCB(&input, mScrollData);
+  }
+}
+
 bool _Window::event(QEvent* event)
 {
   switch(event->type())
@@ -264,6 +280,7 @@ gp_window* gp_window_new(gp_context* context)
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(scroll, mScrollCB, mScrollData)
 _GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)

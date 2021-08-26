@@ -56,6 +56,7 @@ typedef struct
 } gp_event_move_t;
 
 typedef void(*gp_event_click_callback_t)(const gp_event_click_t* click, gp_pointer* userData);
+typedef void(*gp_event_scroll_callback_t)(const gp_event_scroll_t* scroll, gp_pointer* userData);
 typedef void(*gp_event_track_callback_t)(const gp_event_track_t* move, gp_pointer* userData);
 typedef void(*gp_event_enter_callback_t)(const gp_event_enter_t* enter, gp_pointer* userData);
 typedef void(*gp_event_key_callback_t)(const gp_event_key_t* key, gp_pointer* userData);
@@ -169,6 +170,13 @@ GP_EXPORT int gp_window_get_shown(gp_window* window);
  * \param userData Pointer to user defined data.
  */
 GP_EXPORT void gp_window_set_click_callback(gp_window* window, gp_event_click_callback_t callback, gp_pointer* userData);
+
+/*!
+ * Connect a callback for scroll input events.
+ * \param callback Function callback to be used for input scroll events. Set to NULL to remove callback.
+ * \param userData Pointer to user defined data.
+ */
+GP_EXPORT void gp_window_set_scroll_callback(gp_window* window, gp_event_scroll_callback_t callback, gp_pointer* userData);
 
 /*!
  * Connect a callback for mouse move input events.
@@ -312,6 +320,12 @@ namespace GP
     inline void SetClickCallback(std::function<void(const gp_event_click_t*)> callback);
     
     /*!
+     * Set the callback to be used for scroll events.
+     * \param callback Callback to be used.
+     */
+    inline void SetScrollCallback(std::function<void(const gp_event_scroll_t*)> callback);
+    
+    /*!
      * Set the callback to be used for cursor move events.
      * \param callback Callback to be used.
      */
@@ -343,6 +357,7 @@ namespace GP
     
   private:
     typedef std::function<void(const gp_event_click_t*)>    ClickCallback;
+    typedef std::function<void(const gp_event_scroll_t*)>   ScrollCallback;
     typedef std::function<void(const gp_event_track_t*)>    TrackCallback;
     typedef std::function<void(const gp_event_enter_t*)>    EnterCallback;
     typedef std::function<void(const gp_event_key_t*)>      KeyCallback;
@@ -350,7 +365,7 @@ namespace GP
     typedef std::function<void(const gp_event_move_t*)>     MoveCallback;
     
     template <typename T>
-    static void HandleCallback(const T* click, gp_pointer* userData);
+    static void HandleCallback(const T* input, gp_pointer* userData);
     
     template <typename T>
     struct CallbackData
@@ -383,6 +398,14 @@ namespace GP
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
     gp_window_set_click_callback((gp_window*)GetObject(), HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
+    gp_object_unref(pointer);
+  }
+  void Window::SetScrollCallback(std::function<void(const gp_event_scroll_t*)> callback)
+  {
+    auto data = new CallbackData<ScrollCallback>();
+    data->mCallback = callback;
+    auto pointer = Pointer(data).GetObject();
+    gp_window_set_scroll_callback((gp_window*)GetObject(), HandleCallback<gp_event_scroll_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetTrackCallback(std::function<void(const gp_event_track_t*)> callback)

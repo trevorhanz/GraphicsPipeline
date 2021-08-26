@@ -41,6 +41,8 @@ public:
   
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
+  gp_event_scroll_callback_t  mScrollCB;
+  gp_pointer*                 mScrollData;
   gp_event_track_callback_t   mTrackCB;
   gp_pointer*                 mTrackData;
   gp_event_enter_callback_t   mEnterCB;
@@ -60,6 +62,7 @@ protected:
   void keyPressEvent(QKeyEvent* event) override;
   void keyReleaseEvent(QKeyEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
+  void wheelEvent(QWheelEvent* event) override;
   bool event(QEvent* event) override;
   
 private:

@@ -46,6 +46,11 @@ void mouse_click_callback(const gp_event_click_t* click, gp_pointer* userData)
   gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
 }
 
+void mouse_scroll_callback(const gp_event_scroll_t* scroll, gp_pointer* userData)
+{
+  gp_log("Scroll: %f", scroll->scroll);
+}
+
 void mouse_track_callback(const gp_event_track_t* track, gp_pointer* userData)
 {
   gp_log("Track: %d, %d", track->x, track->y);
@@ -84,6 +89,7 @@ int main(int argc, char* argv[])
   gp_shader* shader = gp_shader_new(context);
   
   gp_window_set_click_callback(window, mouse_click_callback, NULL);
+  gp_window_set_scroll_callback(window, mouse_scroll_callback, NULL);
   gp_window_set_track_callback(window, mouse_track_callback, NULL);
   gp_window_set_enter_callback(window, mouse_enter_callback, NULL);
   gp_window_set_key_callback(window, key_callback, NULL);

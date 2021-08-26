@@ -56,6 +56,9 @@ int main(int argc, char* argv[])
   window.SetClickCallback([&](const gp_event_click_t* click){
     gp_log("Click: %d, %d, %d, %d", click->button, click->state, click->x, click->y);
   });
+  window.SetScrollCallback([&](const gp_event_scroll_t* scroll){
+    gp_log("Scroll: %f", scroll->scroll);
+  });
   window.SetTrackCallback([&](const gp_event_track_t* track){
     gp_log("Track: %d, %d", track->x, track->y);
   });

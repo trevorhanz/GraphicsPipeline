@@ -116,6 +116,7 @@ void _gp_window_free(gp_object* object)
   _gp_pipeline_free(window->mPipeline);
   
   if(window->mClickData) gp_object_unref((gp_object*)window->mClickData);
+  if(window->mScrollData) gp_object_unref((gp_object*)window->mScrollData);
   if(window->mTrackData) gp_object_unref((gp_object*)window->mTrackData);
   if(window->mEnterData) gp_object_unref((gp_object*)window->mEnterData);
   if(window->mKeyData) gp_object_unref((gp_object*)window->mKeyData);
@@ -132,6 +133,8 @@ void _gp_window_build(gp_window* window)
   window->mPipeline = _gp_pipeline_new();
   window->mClickCB = NULL;
   window->mClickData = NULL;
+  window->mScrollCB = NULL;
+  window->mScrollData = NULL;
   window->mTrackCB = NULL;
   window->mTrackData = NULL;
   window->mEnterCB = NULL;
@@ -276,6 +279,7 @@ int gp_window_get_shown(gp_window* window)
   }
 
 _GP_SET_WINDOW_CALLBACK(click, mClickCB, mClickData)
+_GP_SET_WINDOW_CALLBACK(scroll, mScrollCB, mScrollData)
 _GP_SET_WINDOW_CALLBACK(track, mTrackCB, mTrackData)
 _GP_SET_WINDOW_CALLBACK(enter, mEnterCB, mEnterData)
 _GP_SET_WINDOW_CALLBACK(key, mKeyCB, mKeyData)

@@ -99,6 +99,8 @@ struct _gp_window
   
   gp_event_click_callback_t   mClickCB;
   gp_pointer*                 mClickData;
+  gp_event_scroll_callback_t  mScrollCB;
+  gp_pointer*                 mScrollData;
   gp_event_track_callback_t   mTrackCB;
   gp_pointer*                 mTrackData;
   gp_event_enter_callback_t   mEnterCB;

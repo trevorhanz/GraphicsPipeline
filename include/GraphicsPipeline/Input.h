@@ -41,12 +41,20 @@ typedef struct
 } gp_event_click_t;
 
 /*!
+ * Structure for scroll input.
+ */
+typedef struct
+{
+  float           scroll;     //!< Amount scrolled.
+} gp_event_scroll_t;
+
+/*!
  * Structure for mouse movement input.
  */
 typedef struct 
 {
-  int       x;
-  int       y;
+  int             x;
+  int             y;
 } gp_event_track_t;
 
 /*!
@@ -54,7 +62,7 @@ typedef struct
  */
 typedef struct
 {
-  int       enter;  // 1 if entering, 0 if leaving
+  int             enter;      //!< 1 if entering, 0 if leaving
 } gp_event_enter_t;
 
 /*!

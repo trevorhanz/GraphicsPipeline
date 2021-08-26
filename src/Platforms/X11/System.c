@@ -272,6 +272,18 @@ void _gp_system_process_events(gp_io* io, gp_pointer* userdata)
         window->mState &= ~GP_MAPPED;
       } break;
       case ButtonPress:
+        if(event.xbutton.button == Button4 || event.xbutton.button == Button5)
+        {
+          gp_window* window = _gp_system_find_window(system, event.xbutton.window);
+          if(window && window->mScrollCB)
+          {
+            gp_event_scroll_t input;
+            input.scroll = (event.xbutton.button == Button4)? 1 : -1;
+            
+            window->mScrollCB(&input, window->mScrollData);
+          }
+          break;
+        }
       case ButtonRelease:
       {
         gp_window* window = _gp_system_find_window(system, event.xbutton.window);
