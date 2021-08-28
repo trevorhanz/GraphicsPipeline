@@ -37,6 +37,8 @@ public:
   QWidget* GetWidget();
   gp_pipeline* GetPipeline();
   
+  // Initiates immediate draw.  Should usually be called as response
+  // to QWindow::requestUpdate call.
   void Draw();
   
   gp_event_click_callback_t   mClickCB;

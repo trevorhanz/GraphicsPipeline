@@ -228,6 +228,10 @@ bool _Window::event(QEvent* event)
         mEnterCB(&input, mEnterData);
       }
     } break;
+    case QEvent::UpdateRequest:
+    {
+      Draw();
+    } break;
     default:
       break;
   }
@@ -294,7 +298,7 @@ gp_pipeline* gp_window_get_pipeline(gp_window* window)
 
 void gp_window_redraw(gp_window* window)
 {
-  window->mWindow->Draw();
+  window->mWindow->requestUpdate();
 }
 
 void gp_window_set_title(gp_window* window, const char* title)
