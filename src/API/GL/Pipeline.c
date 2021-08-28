@@ -562,5 +562,9 @@ void _gp_api_prepare_window(unsigned int width, unsigned int height)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
+#ifdef GP_GL
+  glEnable(GL_PROGRAM_POINT_SIZE);
+#endif
+  
   glViewport(0, 0, width, height);
 }
