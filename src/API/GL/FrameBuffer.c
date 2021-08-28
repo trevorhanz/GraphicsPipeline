@@ -122,7 +122,9 @@ void gp_frame_buffer_redraw(gp_frame_buffer* fb)
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   
   glBindFramebuffer(GL_FRAMEBUFFER, fb->mFBO);
-  glViewport(0, 0, width, height);
+  
+  _gp_api_prepare_window(width, height);
+  
   _gp_pipeline_execute(fb->mPipeline);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   CHECK_GL_ERROR()
