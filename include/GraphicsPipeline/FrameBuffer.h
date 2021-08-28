@@ -100,6 +100,8 @@ namespace GP
   class FrameBuffer : public Object
   {
   public:
+    inline FrameBuffer();
+    
     //! Constructor
     inline FrameBuffer(gp_frame_buffer* frame_buffer);
     
@@ -149,6 +151,7 @@ namespace GP
   //
   // Implementation
   //
+  FrameBuffer::FrameBuffer() : Object((void*)0) {}
   FrameBuffer::FrameBuffer(gp_frame_buffer* frame_buffer) : Object((gp_object*)frame_buffer) {}
   FrameBuffer::FrameBuffer(const Context& context) : Object((void*)gp_frame_buffer_new((gp_context*)context.GetObject())) {}
   Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline((gp_frame_buffer*)GetObject()));}

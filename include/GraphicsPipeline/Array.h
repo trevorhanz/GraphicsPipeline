@@ -150,6 +150,8 @@ namespace GP
   class Array : public Object
   {
   public:
+    inline Array();
+    
     //! Constructor
     inline Array(gp_array* array);
     
@@ -188,8 +190,9 @@ namespace GP
   void* ArrayData::GetData() {return gp_array_data_get_data((gp_array_data*)GetObject());}
   unsigned int ArrayData::GetSize() {return gp_array_data_get_size((gp_array_data*)GetObject());}
   
-  Array::Array(gp_array* array) : Object((void*)array) {}
-  Array::Array(const Context& context) : Object((gp_object*)gp_array_new((gp_context*)context.GetObject())) {}
+  Array::Array() : Object((void*)0) {}
+  Array::Array(gp_array* array) : Object((gp_object*)array) {}
+  Array::Array(const Context& context) : Object((void*)gp_array_new((gp_context*)context.GetObject())) {}
   void Array::SetData(const ArrayData& ad) {gp_array_set_data((gp_array*)GetObject(), (gp_array_data*)ad.GetObject());}
   void Array::SetDataAsync(const ArrayData& ad, std::function<void(Array*)> callback)
   {

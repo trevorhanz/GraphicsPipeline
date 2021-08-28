@@ -138,6 +138,8 @@ namespace GP
   class Shader : public Object
   {
   public:
+    inline Shader();
+    
     //! Constructor
     inline Shader(gp_shader* shader);
     
@@ -149,13 +151,6 @@ namespace GP
      * \param source The shader source object to be compiled.
      */
     inline void Compile(const ShaderSource& source);
-    
-    /*!
-     * Create a new Uniform for a Shader object.
-     * \param name Name of the uniform variable in the shader code.
-     * \return Newly created Uniform object.
-     */
-    inline Uniform CreateUniform(const char* name);
   };
   
   /*!
@@ -182,6 +177,8 @@ namespace GP
   class Uniform##CXXname : public Uniform\
   {\
   public:\
+    inline Uniform##CXXname();\
+    \
     /*! Constructor */\
     inline Uniform##CXXname(const Shader& shader, const char* name);\
     \
@@ -195,6 +192,7 @@ namespace GP
      */\
     inline type Get();\
   };\
+  Uniform##CXXname::Uniform##CXXname() : Uniform((void*)0) {}\
   Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name((gp_shader*)shader.GetObject(), name)) {}\
   void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)mObject, data);}\
   type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)mObject);}
@@ -205,6 +203,8 @@ namespace GP
   class UniformTexture : public Uniform
   {
   public:
+    inline UniformTexture();
+    
     /*! Constructor */
     inline UniformTexture(const Shader& shader, const char* name);
     
@@ -217,8 +217,9 @@ namespace GP
      * Get texture data into Uniform object
      */
     inline gp_texture* Get();
-  };\
-  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform(gp_uniform_texture_new_by_name((gp_shader*)shader.GetObject(), name)) {}
+  };
+  UniformTexture::UniformTexture() : Uniform((void*)0) {}
+  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_texture_new_by_name((gp_shader*)shader.GetObject(), name)) {}
   void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)mObject, (gp_texture*)texture.GetObject());}
   gp_texture* UniformTexture::Get() {return 0;}
   
@@ -248,8 +249,9 @@ namespace GP
     gp_shader_source_add_from_string((gp_shader_source*)GetObject(), type, str);
   }
   
-  Shader::Shader(gp_shader* shader) : Object((void*)shader) {}
-  Shader::Shader(const Context& context) : Object((gp_object*)gp_shader_new((gp_context*)context.GetObject())) {}
+  Shader::Shader() : Object((void*)0) {}
+  Shader::Shader(gp_shader* shader) : Object((gp_object*)shader) {}
+  Shader::Shader(const Context& context) : Object((void*)gp_shader_new((gp_context*)context.GetObject())) {}
   void Shader::Compile(const ShaderSource& source)
   {
     gp_shader_compile((gp_shader*)GetObject(), (gp_shader_source*)source.GetObject());

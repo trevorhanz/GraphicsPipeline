@@ -107,6 +107,12 @@ namespace GP
     //! Equal operator
     inline const Object& operator = (const Object& other);
     
+    //! Validity operator
+    inline bool operator ! () const;
+    
+    //! Validity operator
+    inline operator bool () const;
+    
   protected:
     gp_object*                mObject;
   };
@@ -117,6 +123,8 @@ namespace GP
   class Pointer : public Object
   {
   public:
+    inline Pointer();
+    
     //! Constructor
     inline Pointer(gp_pointer* pointer);
     
@@ -146,19 +154,25 @@ namespace GP
   Object::Object(const Object& other)
   {
     mObject = other.mObject;
-    gp_object_ref(mObject);
+    if(mObject)
+      gp_object_ref(mObject);
   }
-  Object::~Object() {gp_object_unref(mObject);}
+  Object::~Object() {if(mObject) gp_object_unref(mObject);}
   unsigned Object::GetCount() {return gp_object_get_count(mObject);}
   gp_object* Object::GetObject() const {gp_object_ref(mObject); return mObject;}
   const Object& Object::operator = (const Object& other)
   {
-    gp_object_unref(mObject);
+    if(mObject)
+      gp_object_unref(mObject);
     mObject = other.mObject;
-    gp_object_ref(mObject);
+    if(mObject)
+      gp_object_ref(mObject);
     return *this;
   }
+  bool Object::operator ! () const {return mObject == 0;}
+  Object::operator bool () const {return mObject != 0;}
   
+  Pointer::Pointer() : Object((void*)0) {}
   Pointer::Pointer(gp_pointer* pointer) : Object((gp_object*)pointer) {}
   template <typename T>
   Pointer::Pointer(T* pointer) : Object((void*)gp_pointer_new(pointer, Deleter<T>)) {}

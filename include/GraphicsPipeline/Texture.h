@@ -152,6 +152,8 @@ namespace GP
   class Texture : public Object
   {
   public:
+    inline Texture();
+    
     //! Constructor
     inline Texture(gp_texture* texture);
     
@@ -206,8 +208,9 @@ namespace GP
     gp_texture_data_set_2d((gp_texture_data*)GetObject(), data, format, type, width, height);
   }
   
-  Texture::Texture(gp_texture* texture) : Object((void*)texture) {}
-  Texture::Texture(const Context& context) : Object((gp_object*)gp_texture_new((gp_context*)context.GetObject())) {}
+  Texture::Texture() : Object((void*)0) {}
+  Texture::Texture(gp_texture* texture) : Object((gp_object*)texture) {}
+  Texture::Texture(const Context& context) : Object((void*)gp_texture_new((gp_context*)context.GetObject())) {}
   void Texture::SetData(const TextureData& data) {gp_texture_set_data((gp_texture*)GetObject(), (gp_texture_data*)data.GetObject());}
   void Texture::SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback)
   {
