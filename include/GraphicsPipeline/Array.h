@@ -41,12 +41,40 @@ extern "C" {
 GP_EXPORT gp_array_data* gp_array_data_new();
 
 /*!
+ * Create a new gp_array_data object with an initial size.
+ * \param size Initial size of array data object.
+ * \return Newly created array data object.
+ */
+GP_EXPORT gp_array_data* gp_array_data_new_with_size(unsigned int size);
+
+/*!
+ * Allocate enough storage space to store a given number of bytes.
+ * \param ad Array data object to be used.
+ * \param size Number of bytes to be allocated.
+ */
+GP_EXPORT void gp_array_data_allocate(gp_array_data* ad, unsigned int size);
+
+/*!
  * Store array of data in array data object.
  * \param ad Array data object to be used.
  * \param data Pointer to array of data to be stored.
  * \param size Size of the data to be stored in bytes.
  */
 GP_EXPORT void gp_array_data_set(gp_array_data* ad, void* data, unsigned int size);
+
+/*!
+ * Retrieve the array of data stored in the array data object.
+ * \param ad Array data object to be used.
+ * \return Pointer to array of data to be retrieved.
+ */
+GP_EXPORT void* gp_array_data_get_data(gp_array_data* ad);
+
+/*!
+ * Retrieve the size of the data stored in the array data object.
+ * \param ad Array data object to be used.
+ * \return Size of the data stored in bytes.
+ */
+GP_EXPORT unsigned int gp_array_data_get_size(gp_array_data* ad);
 
 /*!
  * Create a new gp_array object tied to a context.
@@ -85,8 +113,16 @@ namespace GP
     //! Constructor
     inline ArrayData(gp_array_data* data);
     
-    //! Constructor
     inline ArrayData();
+    
+    //! Constructor
+    inline ArrayData(unsigned int size);
+    
+    /*!
+     * Allocate enough storage space to store a given number of bytes.
+     * \param size Number of bytes to be allocated.
+     */
+    inline void Allocate(unsigned int size);
     
     /*!
      * Store array of data in array data object.
@@ -94,6 +130,18 @@ namespace GP
      * \param size Size of the data to be stored in bytes.
      */
     inline void Set(void* data, unsigned int size);
+    
+    /*!
+     * Retrieve the array of data stored in the array data object.
+     * \return Pointer to array of data to be retrieved.
+     */
+    inline void* GetData();
+    
+    /*!
+     * Retrieve the size of the data stored in the array data object.
+     * \return Size of the data stored in bytes.
+     */
+    inline unsigned int GetSize();
   };
   
   /*!
@@ -134,7 +182,11 @@ namespace GP
   //
   ArrayData::ArrayData(gp_array_data* data) : Object((gp_object*)data) {}
   ArrayData::ArrayData() : Object((void*)gp_array_data_new()) {}
+  ArrayData::ArrayData(unsigned int size) : Object((void*)gp_array_data_new_with_size(size)) {}
+  void ArrayData::Allocate(unsigned int size) {gp_array_data_allocate((gp_array_data*)GetObject(), size);}
   void ArrayData::Set(void* data, unsigned int size) {gp_array_data_set((gp_array_data*)GetObject(), data, size);}
+  void* ArrayData::GetData() {return gp_array_data_get_data((gp_array_data*)GetObject());}
+  unsigned int ArrayData::GetSize() {return gp_array_data_get_size((gp_array_data*)GetObject());}
   
   Array::Array(gp_array* array) : Object((void*)array) {}
   Array::Array(const Context& context) : Object((gp_object*)gp_array_new((gp_context*)context.GetObject())) {}

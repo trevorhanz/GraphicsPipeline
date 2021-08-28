@@ -46,12 +46,39 @@ gp_array_data* gp_array_data_new()
   return data;
 }
 
+gp_array_data* gp_array_data_new_with_size(unsigned int size)
+{
+  gp_array_data* data = malloc(sizeof(gp_array_data));
+  _gp_object_init(&data->mObject, _gp_array_data_free);
+  data->mData = malloc(size);
+  data->mSize = size;
+  
+  return data;
+}
+
+void gp_array_data_allocate(gp_array_data* ad, unsigned int size)
+{
+  if(ad->mData == NULL) ad->mData = malloc(size);
+  
+  ad->mSize = size;
+}
+
 void gp_array_data_set(gp_array_data* ad, void* data, unsigned int size)
 {
   if(ad->mData == NULL) ad->mData = malloc(size);
   
   memcpy(ad->mData, data, size);
   ad->mSize = size;
+}
+
+void* gp_array_data_get_data(gp_array_data* ad)
+{
+  return ad->mData;
+}
+
+unsigned int gp_array_data_get_size(gp_array_data* ad)
+{
+  return ad->mSize;
 }
 
 void _gp_array_free(gp_object* object)
