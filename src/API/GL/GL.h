@@ -76,6 +76,7 @@ struct _gp_array_data
   gp_object               mObject;
   void*                   mData;
   unsigned int            mSize;
+  int                     mOffset;
 };
 
 struct _gp_array
