@@ -226,6 +226,8 @@ namespace GP
   class Window : public Object
   {
   public:
+    inline Window();
+    
     //! Constructor
     inline Window(gp_window* window);
     
@@ -377,6 +379,7 @@ namespace GP
   //
   // Implementation
   //
+  Window::Window() : Object((void*)0) {}
   Window::Window(gp_window* window) : Object((gp_object*)window) {}
   Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)context.GetObject())) {}
   Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject()));}
