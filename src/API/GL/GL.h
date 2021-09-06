@@ -94,6 +94,8 @@ struct _gp_texture_data
   GP_DATA_TYPE            mType;
   unsigned int            mWidth;
   unsigned int            mHeight;
+  int                     mWidthOffset;
+  int                     mHeightOffset;
 };
 
 struct _gp_texture

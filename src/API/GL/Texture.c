@@ -65,11 +65,11 @@ gp_texture_data* gp_texture_data_new()
   return data;
 }
 
-void gp_texture_data_set_1d(gp_texture_data* td,
-                            void* data,
-                            GP_FORMAT format,
-                            GP_DATA_TYPE type,
-                            unsigned int width)
+void _gp_texture_data_set_1d(gp_texture_data* td,
+                             void* data,
+                             GP_FORMAT format,
+                             GP_DATA_TYPE type,
+                             unsigned int width)
 {
   // NOTE: Only desktop GL supports 1D textures.
   // If not supported, generate 1D textures as 2D.
@@ -98,12 +98,37 @@ void gp_texture_data_set_1d(gp_texture_data* td,
   td->mHeight = 1;
 }
 
-void gp_texture_data_set_2d(gp_texture_data* td,
+void gp_texture_data_set_1d(gp_texture_data* td,
                             void* data,
                             GP_FORMAT format,
                             GP_DATA_TYPE type,
-                            unsigned int width,
-                            unsigned int height)
+                            unsigned int width)
+{
+  _gp_texture_data_set_1d(td, data, format, type, width);
+  
+  td->mWidthOffset = -1;
+  td->mHeightOffset = -1;
+}
+
+void gp_texture_data_set_1d_chunk(gp_texture_data* td,
+                                  void* data,
+                                  GP_FORMAT format,
+                                  GP_DATA_TYPE type,
+                                  unsigned int width,
+                                  unsigned int offset)
+{
+  _gp_texture_data_set_1d(td, data, format, type, width);
+  
+  td->mWidthOffset = offset;
+  td->mHeightOffset = 0;
+}
+
+void _gp_texture_data_set_2d(gp_texture_data* td,
+                             void* data,
+                             GP_FORMAT format,
+                             GP_DATA_TYPE type,
+                             unsigned int width,
+                             unsigned int height)
 {
   td->mDimensions = GL_TEXTURE_2D;
   td->mFormat = format;
@@ -125,6 +150,35 @@ void gp_texture_data_set_2d(gp_texture_data* td,
   td->mWidth = width;
   td->mHeight = height;
 }
+
+void gp_texture_data_set_2d(gp_texture_data* td,
+                            void* data,
+                            GP_FORMAT format,
+                            GP_DATA_TYPE type,
+                            unsigned int width,
+                            unsigned int height)
+{
+  _gp_texture_data_set_2d(td, data, format, type, width, height);
+  
+  td->mWidthOffset = -1;
+  td->mHeightOffset = -1;
+}
+
+void gp_texture_data_set_2d_chunk(gp_texture_data* td,
+                                  void* data,
+                                  GP_FORMAT format,
+                                  GP_DATA_TYPE type,
+                                  unsigned int width,
+                                  unsigned int height,
+                                  unsigned int w_offset,
+                                  unsigned int h_offfset)
+{
+  _gp_texture_data_set_2d(td, data, format, type, width, height);
+  
+  td->mWidthOffset = w_offset;
+  td->mHeightOffset = h_offfset;
+}
+
 
 void _gp_texture_free(gp_object* object)
 {
@@ -227,28 +281,58 @@ void gp_texture_set_data(gp_texture* texture, gp_texture_data* data)
   {
 #ifdef GP_GL
     case GL_TEXTURE_1D:
-      glTexImage1D(data->mDimensions,
-        0,                            // Level of detail (mip-level) (0 is base image)
-        internalFormat,               // Internal format
-        data->mWidth,                 // Width
-        0,                            // Border
-        format,                       // Image format
-        type,                         // Image type
-        (GLvoid*)d                    // data
-      );
+      if(data->mWidthOffset < 0)
+      {
+        glTexImage1D(data->mDimensions,
+          0,                            // Level of detail (mip-level) (0 is base image)
+          internalFormat,               // Internal format
+          data->mWidth,                 // Width
+          0,                            // Border
+          format,                       // Image format
+          type,                         // Image type
+          (GLvoid*)d                    // data
+        );
+      }
+      else
+      {
+        glTexSubImage1D(data->mDimensions,
+          0,
+          data->mWidthOffset,
+          data->mWidth,
+          format,
+          type,
+          (GLvoid*)d
+        );
+      }
       break;
 #endif
     case GL_TEXTURE_2D:
-      glTexImage2D(data->mDimensions,
-        0,                            // Level of detail (mip-level) (0 is base image)
-        internalFormat,               // Internal format
-        data->mWidth,                 // Width
-        data->mHeight,                // Height
-        0,                            // Border
-        format,                       // Image format
-        type,                         // Image type
-        (GLvoid*)d                    // data
-      );
+      if(data->mWidthOffset < 0)
+      {
+        glTexImage2D(data->mDimensions,
+          0,                            // Level of detail (mip-level) (0 is base image)
+          internalFormat,               // Internal format
+          data->mWidth,                 // Width
+          data->mHeight,                // Height
+          0,                            // Border
+          format,                       // Image format
+          type,                         // Image type
+          (GLvoid*)d                    // data
+        );
+      }
+      else
+      {
+        glTexSubImage2D(data->mDimensions,
+          0,
+          data->mWidthOffset,
+          data->mHeightOffset,
+          data->mWidth,
+          data->mHeight,
+          format,
+          type,
+          (GLvoid*)d
+        );
+      }
       break;
   }
   

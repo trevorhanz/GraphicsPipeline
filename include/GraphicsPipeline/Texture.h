@@ -55,6 +55,23 @@ GP_EXPORT void gp_texture_data_set_1d(gp_texture_data* td,
                                       unsigned int width);
 
 /*!
+ * Store 1D data in texture data object.  If the platform doesn't support
+ * 1D textures, the data is converted to a 2D texture with a hieght of 1.
+ * \param td Texture data object to be used.
+ * \param data Pointer to an array of data to be stored.
+ * \param format Number of values per color value.
+ * \param type The data type for data values.
+ * \param width Number of elements in data width.
+ * \param offset Width offset where this chunk should be uploaded.
+ */
+GP_EXPORT void gp_texture_data_set_1d_chunk(gp_texture_data* td,
+                                            void* data,
+                                            GP_FORMAT format,
+                                            GP_DATA_TYPE type,
+                                            unsigned int width,
+                                            unsigned int offset);
+
+/*!
  * Store 2D data in texture data object.
  * \param td Texture data object to be used.
  * \param data Pointer to an array of data to be stored.
@@ -69,6 +86,26 @@ GP_EXPORT void gp_texture_data_set_2d(gp_texture_data* td,
                                       GP_DATA_TYPE type,
                                       unsigned int width,
                                       unsigned int height);
+
+/*!
+ * Store 2D data in texture data object.
+ * \param td Texture data object to be used.
+ * \param data Pointer to an array of data to be stored.
+ * \param format Number of values per color value.
+ * \param type The data type for data values.
+ * \param width Number of elements in data width.
+ * \param height Number of elements in data height.
+ * \param w_offset Width offset where this chunk should be uploaded.
+ * \param h_offset Height offset where this chunk should be uploaded.
+ */
+GP_EXPORT void gp_texture_data_set_2d_chunk(gp_texture_data* td,
+                                            void* data,
+                                            GP_FORMAT format,
+                                            GP_DATA_TYPE type,
+                                            unsigned int width,
+                                            unsigned int height,
+                                            unsigned int w_offset,
+                                            unsigned int h_offfset);
 
 /*!
  * Create a new gp_texture object tied to a context.
@@ -136,6 +173,17 @@ namespace GP
     inline void Set1D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width);
     
     /*!
+     * Store 1D data in texture data object.  If the platform doesn't support
+     * 1D textures, the data is converted to a 2D texture with a hieght of 1.
+     * \param data Pointer to an array to be stored.
+     * \param format Number of values per color value.
+     * \param type The data type for data values.
+     * \param width Number of elements in data width.
+     * \param offset Width offset where this chunk should be uploaded.
+     */
+    inline void Set1DChunk(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int offset);
+    
+    /*!
      * Store 2D data in texture data object.
      * \param data Pointer to an array of data to be stored.
      * \param format Number of values per color value.
@@ -144,6 +192,24 @@ namespace GP
      * \param height Number of elements in data height.
      */
     inline void Set2D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height);
+    
+    /*!
+     * Store 2D data in texture data object.
+     * \param data Pointer to an array of data to be stored.
+     * \param format Number of values per color value.
+     * \param type The data type for data values.
+     * \param width Number of elements in data width.
+     * \param height Number of elements in data height.
+     * \param w_offset Width offset where this chunk should be uploaded.
+     * \param h_offset Height offset where this chunk should be uploaded.
+     */
+    inline void Set2DChunk(void* data,
+                           GP_FORMAT format,
+                           GP_DATA_TYPE type,
+                           unsigned int width,
+                           unsigned int height,
+                           unsigned int w_offset,
+                           unsigned int h_offset);
   };
   
   /*!
@@ -203,9 +269,17 @@ namespace GP
   {
     gp_texture_data_set_1d((gp_texture_data*)GetObject(), data, format, type, width);
   }
+  void TextureData::Set1DChunk(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int offset)
+  {
+    gp_texture_data_set_1d_chunk((gp_texture_data*)GetObject(), data, format, type, width, offset);
+  }
   void TextureData::Set2D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height)
   {
     gp_texture_data_set_2d((gp_texture_data*)GetObject(), data, format, type, width, height);
+  }
+  void TextureData::Set2DChunk(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height, unsigned int w_offset, unsigned int h_offset)
+  {
+    gp_texture_data_set_2d_chunk((gp_texture_data*)GetObject(), data, format, type, width, height, w_offset, h_offset);
   }
   
   Texture::Texture() : Object((void*)0) {}
