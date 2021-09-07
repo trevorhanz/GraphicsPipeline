@@ -42,6 +42,8 @@
 
 #define GP_OBJECT_FROM_LIST_NODE(node) (gp_object*)(((char*)node)-sizeof(gp_object))
 
+#define GP_PIPELINE_RESORT        0x01
+
 // Apple doesn't seem to have support for debug callbacks
 #if !defined(__APPLE__) && defined(GP_GL)
 void DebugCallbackFunction(GLenum source,
@@ -74,6 +76,20 @@ void _gp_notification_null(gp_operation* self)
 {
 }
 
+void gp_operation_set_priority(gp_operation* operation, int priority)
+{
+  if(operation->mPipeline && operation->mPriority != priority)
+  {
+    operation->mPipeline->mState |= GP_PIPELINE_RESORT;
+  }
+  operation->mPriority = priority;
+}
+
+int gp_operation_get_priority(gp_operation* operation)
+{
+  return operation->mPriority;
+}
+
 typedef struct
 {
   gp_operation            mOperation;
@@ -96,6 +112,7 @@ gp_operation* gp_operation_clear_new()
   operation->mOperation.mPipeline = 0;
   operation->mOperation.mAdded = _gp_notification_null;
   operation->mOperation.mRemoved = _gp_notification_null;
+  operation->mOperation.mPriority = 0;
   
   operation->mColor[0] = 0;
   operation->mColor[1] = 0;
@@ -263,6 +280,7 @@ gp_operation* gp_operation_draw_new()
   operation->mOperation.mPipeline = 0;
   operation->mOperation.mAdded = _gp_notification_null;
   operation->mOperation.mRemoved = _gp_operation_draw_removed;
+  operation->mOperation.mPriority = 0;
   gp_list_init(&operation->mUniforms);
   gp_list_init(&operation->mArrays);
   operation->mShader = NULL;
@@ -412,6 +430,7 @@ gp_operation* gp_operation_viewport_new()
   operation->mOperation.mAdded = _gp_notification_null;
   operation->mOperation.mRemoved = _gp_notification_null;
   operation->mPipeline = _gp_pipeline_new();
+  operation->mOperation.mPriority = 0;
   memset(operation->mRect, 0, sizeof(int)*4);
   
   return (gp_operation*)operation;
@@ -441,6 +460,7 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   
   operation->mPipeline = pipeline;
   operation->mAdded(operation);
+  pipeline->mState |= GP_PIPELINE_RESORT;
   
   gp_object_ref((gp_object*)operation);
   gp_list_push_back(&pipeline->mOperations, (gp_list_node*)&operation->mNode);
@@ -462,6 +482,7 @@ gp_pipeline* _gp_pipeline_new()
 {
   gp_pipeline* pipeline = malloc(sizeof(gp_pipeline));
   gp_list_init(&pipeline->mOperations);
+  pipeline->mState = 0;
   
   return pipeline;
 }
@@ -508,8 +529,22 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
   free(context);
 }
 
+int _gp_pipeline_sort(gp_list_node* first, gp_list_node* second)
+{
+  int p1 = ((gp_operation*)GP_OBJECT_FROM_LIST_NODE(first))->mPriority;
+  int p2 = ((gp_operation*)GP_OBJECT_FROM_LIST_NODE(second))->mPriority;
+  return p1 < p2;
+}
+
 void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
 {
+  if(pipeline->mState & GP_PIPELINE_RESORT)
+  {
+    gp_list_sort(&pipeline->mOperations, _gp_pipeline_sort);
+    
+    pipeline->mState &= ~GP_PIPELINE_RESORT;
+  }
+  
   gp_list_node* node = gp_list_front(&pipeline->mOperations);
   while(node != gp_list_end(&pipeline->mOperations))
   {

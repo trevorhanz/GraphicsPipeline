@@ -143,11 +143,13 @@ struct _gp_operation
   gp_pipeline*            mPipeline;
   _gp_notification        mAdded;
   _gp_notification        mRemoved;
+  int                     mPriority;
 };
 
 struct _gp_pipeline
 {
   gp_list                 mOperations;
+  unsigned int            mState;
 };
 
 #ifdef __cplusplus

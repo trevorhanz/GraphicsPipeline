@@ -36,6 +36,21 @@ extern "C" {
  */
 
 /*!
+ * Set the rendering priority for an operation.  Higher priorities render
+ * first.  The default pririty is 0.
+ * \param operation Operation for which to set the rendering priority.
+ * \param priority The new rendering priority.
+ */
+GP_EXPORT void gp_operation_set_priority(gp_operation* operation, int priority);
+
+/*!
+ * Retrieve the current rendering priority for an operation.
+ * \param operation Operation for which to set the rendering priority.
+ * \return The current rendering priority.
+ */
+GP_EXPORT int gp_operation_get_priority(gp_operation* operation);
+
+/*!
  * Create a new clear operation.
  * \return Pointer to new operation.
  */
@@ -156,6 +171,19 @@ namespace GP
   public:
     //! Constructor
     inline Operation(gp_operation* operation);
+    
+    /*!
+     * Set the rendering priority for an operation.  Higher priorities render
+     * first.
+     * \param priority The new rendering priority.
+     */
+    inline void SetPriority(int priority);
+    
+    /*!
+     * Retrieve the current rendering priority for an operation.
+     * \return The current rendering priority.
+     */
+    inline int GetPriority();
   };
   
   /*!
@@ -279,6 +307,8 @@ namespace GP
   // Implementation
   //
   Operation::Operation(gp_operation* operation) : Object((gp_object*)operation) {}
+  void Operation::SetPriority(int priority) {gp_operation_set_priority((gp_operation*)GetObject(), priority);}
+  int Operation::GetPriority() {return gp_operation_get_priority((gp_operation*)GetObject());}
   
   ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
   void ClearOperation::SetColor(float r, float g, float b, float a) {
