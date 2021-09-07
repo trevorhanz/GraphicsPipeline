@@ -162,7 +162,7 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
   }
   
   gp_list_node* node = gp_list_front(&self->mUniforms);
-  while(node != NULL)
+  while(node != gp_list_end(&self->mUniforms))
   {
     gp_uniform_list* uniform = (gp_uniform_list*)node;
     uniform->mUniform->mOperation(uniform->mUniform, context);
@@ -179,7 +179,7 @@ void _gp_operation_draw_func(gp_operation* operation, _gp_draw_context* context)
   {
 #endif
   node = gp_list_front(&self->mArrays);
-  while(node != NULL)
+  while(node != gp_list_end(&self->mArrays))
   {
     gp_array_list* array = (gp_array_list*)node;
     glBindBuffer(GL_ARRAY_BUFFER, array->mArray->mVBO);
@@ -226,7 +226,7 @@ void _gp_operation_draw_free(gp_object* object)
   
   // TODO - free VAO
   gp_list_node* node = gp_list_front(&d->mArrays);
-  while(node != NULL)
+  while(node != gp_list_end(&d->mArrays))
   {
     gp_array_list* array = (gp_array_list*)node;
     gp_object_unref((gp_object*)array->mArray);
@@ -236,7 +236,7 @@ void _gp_operation_draw_free(gp_object* object)
   }
   
   node = gp_list_front(&d->mUniforms);
-  while(node != NULL)
+  while(node != gp_list_end(&d->mUniforms))
   {
     gp_uniform_list* uniform = (gp_uniform_list*)node;
     gp_object_unref((gp_object*)uniform->mUniform);
@@ -303,7 +303,7 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation,
   
   // Search for existing array at index first.
   gp_list_node* node = gp_list_front(&self->mArrays);
-  while(node != NULL)
+  while(node != gp_list_end(&self->mArrays))
   {
     a = (gp_array_list*)node;
     if(a->mIndex == index)
@@ -316,7 +316,7 @@ void gp_operation_draw_add_array_by_index(gp_operation* operation,
   }
   
   // Create a new node if one wasn't found.
-  if(node == NULL)
+  if(node == gp_list_end(&self->mArrays))
   {
     a = malloc(sizeof(gp_array_list));
     gp_list_push_back(&self->mArrays, (gp_list_node*)a);
@@ -432,7 +432,6 @@ void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, 
   self->mRect[3] = height;
 }
 
-
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
   if(operation->mPipeline)
@@ -512,7 +511,7 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
 void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
 {
   gp_list_node* node = gp_list_front(&pipeline->mOperations);
-  while(node != NULL)
+  while(node != gp_list_end(&pipeline->mOperations))
   {
     gp_operation* op = (gp_operation*)GP_OBJECT_FROM_LIST_NODE(node);
     op->mFunc(op, context);

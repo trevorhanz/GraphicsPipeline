@@ -41,7 +41,7 @@ TEST(List, order)
   
   int i=0;
   test_node* node = (test_node*)gp_list_front(&l);
-  while(node != NULL)
+  while(node != (test_node*)gp_list_end(&l))
   {
     ASSERT_EQ(node->mValue, i++);
     
@@ -63,7 +63,7 @@ TEST(List, order_reverse)
   
   int i=0;
   test_node* node = (test_node*)gp_list_back(&l);
-  while(node != NULL)
+  while(node != (test_node*)gp_list_begin(&l))
   {
     ASSERT_EQ(node->mValue, i++);
     
@@ -76,25 +76,60 @@ TEST(List, empty)
   gp_list l;
   gp_list_init(&l);
   
-  for(int i=0; i<100; ++i)
+  const int num_nodes = 10000;
+  
+  for(int i=0; i<num_nodes; ++i)
   {
     test_node* node = new test_node;
     node->mValue = i;
     gp_list_push_front(&l, (gp_list_node*)node);
   }
   
+  int count = 0;
   test_node* node = (test_node*)gp_list_front(&l);
-  while(node != NULL)
+  while(node != (test_node*)gp_list_end(&l))
   {
     test_node* temp = node;
     node = (test_node*)gp_list_node_next((gp_list_node*)node);
     gp_list_remove(&l, (gp_list_node*)temp);
     
     delete temp;
+    
+    ++count;
   }
   
-  ASSERT_EQ(gp_list_front(&l), nullptr);
-  ASSERT_EQ(gp_list_back(&l), nullptr);
+  ASSERT_EQ(count, num_nodes);
+  ASSERT_EQ(gp_list_front(&l), gp_list_end(&l));
+}
+
+int _node_test_compare(gp_list_node* first, gp_list_node* second)
+{
+  return ((test_node*)first)->mValue > ((test_node*)second)->mValue;
+}
+
+TEST(List, sort)
+{
+  gp_list l;
+  gp_list_init(&l);
+  
+  for(int i=0; i<10; ++i)
+  {
+    test_node* node = new test_node;
+    node->mValue = rand()%256;
+    gp_list_push_front(&l, (gp_list_node*)node);
+  }
+  
+  gp_list_sort(&l, _node_test_compare);
+  
+  test_node* node = (test_node*)gp_list_front(&l);
+  int last_value = node->mValue;
+  while(node != (test_node*)gp_list_back(&l))
+  {
+    ASSERT_LE(last_value, node->mValue);
+    last_value = node->mValue;
+    
+    node = (test_node*)gp_list_node_next((gp_list_node*)node);
+  }
 }
 
 TEST(RefCounter, init)

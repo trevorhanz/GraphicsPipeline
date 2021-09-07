@@ -62,7 +62,7 @@ void WorkQueue::run()
   
   while(1)
   {
-    while(gp_list_front(&mWork) != NULL)
+    while(gp_list_front(&mWork) != gp_list_end(&mWork))
     {
       _gp_work_node* node = (_gp_work_node*)gp_list_front(&mWork);
       gp_list_remove(&mWork, (gp_list_node*)node);
@@ -97,7 +97,7 @@ void WorkQueue::Finalize()
   mMutex.lock();
   
   _gp_work_node* node;
-  while(gp_list_front(&mFinished) != NULL)
+  while(gp_list_front(&mFinished) != gp_list_end(&mFinished))
   {
     node = (_gp_work_node*)gp_list_front(&mFinished);
     gp_list_remove(&mFinished, (gp_list_node*)node);

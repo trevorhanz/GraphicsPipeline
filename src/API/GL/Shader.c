@@ -42,7 +42,7 @@ void _gp_shader_source_free(gp_object* object)
   gp_shader_source* source = (gp_shader_source*)object;
   
   gp_list_node* node = gp_list_front(&source->mSource);
-  while(node != NULL)
+  while(node != gp_list_end(&source->mSource))
   {
     _gp_shader_source_node* s = (_gp_shader_source_node*)node;
     free((char*)s->mText);
@@ -129,7 +129,7 @@ void gp_shader_compile(gp_shader* shader, gp_shader_source* source)
   shader->mProgram = glCreateProgram();
   
   _gp_shader_source_node* node = (_gp_shader_source_node*)gp_list_front(&source->mSource);
-  while(node != NULL)
+  while(node != (_gp_shader_source_node*)gp_list_end(&source->mSource))
   {
     int gl_type;
     switch(node->mType)

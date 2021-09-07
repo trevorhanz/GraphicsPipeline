@@ -17,52 +17,88 @@
 
 #include "List.h"
 
+#include <stdlib.h>
+
 void gp_list_init(gp_list* list)
 {
-  list->mBegin = 0;
-  list->mEnd = 0;
+  list->mBegin = (gp_list_node*)malloc(sizeof(gp_list_node));
+  list->mEnd = (gp_list_node*)malloc(sizeof(gp_list_node));
+  
+  list->mBegin->mPrev = 0;
+  list->mBegin->mNext = list->mEnd;
+  
+  list->mEnd->mPrev = list->mBegin;
+  list->mEnd->mNext = 0;
 }
 
 void gp_list_push_front(gp_list* list, gp_list_node* node)
 {
-  node->mNext = list->mBegin;
-  node->mPrev = 0;
-  if(list->mBegin)
-  {
-    list->mBegin->mPrev = node;
-  }
-  else
-  {
-    list->mEnd = node;
-  }
-  list->mBegin = node;
+  node->mNext = list->mBegin->mNext;
+  node->mPrev = list->mBegin;
+  list->mBegin->mNext->mPrev = node;
+  list->mBegin->mNext = node;
 }
 
 void gp_list_push_back(gp_list* list, gp_list_node* node)
 {
-  node->mNext = 0;
-  node->mPrev = list->mEnd;
-  if(list->mEnd)
-  {
-    list->mEnd->mNext = node;
-  }
-  else
-  {
-    list->mBegin = node;
-  }
-  list->mEnd = node;
+  node->mNext = list->mEnd;
+  node->mPrev = list->mEnd->mPrev;
+  list->mEnd->mPrev->mNext = node;
+  list->mEnd->mPrev = node;
 }
 
 void gp_list_remove(gp_list* list, gp_list_node* node)
 {
-  if(node->mNext) node->mNext->mPrev = node->mPrev;
-  else list->mEnd = node->mPrev;
-  
-  if(node->mPrev) node->mPrev->mNext = node->mNext;
-  else list->mBegin = node->mNext;
+  node->mPrev->mNext = node->mNext;
+  node->mNext->mPrev = node->mPrev;
   
   node->mNext = 0;
   node->mPrev = 0;
+}
+
+void gp_list_swap(gp_list* list, gp_list_node* first, gp_list_node* second)
+{
+  gp_list_node* tmp;
+  
+  if(list->mBegin == first) list->mBegin = second;
+  if(list->mBegin == second) list->mBegin = first;
+  if(list->mEnd == first) list->mEnd = second;
+  if(list->mEnd == second) list->mEnd = first;
+  
+  tmp = first->mNext;
+  first->mNext = second->mNext;
+  second->mNext = tmp;
+  
+  tmp = first->mPrev;
+  first->mPrev = second->mPrev;
+  second->mPrev = tmp;
+}
+
+void gp_list_sort(gp_list* list, gp_list_compare_t compare)
+{
+  int size = gp_list_size(list);
+  for(int i=0; i<size; ++i)
+  {
+    gp_list_node* i = gp_list_front(list);
+    while(i != gp_list_back(list))
+    {
+      gp_list_node* tmp = gp_list_node_next(i);
+      if(compare(i, tmp))
+      {
+        gp_list_node* tmp2 = i->mPrev;
+        i->mPrev->mNext = i->mNext;
+        i->mNext->mPrev = i->mPrev;
+        i->mNext = tmp->mNext;
+        i->mPrev = tmp;
+        tmp->mNext->mPrev = i;
+        tmp->mNext = i;
+        
+        tmp = tmp2->mNext;
+      }
+      
+      i = tmp;
+    }
+  }
 }
 
 unsigned int gp_list_size(gp_list* list)
@@ -93,10 +129,20 @@ gp_list_node* gp_list_find(gp_list* list, gp_list_node_compare func, void* userd
 
 gp_list_node* gp_list_front(gp_list* list)
 {
-  return list->mBegin;
+  return list->mBegin->mNext;
 }
 
 gp_list_node* gp_list_back(gp_list* list)
+{
+  return list->mEnd->mPrev;
+}
+
+gp_list_node* gp_list_begin(gp_list* list)
+{
+  return list->mBegin;
+}
+
+gp_list_node* gp_list_end(gp_list* list)
 {
   return list->mEnd;
 }

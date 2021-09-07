@@ -36,6 +36,9 @@
 #define max(X,Y) ((X) > (Y) ? (X) : (Y))
 #endif
 
+#define GP_IO_READ      0x01
+#define GP_IO_WRITE     0x02
+
 struct __gp_event
 {
   fd_set                  mReadFDs;
@@ -73,6 +76,7 @@ struct _gp_io
   int                     mFD;
   gp_io_callback          mCallback;
   gp_pointer*             mUserData;
+  uint8_t                 mType;
 };
 
 void _gp_event_fd_set(int fd, fd_set* fds, int* max_fd) {
@@ -144,7 +148,7 @@ void _gp_event_run(_gp_event* event)
       }
       
       gp_list_node* node = gp_list_front(&event->mIORead);
-      while(node != NULL)
+      while(node != gp_list_end(&event->mIORead))
       {
         gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &readfds))
@@ -155,7 +159,7 @@ void _gp_event_run(_gp_event* event)
       }
       
       node = gp_list_front(&event->mIOWrite);
-      while(node != NULL)
+      while(node != gp_list_end(&event->mIOWrite))
       {
         gp_io* io = (gp_io*)GP_OBJECT_FROM_LIST_NODE(node);
         if(FD_ISSET(io->mFD, &writefds))
@@ -166,7 +170,7 @@ void _gp_event_run(_gp_event* event)
       }
       
       node = gp_list_front(&event->mTimer);
-      while(node != NULL)
+      while(node != gp_list_end(&event->mTimer))
       {
         _gp_timer_data* timer = (_gp_timer_data*)node;
         if(FD_ISSET(timer->mFD, &readfds))
@@ -277,8 +281,10 @@ void _gp_io_free(gp_object* object)
   _gp_event_fd_clr(io->mFD, &io->mEvent->mReadFDs, &io->mEvent->mReadFDMax);
   _gp_event_fd_clr(io->mFD, &io->mEvent->mWriteFDs, &io->mEvent->mWriteFDMax);
   
-  gp_list_remove(&io->mEvent->mIORead, &io->mNode);
-  gp_list_remove(&io->mEvent->mIOWrite, &io->mNode);
+  if(io->mType == GP_IO_READ)
+    gp_list_remove(&io->mEvent->mIORead, &io->mNode);
+  else
+    gp_list_remove(&io->mEvent->mIOWrite, &io->mNode);
   
   if(io->mUserData)
   {
@@ -296,6 +302,7 @@ gp_io* _gp_event_io_read_new(_gp_event* event, int fd)
   io->mFD = fd;
   io->mCallback = NULL;
   io->mUserData = 0;
+  io->mType = GP_IO_READ;
   
   _gp_event_fd_set(fd, &event->mReadFDs, &event->mReadFDMax);
   
@@ -312,6 +319,7 @@ gp_io* _gp_event_io_write_new(_gp_event* event, int fd)
   io->mFD = fd;
   io->mCallback = NULL;
   io->mUserData = 0;
+  io->mType = GP_IO_WRITE;
   
   _gp_event_fd_set(fd, &event->mWriteFDs, &event->mWriteFDMax);
   

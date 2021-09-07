@@ -38,18 +38,26 @@ struct _gp_list_node
 extern "C" {
 #endif
 
+typedef int (*gp_list_compare_t)(gp_list_node* first, gp_list_node* second);
+
 void gp_list_init(gp_list* l);
 
 void gp_list_push_front(gp_list* list, gp_list_node* node);
 void gp_list_push_back(gp_list* list, gp_list_node* node);
 void gp_list_remove(gp_list* list, gp_list_node* node);
 
+void gp_list_swap(gp_list* list, gp_list_node* first, gp_list_node* second);
+
+void gp_list_sort(gp_list* list, gp_list_compare_t compare);
+
 unsigned int gp_list_size(gp_list* list);
 
 gp_list_node* gp_list_find(gp_list* list, gp_list_node_compare func, void* userdata);
 
-gp_list_node* gp_list_front(gp_list* list);
-gp_list_node* gp_list_back(gp_list* list);
+gp_list_node* gp_list_front(gp_list* list);           //!< First node in the list.
+gp_list_node* gp_list_back(gp_list* list);            //!< Last node in the list.
+gp_list_node* gp_list_begin(gp_list* list);           //!< Dummy node before first node.
+gp_list_node* gp_list_end(gp_list* list);             //!< Dummy node after last node.
 gp_list_node* gp_list_node_next(gp_list_node* node);
 gp_list_node* gp_list_node_prev(gp_list_node* node);
 

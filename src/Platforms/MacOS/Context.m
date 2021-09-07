@@ -43,7 +43,7 @@ void* _gp_work_thread(void* data)
   
   while(1)
   {
-    while(gp_list_front(&context->mWork) != NULL)
+    while(gp_list_front(&context->mWork) != gp_list_end(&context->mWork))
     {
       _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mWork);
       gp_list_remove(&context->mWork, (gp_list_node*)node);
@@ -75,7 +75,7 @@ void _gp_work_done(gp_io* io, gp_pointer* userdata)
   
   pthread_mutex_lock(&context->mWorkMutex);
   
-  while(gp_list_front(&context->mFinished) != NULL)
+  while(gp_list_front(&context->mFinished) != gp_list_end(&context->mFinished))
   {
     _gp_work_node* node = (_gp_work_node*)gp_list_front(&context->mFinished);
     gp_list_remove(&context->mFinished, (gp_list_node*)node);
