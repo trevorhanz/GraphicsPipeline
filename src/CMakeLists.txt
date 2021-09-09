@@ -208,6 +208,7 @@ else(ANDROID)
     set_property(TARGET GP_Qt5 PROPERTY OUTPUT_NAME GPQt5)
     set_property(TARGET GP_Qt5 PROPERTY EXPORT_NAME Qt5)
     set_property(TARGET GP_Qt5 PROPERTY CXX_STANDARD 11)
+    set_property(TARGET GP_Qt5 PROPERTY C_STANDARD 11)
     
   endif(GP_BUILD_QT5)
 endif(EMSCRIPTEN)
