@@ -533,7 +533,7 @@ int _gp_pipeline_sort(gp_list_node* first, gp_list_node* second)
 {
   int p1 = ((gp_operation*)GP_OBJECT_FROM_LIST_NODE(first))->mPriority;
   int p2 = ((gp_operation*)GP_OBJECT_FROM_LIST_NODE(second))->mPriority;
-  return p1 < p2;
+  return p1 > p2;
 }
 
 void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
