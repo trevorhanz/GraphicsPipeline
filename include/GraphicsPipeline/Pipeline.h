@@ -143,6 +143,19 @@ GP_EXPORT gp_pipeline* gp_operation_viewport_get_pipeline(gp_operation* operatio
 GP_EXPORT void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, int width, int height);
 
 /*!
+ * Create a new group operation.
+ * \return Newly created group operation.
+ */
+GP_EXPORT gp_operation* gp_operation_group_new();
+
+/*!
+ * Get the underline pipeline of the group.
+ * \param operation Group operation for which to get the pipeline.
+ * \return The pipeline of the group operation.
+ */
+GP_EXPORT gp_pipeline* gp_operation_group_get_pipeline(gp_operation* operation);
+
+/*!
   * Add an operation to the end of the pipeline.
   * \param pipeline Pipeline to add operation to.
   * \param operation Operation to be added.
@@ -277,6 +290,22 @@ namespace GP
   };
   
   /*!
+   * \brief Extended class for accessing group operation functions.
+   */
+  class GroupOperation : public Operation
+  {
+  public:
+    //! Constructor
+    inline GroupOperation();
+    
+    /*!
+     * Get the underline Pipeline of the viewport.
+     * \return The Pipeline of the viewport operation.
+     */
+    inline Pipeline GetPipeline();
+  };
+  
+  /*!
    * \brief Wrapper class for ::gp_pipeline 
    */
   class Pipeline
@@ -338,6 +367,11 @@ namespace GP
   {
     gp_operation_viewport_set_dimesions((gp_operation*)GetObject(), x, y, width, height);
   }
+  
+  GroupOperation::GroupOperation()
+    : Operation(gp_operation_group_new())
+    {}
+  Pipeline GroupOperation::GetPipeline() {return Pipeline(gp_operation_group_get_pipeline((gp_operation*)GetObject()));}
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}

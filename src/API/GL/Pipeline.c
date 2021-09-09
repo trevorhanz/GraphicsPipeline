@@ -451,6 +451,46 @@ void gp_operation_viewport_set_dimesions(gp_operation* operation, int x, int y, 
   self->mRect[3] = height;
 }
 
+typedef struct
+{
+  gp_operation            mOperation;
+  gp_pipeline*            mPipeline;
+} _gp_operation_group;
+
+void _gp_operation_group_func(gp_operation* operation, _gp_draw_context* context)
+{
+  _gp_operation_group* self = (_gp_operation_group*)operation;
+  
+  _gp_pipeline_execute_with_context(self->mPipeline, context);
+}
+
+void _gp_operation_group_free(gp_object* object)
+{
+  _gp_operation_group* self = (_gp_operation_group*)object;
+  _gp_pipeline_free(self->mPipeline);
+  free(self);
+}
+
+gp_operation* gp_operation_group_new()
+{
+  _gp_operation_group* operation = malloc(sizeof(_gp_operation_group));
+  _gp_object_init(&operation->mOperation.mObject, _gp_operation_viewport_free);
+  operation->mOperation.mFunc = _gp_operation_viewport_func;
+  operation->mOperation.mPipeline = 0;
+  operation->mOperation.mAdded = _gp_notification_null;
+  operation->mOperation.mRemoved = _gp_notification_null;
+  operation->mPipeline = _gp_pipeline_new();
+  operation->mOperation.mPriority = 0;
+  
+  return (gp_operation*)operation;
+}
+
+gp_pipeline* gp_operation_group_get_pipeline(gp_operation* operation)
+{
+  _gp_operation_group* self = (_gp_operation_group*)operation;
+  return self->mPipeline;
+}
+
 void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
 {
   if(operation->mPipeline)

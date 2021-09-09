@@ -34,6 +34,7 @@ const char* vertexSource = GLSL(
     gl_Position = vec4(position.x+Offset.x, position.y+Offset.y, position.z, 1.0);
   });
 const char* fragmentSource = GLSL(
+  precision highp float;
   out vec4 fragColor;
   void main()
   { 
@@ -88,6 +89,7 @@ int main(int argc, char* argv[])
   Pipeline pipeline = window.GetPipeline();
   
   ClearOperation clear;
+//   clear.SetPriority(100);
   pipeline.AddOperation(clear);
   
   DrawOperation operation;
