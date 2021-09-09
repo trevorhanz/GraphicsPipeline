@@ -381,7 +381,7 @@ void gp_texture_set_wrap_x(gp_texture* texture, GP_WRAP wrap)
 void gp_texture_set_wrap_y(gp_texture* texture, GP_WRAP wrap)
 {
   GLuint w = _gp_wrap_to_gl(wrap);
-  if(w == texture->mWrapX) return;
+  if(w == texture->mWrapY) return;
   
   texture->mWrapY = w;
   
