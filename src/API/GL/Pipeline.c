@@ -474,8 +474,8 @@ void _gp_operation_group_free(gp_object* object)
 gp_operation* gp_operation_group_new()
 {
   _gp_operation_group* operation = malloc(sizeof(_gp_operation_group));
-  _gp_object_init(&operation->mOperation.mObject, _gp_operation_viewport_free);
-  operation->mOperation.mFunc = _gp_operation_viewport_func;
+  _gp_object_init(&operation->mOperation.mObject, _gp_operation_group_free);
+  operation->mOperation.mFunc = _gp_operation_group_func;
   operation->mOperation.mPipeline = 0;
   operation->mOperation.mAdded = _gp_notification_null;
   operation->mOperation.mRemoved = _gp_notification_null;
