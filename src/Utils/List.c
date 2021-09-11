@@ -74,31 +74,48 @@ void gp_list_swap(gp_list* list, gp_list_node* first, gp_list_node* second)
   second->mPrev = tmp;
 }
 
-void gp_list_sort(gp_list* list, gp_list_compare_t compare)
+gp_list_node* _gp_list_sort_partition(gp_list* list, gp_list_node* start, gp_list_node* end, gp_list_compare_t compare)
 {
-  int size = gp_list_size(list);
-  for(int i=0; i<size; ++i)
+  gp_list_node* pivot = end->mPrev;
+  
+  gp_list_node* i = start->mNext;
+  while(i != pivot)
   {
-    gp_list_node* i = gp_list_front(list);
-    while(i != gp_list_back(list))
+    if(compare(i, pivot))
     {
-      gp_list_node* tmp = gp_list_node_next(i);
-      if(compare(i, tmp))
-      {
-        gp_list_node* tmp2 = i->mPrev;
-        i->mPrev->mNext = i->mNext;
-        i->mNext->mPrev = i->mPrev;
-        i->mNext = tmp->mNext;
-        i->mPrev = tmp;
-        tmp->mNext->mPrev = i;
-        tmp->mNext = i;
-        
-        tmp = tmp2->mNext;
-      }
+      gp_list_node* tmp = i->mPrev;
+      
+      // Remove i from current position
+      i->mPrev->mNext = i->mNext;
+      i->mNext->mPrev = i->mPrev;
+      
+      // Add i after pivot
+      i->mNext = pivot->mNext;
+      i->mPrev = pivot;
+      pivot->mNext->mPrev = i;
+      pivot->mNext = i;
       
       i = tmp;
     }
+    i = i->mNext;
   }
+  
+  return pivot;
+}
+
+void _gp_list_sort(gp_list* list, gp_list_node* start, gp_list_node* end, gp_list_compare_t compare)
+{
+  if(start->mNext != end)
+  {
+    gp_list_node* pivot = _gp_list_sort_partition(list, start, end, compare);
+    _gp_list_sort(list, start, pivot, compare);
+    _gp_list_sort(list, pivot, end, compare);
+  }
+}
+
+void gp_list_sort(gp_list* list, gp_list_compare_t compare)
+{
+  _gp_list_sort(list, list->mBegin, list->mEnd, compare);
 }
 
 unsigned int gp_list_size(gp_list* list)

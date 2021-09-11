@@ -112,10 +112,10 @@ TEST(List, sort)
   gp_list l;
   gp_list_init(&l);
   
-  for(int i=0; i<10; ++i)
+  for(int i=0; i<10000; ++i)
   {
     test_node* node = new test_node;
-    node->mValue = rand()%256;
+    node->mValue = rand()%1024;
     gp_list_push_front(&l, (gp_list_node*)node);
   }
   
