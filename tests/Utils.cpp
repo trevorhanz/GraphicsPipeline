@@ -123,10 +123,42 @@ TEST(List, sort)
   
   test_node* node = (test_node*)gp_list_front(&l);
   int last_value = node->mValue;
-  while(node != (test_node*)gp_list_back(&l))
+  while(node != (test_node*)gp_list_end(&l))
   {
     ASSERT_LE(last_value, node->mValue);
     last_value = node->mValue;
+    
+    node = (test_node*)gp_list_node_next((gp_list_node*)node);
+  }
+}
+
+TEST(List, swap)
+{
+  gp_list l;
+  gp_list_init(&l);
+  
+  const int size = 10;
+  
+  test_node* nodes[size];
+  
+  for(int i=0; i<size; ++i)
+  {
+    nodes[i] = new test_node;
+    nodes[i]->mValue = i;
+    gp_list_push_back(&l, (gp_list_node*)nodes[i]);
+  }
+  
+  gp_list_swap(&l, (gp_list_node*)nodes[1], (gp_list_node*)nodes[3]);
+  gp_list_swap(&l, (gp_list_node*)nodes[5], (gp_list_node*)nodes[6]);
+  gp_list_swap(&l, (gp_list_node*)nodes[9], (gp_list_node*)nodes[0]);
+  
+  int results[] = {9, 3, 2, 1, 4, 6, 5, 7, 8, 0};
+  
+  int i = 0;
+  test_node* node = (test_node*)gp_list_front(&l);
+  while(node != (test_node*)gp_list_end(&l))
+  {
+    ASSERT_EQ(results[i++], node->mValue);
     
     node = (test_node*)gp_list_node_next((gp_list_node*)node);
   }

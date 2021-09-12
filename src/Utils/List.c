@@ -60,17 +60,16 @@ void gp_list_swap(gp_list* list, gp_list_node* first, gp_list_node* second)
 {
   gp_list_node* tmp;
   
-  if(list->mBegin == first) list->mBegin = second;
-  if(list->mBegin == second) list->mBegin = first;
-  if(list->mEnd == first) list->mEnd = second;
-  if(list->mEnd == second) list->mEnd = first;
-  
   tmp = first->mNext;
+  first->mNext->mPrev = second;
   first->mNext = second->mNext;
+  second->mNext->mPrev = first;
   second->mNext = tmp;
   
   tmp = first->mPrev;
+  first->mPrev->mNext = second;
   first->mPrev = second->mPrev;
+  second->mPrev->mNext = first;
   second->mPrev = tmp;
 }
 
