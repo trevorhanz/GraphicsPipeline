@@ -20,8 +20,6 @@
 #ifndef __GP_COMMON_H__
 #define __GP_COMMON_H__
 
-#include "Config.h"
-
 #ifdef _WIN64
 	#ifndef GP_STATIC
 		#ifdef GraphicsPipeline_EXPORTS

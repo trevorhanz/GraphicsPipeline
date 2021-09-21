@@ -3,11 +3,6 @@
 #define __GP_CONFIG_H__
 
 //
-// Build Info
-//
-#cmakedefine GP_STATIC
-
-//
 // Platform Info
 //
 #cmakedefine GP_DESKTOP

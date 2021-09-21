@@ -201,9 +201,7 @@ else(ANDROID)
     
     add_library(GP_Qt5 ${Qt5_SRC})
     target_include_directories(GP_Qt5 PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR} API/GL/)
-    target_include_directories(GP_Qt5 PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+    target_include_directories(GP_Qt5 PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include/)
     target_link_libraries(GP_Qt5 PRIVATE Qt5::Widgets ${LIB} GP_Interface)
     set_property(TARGET GP_Qt5 PROPERTY OUTPUT_NAME GPQt5)
     set_property(TARGET GP_Qt5 PROPERTY EXPORT_NAME Qt5)
@@ -221,9 +219,7 @@ set_property(TARGET GP_Interface PROPERTY EXPORT_NAME Interface)
 
 add_library(GP_Native ${SRC})
 target_include_directories(GP_Native PRIVATE ${INC} ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(GP_Native PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>
-  $<INSTALL_INTERFACE:include>)
+target_include_directories(GP_Native PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include/)
 target_link_libraries(GP_Native PRIVATE ${LIB} GP_Interface)
 set_property(TARGET GP_Native PROPERTY OUTPUT_NAME GPNative)
 set_property(TARGET GP_Native PROPERTY EXPORT_NAME Native)
@@ -240,6 +236,11 @@ endif()
 
 if(NOT BUILD_SHARED_LIBS)
     set(GP_STATIC ON)
+    target_compile_definitions(GP_Native PUBLIC GP_STATIC)
+    
+    if(GP_BUILD_QT5)
+      target_compile_definitions(GP_Qt5 PRIVATE GP_STATIC)
+    endif(GP_BUILD_QT5)
 endif(NOT BUILD_SHARED_LIBS)
 configure_file(Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/Config.h)
 

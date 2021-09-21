@@ -18,6 +18,8 @@
 #include <GraphicsPipeline/Array.h>
 #include <GraphicsPipeline/Logging.h>
 
+#include "Config.h"
+
 #ifdef GP_GL
 #ifndef __APPLE__
 #include <GL/glew.h>

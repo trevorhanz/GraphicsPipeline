@@ -18,6 +18,8 @@
 #ifndef __GP_GL_H__
 #define __GP_GL_H__
 
+#include "Config.h"
+
 #include <GraphicsPipeline/Types.h>
 #include <GraphicsPipeline/Common.h>
 
