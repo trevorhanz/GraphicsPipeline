@@ -85,6 +85,7 @@ if(EMSCRIPTEN)
     Platforms/Web/Context.c
     Platforms/Web/Event.c
     Platforms/Web/Logging.c
+    Platforms/Web/Monitor.c
     Platforms/Web/Window.c)
 elseif(ANDROID)
   set(GP_MOBILE ON)
@@ -116,6 +117,7 @@ elseif(ANDROID)
     Platforms/Android/Context.c
     Platforms/Android/Event.c
     Platforms/Android/Logging.c
+    Platforms/Android/Monitor.c
     Platforms/Android/System.c
     Platforms/Android/Window.c)
 else(ANDROID)
@@ -133,6 +135,7 @@ else(ANDROID)
     list(APPEND SRC
       Platforms/Windows/Context.c
       Platforms/Windows/Logging.c
+      Platforms/Windows/Monitor.c
       Platforms/Windows/Event.c
       Platforms/Windows/System.c
       Platforms/Windows/Windows.h
@@ -150,6 +153,7 @@ else(ANDROID)
       Platforms/MacOS/Event.m
       Platforms/MacOS/Logging.c
       Platforms/MacOS/MacOS.h
+      Platforms/MacOS/Monitor.m
       Platforms/MacOS/View.m
       Platforms/MacOS/View.h
       Platforms/MacOS/Timer.m
@@ -165,6 +169,7 @@ else(ANDROID)
       Platforms/X11/Context.c
       Platforms/X11/Event.c
       Platforms/X11/Logging.c
+      Platforms/X11/Monitor.c
       Platforms/X11/System.c
       Platforms/X11/Window.c)
     

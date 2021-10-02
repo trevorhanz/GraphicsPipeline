@@ -253,6 +253,15 @@ int gp_window_get_shown(gp_window* window)
   return window->mState & GP_MAPPED;
 }
 
+void gp_window_set_fullscreen(gp_window* window, gp_monitor* monitor)
+{
+}
+
+gp_monitor* gp_window_get_fullscreen(gp_window* window)
+{
+  return NULL;
+}
+
 #define _GP_SET_WINDOW_CALLBACK(name, cb, data)\
   void gp_window_set_ ## name ## _callback(gp_window* window, gp_event_ ## name ## _callback_t callback, gp_pointer* userData)\
   {\

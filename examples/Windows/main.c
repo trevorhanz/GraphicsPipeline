@@ -57,10 +57,12 @@ void window_resize_callback(const gp_event_resize_t* resize, gp_pointer* userDat
 
 typedef struct
 {
+  gp_system*        system;
   gp_window*        window1;
   gp_window*        window2;
   gp_operation*     draw;
   int               state;
+  int               monitor;
 } timerCallbackData;
 
 void window_timer_callback(gp_timer* timer, gp_pointer* userdata)
@@ -89,6 +91,24 @@ void window_timer_callback(gp_timer* timer, gp_pointer* userdata)
     gp_pipeline* pipeline = gp_window_get_pipeline(data->window2);
     gp_pipeline_remove_operation(pipeline, data->draw);
     gp_window_redraw(data->window2);
+    ++data->state;
+  }
+  else if(data->state == 3)
+  {
+    gp_monitor_list* monitors = gp_monitor_list_new(data->system);
+    if(data->monitor < gp_monitor_list_get_count(monitors))
+    {
+      gp_log("Fullscreened Window1 to monitor %d", data->monitor);
+      gp_window_set_fullscreen(data->window1, gp_monitor_list_get_by_index(monitors, data->monitor));
+      ++data->monitor;
+    }
+    else
+    {
+      gp_log("Un-Fullscreened Window1");
+      gp_window_set_fullscreen(data->window1, NULL);
+      data->monitor = 0;
+    }
+    
     data->state = 0;
   }
   
@@ -100,6 +120,19 @@ int main(int argc, char* argv[])
   gp_system* system = gp_system_new();
   
   gp_context* context = gp_context_new(system);
+  
+  gp_monitor_list* monitors = gp_monitor_list_new(system);
+  gp_monitor* monitor;
+  int width, height;
+  gp_log("Found %d monitors", gp_monitor_list_get_count(monitors));
+  int i;
+  for(i = 0; i<gp_monitor_list_get_count(monitors); ++i)
+  {
+    monitor = gp_monitor_list_get_by_index(monitors, i);
+    gp_monitor_get_size(monitor, &width, &height);
+    
+    gp_log("%d. %dx%d", i+1, width, height);
+  }
   
   gp_window* window1 = gp_window_new(context);
   gp_window* window2 = gp_window_new(context);
@@ -169,10 +202,12 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)array);
   
   timerCallbackData* data = malloc(sizeof(timerCallbackData));
+  data->system = system;
   data->window1 = window1;
   data->window2 = window2;
   data->draw = draw;
   data->state = 1;
+  data->monitor = 0;
   gp_pointer* pointer = gp_pointer_new(data, free);
   gp_timer* timer = gp_timer_new(system);
   gp_timer_set_callback(timer, window_timer_callback, pointer);
@@ -185,6 +220,9 @@ int main(int argc, char* argv[])
   else
     gp_window_show(window1);
   gp_window_show(window2);
+  
+  if(gp_monitor_list_get_count(monitors)>2)
+    gp_window_set_fullscreen(window1, gp_monitor_list_get_by_index(monitors, 2));
   
   gp_system_run(system);
   

@@ -268,6 +268,7 @@ gp_window* gp_window_new(gp_context* context)
   gp_window* window = new gp_window();
   _gp_object_init(&window->mObject, _gp_window_free);
   window->mWindow = new _Window(context, context->mShare);
+  window->mMonitor = NULL;
   
   return window;
 }
@@ -366,3 +367,43 @@ int gp_window_get_shown(gp_window* window)
   return !window->mWindow->GetWidget()->isHidden();
 }
 
+void gp_window_set_fullscreen(gp_window* window, gp_monitor* monitor)
+{
+  if(monitor)
+  {
+    if(window->mMonitor)
+    {
+      gp_object_unref((gp_object*)window->mMonitor);
+      window->mMonitor = NULL;
+      
+      // Switch back to non-fullscreen mode
+      // Needs to be un-fullscreened in order to move the window to another monitor
+      window->mWindow->GetWidget()->showNormal();
+    }
+    window->mMonitor = monitor;
+    
+    QRect geometry = monitor->mScreen->geometry();
+    QWidget* widget = window->mWindow->GetWidget();
+    
+    widget->show(); // Doesn't work if widget isn't shown
+    widget->move(QPoint(geometry.x()+1, geometry.y()+1)); // Add 1 to ensure window is entirely within the monitor
+    widget->windowHandle()->setScreen(monitor->mScreen); // According to documentation, this is all that should be needed
+    widget->showFullScreen(); // Switch to fullscreen mode
+  }
+  else
+  {
+    // Switch back to non-fullscreen mode
+    window->mWindow->GetWidget()->showNormal();
+    
+    if(window->mMonitor)
+    {
+      gp_object_unref((gp_object*)window->mMonitor);
+      window->mMonitor = NULL;
+    }
+  }
+}
+
+gp_monitor* gp_window_get_fullscreen(gp_window* window)
+{
+  return window->mMonitor;
+}

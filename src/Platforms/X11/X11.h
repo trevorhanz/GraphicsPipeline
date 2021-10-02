@@ -62,6 +62,11 @@ struct _gp_system
   } mKeyMap;
 };
 
+struct _gp_monitor_list
+{
+  gp_object               mObject;
+};
+
 struct _gp_context
 {
   gp_object               mObject;

@@ -39,6 +39,11 @@ struct _gp_system
   gp_window*                            mTarget;
 };
 
+struct _gp_monitor_list
+{
+  gp_object                             mObject;
+};
+
 struct _gp_context
 {
   gp_object                             mObject;

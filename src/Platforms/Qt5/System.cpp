@@ -55,6 +55,45 @@ extern "C" gp_system* gp_qt_system_new(int* argc, char** argv)
   return system;
 }
 
+gp_monitor_list* gp_monitor_list_new(gp_system* system)
+{
+  gp_monitor_list* monitors = new gp_monitor_list();
+  _gp_object_init(&monitors->mObject, (gp_object_free)free);
+  
+  return monitors;
+}
+
+int gp_monitor_list_get_count(gp_monitor_list* monitors)
+{
+  return qApp->screens().size();
+}
+
+void _gp_monitor_free(gp_object* object)
+{
+  delete object;
+}
+
+gp_monitor* gp_monitor_list_get_by_index(gp_monitor_list* monitors, int index)
+{
+  gp_monitor* monitor = new gp_monitor();
+  _gp_object_init(&monitor->mObject, _gp_monitor_free);
+  
+  monitor->mScreen = qApp->screens()[index];
+  
+  return monitor;
+}
+
+gp_monitor* gp_monitor_list_get_primary(gp_monitor_list* monitors)
+{
+  return NULL;
+}
+
+void gp_monitor_get_size(gp_monitor* monitor, int* width, int* height)
+{
+  if(width) *width = monitor->mScreen->size().width();
+  if(height) *height = monitor->mScreen->size().height();
+}
+
 extern "C" void gp_system_run(gp_system* system)
 {
   auto ret = system->mApp->exec();

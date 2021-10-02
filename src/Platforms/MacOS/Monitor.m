@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2020 Trevor Hanz
+* Copyright (C) 2021 Trevor Hanz
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,35 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-//! \file GP.h
+#include "MacOS.h"
 
-#ifndef __GRAPHICS_PIPELINE_H__
-#define __GRAPHICS_PIPELINE_H__
+#include <stdlib.h>
 
-#include "Array.h"
-#include "Context.h"
-#include "FrameBuffer.h"
-#include "Input.h"
-#include "System.h"
-#include "Monitor.h"
-#include "Object.h"
-#include "Pipeline.h"
-#include "Shader.h"
-#include "Logging.h"
-#include "Texture.h"
-#include "Types.h"
-#include "Window.h"
+gp_monitor_list* gp_monitor_list_new(gp_system* system)
+{
+  gp_monitor_list* monitors = (gp_monitor_list*)malloc(sizeof(gp_monitor_list));
+  _gp_object_init(&monitors->mObject, (gp_object_free)free);
+  
+  return monitors;
+}
 
-#endif // __GRAPHICS_PIPELINE_H__
+int gp_monitor_list_get_count(gp_monitor_list* monitors)
+{
+  return 0;
+}
+
+gp_monitor* gp_monitor_list_get_by_index(gp_monitor_list* monitors, int index)
+{
+  return NULL;
+}
+
+gp_monitor* gp_monitor_list_get_primary(gp_monitor_list* monitors)
+{
+  return NULL;
+}
+
+void gp_monitor_get_size(gp_monitor* monitor, int* width, int* height)
+{
+  
+}
+

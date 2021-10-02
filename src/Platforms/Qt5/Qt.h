@@ -26,6 +26,7 @@
 #include <QTimer>
 #include <QSocketNotifier>
 #include <QThread>
+#include <QScreen>
 
 #include "Window.h"
 #include "TimerCallback.h"
@@ -42,6 +43,17 @@ struct _gp_system
   bool                    mManageApp;
 };
 
+struct _gp_monitor_list
+{
+  gp_object               mObject;
+};
+
+struct _gp_monitor
+{
+  gp_object               mObject;
+  QScreen*                mScreen;
+};
+
 struct _gp_context
 {
   gp_object               mObject;
@@ -55,6 +67,7 @@ struct _gp_window
 {
   gp_object               mObject;
   _Window*                mWindow;
+  gp_monitor*             mMonitor;
 };
 
 struct _gp_timer

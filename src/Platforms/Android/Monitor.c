@@ -15,30 +15,35 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ************************************************************************/
 
-#ifndef __GP_MONITORS_H__
-#define __GP_MONITORS_H__
+#include "Android.h"
 
-#include "Common.h"
-#include "Types.h"
-#include "System.h"
-#include "Object.h"
+#include <stdlib.h>
 
-#ifdef __cplusplus
-#include <functional>
+gp_monitor_list* gp_monitor_list_new(gp_system* system)
+{
+  gp_monitor_list* monitors = (gp_monitor_list*)malloc(sizeof(gp_monitor_list));
+  _gp_object_init(&monitors->mObject, (gp_object_free)free);
+  
+  return monitors;
+}
 
-extern "C" {
-#endif
+int gp_monitor_list_get_count(gp_monitor_list* monitors)
+{
+  return 0;
+}
 
-/*!
- * \defgroup Monitor
- * \{
- */
+gp_monitor* gp_monitor_list_get_by_index(gp_monitor_list* monitors, int index)
+{
+  return NULL;
+}
 
-int gp_monitor_get_count(gp_system* system);
+gp_monitor* gp_monitor_list_get_primary(gp_monitor_list* monitors)
+{
+  return NULL;
+}
 
-//! \} // Monitor
+void gp_monitor_get_size(gp_monitor* monitor, int* width, int* height)
+{
+  
+}
 
-#ifdef __cplusplus
-} // extern "C"
-
-#endif // __GP_MONITORS_H__

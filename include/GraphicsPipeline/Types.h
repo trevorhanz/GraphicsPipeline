@@ -89,6 +89,12 @@ extern "C" {
  * 
  * \typedef gp_io
  * \brief Event io object.
+ * 
+ * \typedeff gp_monior_list
+ * \brief Structor for retrieving monitor information.
+ * 
+ * \typedef gp_monitor
+ * \brief Structure for storing monitor information.
  */
 typedef struct _gp_object gp_object;
 typedef struct _gp_pointer gp_pointer;
@@ -107,6 +113,8 @@ typedef struct _gp_pipeline gp_pipeline;
 typedef struct _gp_operation gp_operation;
 typedef struct _gp_timer gp_timer;
 typedef struct _gp_io gp_io;
+typedef struct _gp_monitor_list gp_monitor_list;
+typedef struct _gp_monitor gp_monitor;
 
 /*!
  * Defines how texture data wraps past the edge of their coordinates.
@@ -209,6 +217,7 @@ namespace GP
   class Shader;
   class Pipeline;
   class Operation;
+  class Monitor;
 }
 
 #endif // __cplusplus

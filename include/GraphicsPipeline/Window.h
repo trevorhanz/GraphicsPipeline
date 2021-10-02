@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Input.h"
 #include "Object.h"
+#include "Monitor.h"
 
 #ifdef __cplusplus
 #include <functional>
@@ -163,6 +164,20 @@ GP_EXPORT void gp_window_hide(gp_window* window);
  * \return Returns 1 if the window is visible, else it returns 0.
  */
 GP_EXPORT int gp_window_get_shown(gp_window* window);
+
+/*!
+ * Set the window to be fullscreened to the specified monitor.
+ * \param window Pointer to window object.
+ * \param monitor Monitor onto which to be fullscreened.  Set to NULL to remove fullscreen.
+ */
+GP_EXPORT void gp_window_set_fullscreen(gp_window* window, gp_monitor* monitor);
+
+/*!
+ * Retrieve the current fullscreened monitor.
+ * \param window Pointer to window object.
+ * \return The monitor for which the window is currently fullscreened or NULL if not fullscreened.
+ */
+GP_EXPORT gp_monitor* gp_window_get_fullscreen(gp_window* window);
 
 /*!
  * Connect a callback for mouse click input events.
@@ -316,6 +331,18 @@ namespace GP
     inline bool GetShown();
     
     /*!
+     * Set the window to be fullscreened to the specified monitor.
+     * \param monitor Monitor onto which to be fullscreened.
+     */
+    inline void SetFullscreen(Monitor monitor);
+    
+    /*!
+     * Retrieve the current fullscreened monitor.
+     * \return The monitor for which the window is currently fullscreened.
+     */
+    inline Monitor GetFullscreen();
+    
+    /*!
      * Set the callback to be used for cursor click events.
      * \param callback Callback to be used.
      */
@@ -395,6 +422,14 @@ namespace GP
   void Window::Show() {gp_window_show((gp_window*)GetObject());}
   void Window::Hide() {gp_window_hide((gp_window*)GetObject());}
   bool Window::GetShown() {return (bool)gp_window_get_shown((gp_window*)GetObject());}
+  void Window::SetFullscreen(Monitor monitor) {gp_window_set_fullscreen((gp_window*)GetObject(), (gp_monitor*)monitor.GetObject());}
+  Monitor Window::GetFullscreen()
+  {
+    gp_monitor* monitor = gp_window_get_fullscreen((gp_window*)GetObject());
+    Monitor result(monitor);
+    gp_object_unref((gp_object*)monitor);
+    return result;
+  }
   void Window::SetClickCallback(std::function<void(const gp_event_click_t*)> callback)
   {
     auto data = new CallbackData<ClickCallback>();
