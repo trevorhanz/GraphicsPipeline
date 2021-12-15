@@ -28,6 +28,22 @@ gp_context* sContext = NULL;
 
 #define GP_STATE_RUNNING 0x01
 
+static const struct { int major, minor; } _gl_versions[] = {
+  {4, 6},
+  {4, 5},
+  {4, 4},
+  {4, 3},
+  {4, 2},
+  {4, 1},
+  {4, 0},
+
+  {3, 3},
+  {3, 2},
+  {3, 1},
+  
+  {0, 0} /* end of list */
+};
+
 typedef struct
 {
   gp_list_node      mNode;
@@ -116,6 +132,13 @@ void _gp_context_free(gp_object* object)
   free(context);
 }
 
+int _gp_create_context_error_handler(Display *dpy, XErrorEvent *error)
+{
+   (void) dpy;
+   (void) error->error_code;
+   return 0;
+}
+
 gp_context* gp_context_new(gp_system* system)
 {
   assert(system != NULL);
@@ -182,29 +205,38 @@ gp_context* gp_context_new(gp_system* system)
   //
   GLXContext dummy = glXCreateNewContext(context->mDisplay, context->mConfig, GLX_RGBA_TYPE, NULL, True);
   glXMakeCurrent(context->mDisplay, context->mWindow, dummy);
-  int major, minor;
-  glGetIntegerv(GL_MAJOR_VERSION, &major);
-  glGetIntegerv(GL_MINOR_VERSION, &minor);
-  
-  _gp_api_init();
   
   glXDestroyContext(context->mDisplay, dummy);
   
   //
   // Create the real OpenGL context.
   //
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
   int context_attribs[] =
   {
-    GLX_CONTEXT_MAJOR_VERSION_ARB, major,
-    GLX_CONTEXT_MINOR_VERSION_ARB, minor,
+    GLX_CONTEXT_MAJOR_VERSION_ARB, _gl_versions[0].major,
+    GLX_CONTEXT_MINOR_VERSION_ARB, _gl_versions[0].minor,
     GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
     None
   };
   
-  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
-  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
-  GLXContext ctx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, 0, True, context_attribs);
-  context->mShare = ctx;
+  int (*old_handler)(Display *, XErrorEvent *);
+  old_handler = XSetErrorHandler(_gp_create_context_error_handler);
+  
+  for(int i=1; _gl_versions[i].major!=0; ++i)
+  {
+    GLXContext ctx = glXCreateContextAttribsARB(context->mDisplay, context->mConfig, 0, True, context_attribs);
+    context->mShare = ctx;
+    if(ctx) break;
+    
+    context_attribs[1] = _gl_versions[i].major;
+    context_attribs[3] = _gl_versions[i].minor;
+  }
+  
+  XSetErrorHandler(old_handler);
+  
+  _gp_api_init();
   
   //
   // Create window
@@ -223,6 +255,7 @@ gp_context* gp_context_new(gp_system* system)
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
   // NOTE: GL functions need a context to be bound to get information from
+  int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
   gp_log_info("OpenGL Version: %d.%d", major, minor);
