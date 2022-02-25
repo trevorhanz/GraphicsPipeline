@@ -185,6 +185,33 @@ typedef enum
 typedef unsigned int gp_color;
 
 /*!
+ * Storage for a 2D coordinate.
+ */
+typedef struct
+{
+  short unsigned int      x;
+  short unsigned int      y;
+} gp_point;
+
+/*!
+ * Storage for a 2D dimension.
+ */
+typedef struct
+{
+  short unsigned int      width;
+  short unsigned int      height;
+} gp_size;
+
+/*!
+ * Definition of a rectangular region.
+ */
+typedef struct
+{
+  gp_point                point;
+  gp_size                 size;
+} gp_rect;
+
+/*!
  * \brief Callback function to be used by gp_timer objects.
  * \param timer Pointer to gp_timer object that timed out.
  * \param userdata Pointer to user defined data.
@@ -218,6 +245,10 @@ namespace GP
   class Pipeline;
   class Operation;
   class Monitor;
+  
+  typedef gp_point Point;
+  typedef gp_size Size;
+  typedef gp_rect Rect;
 }
 
 #endif // __cplusplus

@@ -123,15 +123,14 @@ int main(int argc, char* argv[])
   
   gp_monitor_list* monitors = gp_monitor_list_new(system);
   gp_monitor* monitor;
-  int width, height;
   gp_log("Found %d monitors", gp_monitor_list_get_count(monitors));
   int i;
   for(i = 0; i<gp_monitor_list_get_count(monitors); ++i)
   {
     monitor = gp_monitor_list_get_by_index(monitors, i);
-    gp_monitor_get_size(monitor, &width, &height);
+    gp_rect rect = gp_monitor_get_rect(monitor);
     
-    gp_log("%d. %dx%d", i+1, width, height);
+    gp_log("%d. (%d,%d) %dx%d", i+1, rect.point.x, rect.point.y, rect.size.width, rect.size.height);
   }
   
   gp_window* window1 = gp_window_new(context);

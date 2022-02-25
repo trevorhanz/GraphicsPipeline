@@ -37,13 +37,37 @@ gp_monitor* gp_monitor_list_get_by_index(gp_monitor_list* monitors, int index)
   return NULL;
 }
 
+gp_monitor* gp_monitor_list_get_at_position(gp_monitor_list* monitors, int x, int y)
+{
+  return NULL;
+}
+
 gp_monitor* gp_monitor_list_get_primary(gp_monitor_list* monitors)
 {
   return NULL;
 }
 
-void gp_monitor_get_size(gp_monitor* monitor, int* width, int* height)
+gp_point gp_monitor_get_position(gp_monitor* monitor)
 {
-  
+  gp_point point;
+  point.x = 0;
+  point.y = 0;
+  return point;
+}
+
+gp_size gp_monitor_get_size(gp_monitor* monitor)
+{
+  gp_size size;
+  size.width = 0;
+  size.height = 0;
+  return size;
+}
+
+gp_rect gp_monitor_get_rect(gp_monitor* monitor)
+{
+  gp_rect rect;
+  rect.size = gp_monitor_get_size(monitor);
+  rect.point = gp_monitor_get_position(monitor);
+  return rect;
 }
 

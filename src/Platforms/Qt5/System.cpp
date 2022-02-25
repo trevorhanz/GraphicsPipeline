@@ -83,15 +83,47 @@ gp_monitor* gp_monitor_list_get_by_index(gp_monitor_list* monitors, int index)
   return monitor;
 }
 
+gp_monitor* gp_monitor_list_get_at_position(gp_monitor_list* monitors, int x, int y)
+{
+  gp_monitor* monitor = new gp_monitor();
+  _gp_object_init(&monitor->mObject, _gp_monitor_free);
+  
+  monitor->mScreen = qApp->screenAt(QPoint(x, y));
+  
+  return monitor;
+}
+
 gp_monitor* gp_monitor_list_get_primary(gp_monitor_list* monitors)
 {
   return NULL;
 }
 
-void gp_monitor_get_size(gp_monitor* monitor, int* width, int* height)
+gp_point gp_monitor_get_position(gp_monitor* monitor)
 {
-  if(width) *width = monitor->mScreen->size().width();
-  if(height) *height = monitor->mScreen->size().height();
+  QRect geometry = monitor->mScreen->geometry();
+  gp_point point;
+  point.x = geometry.left();
+  point.y = geometry.top();
+  return point;
+}
+
+gp_size gp_monitor_get_size(gp_monitor* monitor)
+{
+  gp_size size;
+  size.width = monitor->mScreen->size().width();
+  size.height = monitor->mScreen->size().height();
+  return size;
+}
+
+gp_rect gp_monitor_get_rect(gp_monitor* monitor)
+{
+  QRect geometry = monitor->mScreen->geometry();
+  gp_rect rect;
+  rect.size.width = geometry.width();
+  rect.size.height = geometry.height();
+  rect.point.x = geometry.left();
+  rect.point.y = geometry.top();
+  return rect;
 }
 
 extern "C" void gp_system_run(gp_system* system)
