@@ -88,7 +88,19 @@ gp_monitor* gp_monitor_list_get_at_position(gp_monitor_list* monitors, int x, in
   gp_monitor* monitor = new gp_monitor();
   _gp_object_init(&monitor->mObject, _gp_monitor_free);
   
+#if QT_VERSION >= 0x051000
   monitor->mScreen = qApp->screenAt(QPoint(x, y));
+#else
+  QList<QScreen*> screens = qApp->screens();
+  foreach(QScreen* screen, screens)
+  {
+    if(screen->geometry().contains(x, y))
+    {
+      monitor->mScreen = screen;
+      break;
+    }
+  }
+#endif
   
   return monitor;
 }
