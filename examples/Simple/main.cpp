@@ -29,6 +29,7 @@ const char* vertexSource = GLSL(
   in highp vec4 position;
   void main()
   {
+    gl_PointSize = 64.0f;
     gl_Position = vec4(position.xyz, 1.0);
   });
 const char* fragmentSource = GLSL(
@@ -60,20 +61,32 @@ int main(int argc, char* argv[])
   shader.Compile(source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
-  UniformVec4 color(shader, "Color");
-  color.Set(c);
+  UniformVec4 color1(shader, "Color");
+  color1.Set(c);
+  
+  c[1] = 1.0f;
+  UniformVec4 color2(shader, "Color");
+  color2.Set(c);
   
   Pipeline pipeline = window.GetPipeline();
   
   ClearOperation clear;
   pipeline.AddOperation(clear);
   
-  DrawOperation operation;
-  operation.SetShader(shader);
-  operation.SetUniform(color);
-  operation.AddArrayByIndex(array, 0, 2);
-  operation.SetVerticies(3);
-  pipeline.AddOperation(operation);
+  DrawOperation operation1;
+  operation1.SetShader(shader);
+  operation1.SetUniform(color1);
+  operation1.AddArrayByIndex(array, 0, 2);
+  operation1.SetVerticies(3);
+  pipeline.AddOperation(operation1);
+  
+  DrawOperation operation2;
+  operation2.SetShader(shader);
+  operation2.SetUniform(color2);
+  operation2.AddArrayByIndex(array, 0, 2);
+  operation2.SetVerticies(3);
+  operation2.SetMode(GP_MODE_POINTS);
+  pipeline.AddOperation(operation2);
   
   window.Show();
   

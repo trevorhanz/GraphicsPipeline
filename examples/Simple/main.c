@@ -27,6 +27,7 @@ const char* vertexSource = GLSL(
   in highp vec4 position;
   void main()
   {
+    gl_PointSize = 64.0f;
     gl_Position = vec4(position.xyz, 1.0);
   });
 const char* fragmentSource = GLSL(
@@ -60,8 +61,12 @@ int main(int argc, char* argv[])
   gp_object_unref((gp_object*)source);
   
   float c[] = {1.0f, 0.0f, 0.0f, 1.0f};
-  gp_uniform* color = gp_uniform_vec4_new_by_name(shader, "Color");
-  gp_uniform_vec4_set(color, c);
+  gp_uniform* color1 = gp_uniform_vec4_new_by_name(shader, "Color");
+  gp_uniform_vec4_set(color1, c);
+  
+  c[1] = 1.0f;
+  gp_uniform* color2 = gp_uniform_vec4_new_by_name(shader, "Color");
+  gp_uniform_vec4_set(color2, c);
   
   gp_pipeline* pipeline = gp_window_get_pipeline(window);
   
@@ -71,12 +76,23 @@ int main(int argc, char* argv[])
   
   gp_operation* draw = gp_operation_draw_new();
   gp_operation_draw_set_shader(draw, shader);
-  gp_operation_draw_set_uniform(draw, color);
+  gp_operation_draw_set_uniform(draw, color1);
   gp_operation_draw_add_array_by_index(draw, array, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
   gp_operation_draw_set_verticies(draw, 3);
   gp_pipeline_add_operation(pipeline, draw);
   gp_object_unref((gp_object*)draw);
-  gp_object_unref((gp_object*)color);
+  gp_object_unref((gp_object*)color1);
+  
+  draw = gp_operation_draw_new();
+  gp_operation_draw_set_shader(draw, shader);
+  gp_operation_draw_set_uniform(draw, color2);
+  gp_operation_draw_add_array_by_index(draw, array, 0, 2, GP_DATA_TYPE_FLOAT, 0, 0);
+  gp_operation_draw_set_verticies(draw, 3);
+  gp_operation_draw_set_mode(draw, GP_MODE_POINTS);
+  gp_pipeline_add_operation(pipeline, draw);
+  gp_object_unref((gp_object*)draw);
+  gp_object_unref((gp_object*)color2);
+  
   gp_object_unref((gp_object*)shader);
   gp_object_unref((gp_object*)array);
   
