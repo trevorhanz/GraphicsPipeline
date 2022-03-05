@@ -602,6 +602,7 @@ void _gp_api_init()
 #ifdef GP_GL
 #ifndef __APPLE__
   // NOTE: GLEW must be initialize with an active OpenGL context
+  glewExperimental = GL_TRUE;
   GLenum err = glewInit();
   if(GLEW_OK != err)
   {

@@ -24,6 +24,22 @@
 
 gp_context* sContext = 0;
 
+static const struct { int major, minor; } _gl_versions[] = {
+  {4, 6},
+  {4, 5},
+  {4, 4},
+  {4, 3},
+  {4, 2},
+  {4, 1},
+  {4, 0},
+
+  {3, 3},
+  {3, 2},
+  {3, 1},
+  
+  {0, 0} /* end of list */
+};
+
 void _gp_context_free(gp_object* object)
 {
   gp_context* context = (gp_context*)object;
@@ -38,16 +54,24 @@ extern "C" gp_context* gp_qt_context_new()
   sContext = context;
   
   QSurfaceFormat format;
-  format.setMajorVersion(4);
-  format.setMinorVersion(2);
   format.setRenderableType(QSurfaceFormat::OpenGL);
+  format.setProfile(QSurfaceFormat::CoreProfile);
   format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
   format.setSamples(4);
   format.setOption(QSurfaceFormat::DebugContext);
   
-  context->mSurface = new QOffscreenSurface();
-  context->mSurface->setFormat(format);
-  context->mSurface->create();
+  QOffscreenSurface* surface  = new QOffscreenSurface();
+  for(int i=0; _gl_versions[i].major!=0; ++i)
+  {
+    format.setMajorVersion(_gl_versions[i].major);
+    format.setMinorVersion(_gl_versions[i].minor);
+    
+    surface->setFormat(format);
+    surface->create();
+    if(surface->isValid()) break;
+  }
+  
+  context->mSurface = surface;
   
   context->mShare = new QOpenGLContext();
   context->mShare->setFormat(format);
