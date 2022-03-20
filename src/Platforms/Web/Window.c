@@ -33,7 +33,7 @@ EM_BOOL _gp_window_click_callback(int eventType, const EmscriptenMouseEvent* mou
     gp_event_click_t input;
     input.x = mouseEvent->targetX;
     input.y = mouseEvent->targetY;
-    input.state = (eventType == EMSCRIPTEN_EVENT_MOUSEUP);
+    input.state = (eventType != EMSCRIPTEN_EVENT_MOUSEUP);
     switch(mouseEvent->button)
     {
       case 0: input.button = GP_BUTTON_LEFT; break;
@@ -70,6 +70,20 @@ EM_BOOL _gp_window_enter_callback(int eventType, const EmscriptenMouseEvent* mou
     gp_event_enter_t input;
     input.enter = (eventType == EMSCRIPTEN_EVENT_MOUSEENTER)?1:0;
     window->mEnterCB(&input, window->mEnterData);
+  }
+  
+  return EM_TRUE;
+}
+
+EM_BOOL _gp_window_wheel_callback(int eventType, const EmscriptenWheelEvent* wheelEvent, void* userData)
+{
+  gp_window* window = (gp_window*)userData;
+  
+  if(window->mScrollCB)
+  {
+    gp_event_scroll_t input;
+    input.scroll = (wheelEvent->deltaY > 0.0f) ? -1 : 1;
+    window->mScrollCB(&input, window->mScrollData);
   }
   
   return EM_TRUE;
@@ -160,6 +174,7 @@ void _gp_window_build(gp_window* window)
   emscripten_set_mousemove_callback(window->mID, window, EM_TRUE, _gp_window_track_callback);
   emscripten_set_mouseenter_callback(window->mID, window, EM_TRUE, _gp_window_enter_callback);
   emscripten_set_mouseleave_callback(window->mID, window, EM_TRUE, _gp_window_enter_callback);
+  emscripten_set_wheel_callback(window->mID, window, EM_TRUE, _gp_window_wheel_callback);
   emscripten_set_keyup_callback(window->mID, window, EM_TRUE, _gp_window_key_callback);
   emscripten_set_keydown_callback(window->mID, window, EM_TRUE, _gp_window_key_callback);
   emscripten_set_resize_callback(window->mID, window, EM_TRUE, _gp_window_resize_callback);
