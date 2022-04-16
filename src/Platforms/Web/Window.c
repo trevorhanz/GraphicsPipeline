@@ -316,6 +316,10 @@ void _gp_window_redraw_callback(void* data)
 {
   gp_window* window = (gp_window*)data;
   
+  unsigned int width, height;
+  gp_window_get_size(window, &width, &height);
+  _gp_api_prepare_window(width, height);
+  
   _gp_pipeline_execute(window->mPipeline);
 }
 
