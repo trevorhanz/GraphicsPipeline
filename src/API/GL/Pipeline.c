@@ -520,6 +520,21 @@ void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation
   }
 }
 
+void gp_pipeline_clear(gp_pipeline* pipeline)
+{
+  gp_list_node* node = gp_list_front(&pipeline->mOperations);
+  while(node != gp_list_end(&pipeline->mOperations))
+  {
+    gp_list_node* next = gp_list_node_next(node);
+    gp_operation* op = (gp_operation*)GP_OBJECT_FROM_LIST_NODE(node);
+    op->mRemoved(op);
+    op->mPipeline = 0;
+    gp_list_remove(&pipeline->mOperations, node);
+    gp_object_unref((gp_object*)op);
+    node = next;
+  }
+}
+
 gp_pipeline* _gp_pipeline_new()
 {
   gp_pipeline* pipeline = malloc(sizeof(gp_pipeline));

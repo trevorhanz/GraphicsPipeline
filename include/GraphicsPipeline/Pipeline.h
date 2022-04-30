@@ -169,6 +169,12 @@ GP_EXPORT void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* op
  */
 GP_EXPORT void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation* operation);
 
+/*!
+ * Remove all operations from the pipeline.
+ * \param pipeline Pipeline from which to remove all operations.
+ */
+GP_EXPORT void gp_pipeline_clear(gp_pipeline* pipeline);
+
 //! \} // Pipeline
 
 #ifdef __cplusplus
@@ -328,6 +334,11 @@ namespace GP
      */
     inline void RemoveOperation(const Operation& operation);
     
+    /*!
+     * Remove all operations from the pipeline.
+     */
+    inline void Clear();
+    
   private:
     gp_pipeline*          mPipeline;
   };
@@ -382,6 +393,10 @@ namespace GP
   void Pipeline::RemoveOperation(const Operation& operation)
   {
     gp_pipeline_remove_operation(mPipeline, (gp_operation*)operation.GetObject());
+  }
+  void Pipeline::Clear()
+  {
+    gp_pipeline_clear(mPipeline);
   }
 }
 #endif // __cplusplus
