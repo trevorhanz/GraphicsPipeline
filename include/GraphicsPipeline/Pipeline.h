@@ -347,52 +347,56 @@ namespace GP
   // Implementation
   //
   Operation::Operation(gp_operation* operation) : Object((gp_object*)operation) {}
-  void Operation::SetPriority(int priority) {gp_operation_set_priority((gp_operation*)GetObject(), priority);}
-  int Operation::GetPriority() {return gp_operation_get_priority((gp_operation*)GetObject());}
+  void Operation::SetPriority(int priority) {gp_operation_set_priority((gp_operation*)GetObject(*this), priority);}
+  int Operation::GetPriority() {return gp_operation_get_priority((gp_operation*)GetObject(*this));}
   
   ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
   void ClearOperation::SetColor(float r, float g, float b, float a) {
-    gp_operation_clear_set_color((gp_operation*)GetObject(), r, g, b,  a);
+    gp_operation_clear_set_color((gp_operation*)GetObject(*this), r, g, b,  a);
   }
   DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
   void DrawOperation::SetShader(const Shader& shader)
   {
-    gp_operation_draw_set_shader((gp_operation*)GetObject(), (gp_shader*)shader.GetObject());
+    gp_operation_draw_set_shader((gp_operation*)GetObject(*this), (gp_shader*)GetObject(shader));
   }
   void DrawOperation::SetUniform(const Uniform& uniform)
   {
-    gp_operation_draw_set_uniform((gp_operation*)GetObject(), (gp_uniform*)uniform.GetObject());
+    gp_operation_draw_set_uniform((gp_operation*)GetObject(*this), (gp_uniform*)GetObject(uniform));
   }
   void DrawOperation::AddArrayByIndex(const Array& array, int index, int components, GP_DATA_TYPE type, int stride, int offset)
   {
-    gp_operation_draw_add_array_by_index((gp_operation*)GetObject(), (gp_array*)array.GetObject(), index, components, type, stride, offset);
+    gp_operation_draw_add_array_by_index((gp_operation*)GetObject(*this), (gp_array*)GetObject(array), index, components, type, stride, offset);
   }
-  void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies((gp_operation*)GetObject(), count);}
-  void DrawOperation::SetMode(GP_DRAW_MODE mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(), mode);}
+  void DrawOperation::SetVerticies(int count) {gp_operation_draw_set_verticies((gp_operation*)GetObject(*this), count);}
+  void DrawOperation::SetMode(GP_DRAW_MODE mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(*this), mode);}
   
   ViewportOperation::ViewportOperation()
     : Operation(gp_operation_viewport_new())
     {}
-  Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline((gp_operation*)GetObject()));}
+  Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline((gp_operation*)GetObject(*this)));}
   void ViewportOperation::SetDimensions(int x, int y, int width, int height)
   {
-    gp_operation_viewport_set_dimesions((gp_operation*)GetObject(), x, y, width, height);
+    gp_operation_viewport_set_dimesions((gp_operation*)GetObject(*this), x, y, width, height);
   }
   
   GroupOperation::GroupOperation()
     : Operation(gp_operation_group_new())
     {}
-  Pipeline GroupOperation::GetPipeline() {return Pipeline(gp_operation_group_get_pipeline((gp_operation*)GetObject()));}
+  Pipeline GroupOperation::GetPipeline() {return Pipeline(gp_operation_group_get_pipeline((gp_operation*)GetObject(*this)));}
   
   Pipeline::Pipeline(gp_pipeline* pipeline) : mPipeline(pipeline) {}
   Pipeline::~Pipeline() {}
   void Pipeline::AddOperation(const Operation& operation)
   {
-    gp_pipeline_add_operation(mPipeline, (gp_operation*)operation.GetObject());
+    gp_object* op = operation.GetObject();
+    gp_pipeline_add_operation(mPipeline, (gp_operation*)op);
+    gp_object_unref(op);
   }
   void Pipeline::RemoveOperation(const Operation& operation)
   {
-    gp_pipeline_remove_operation(mPipeline, (gp_operation*)operation.GetObject());
+    gp_object* op = operation.GetObject();
+    gp_pipeline_remove_operation(mPipeline, (gp_operation*)op);
+    gp_object_unref(op);
   }
   void Pipeline::Clear()
   {

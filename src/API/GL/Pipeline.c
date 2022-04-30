@@ -253,6 +253,7 @@ void _gp_operation_draw_free(gp_object* object)
     node = gp_list_node_next(node);
     free(array);
   }
+  gp_list_free(&d->mArrays);
   
   node = gp_list_front(&d->mUniforms);
   while(node != gp_list_end(&d->mUniforms))
@@ -263,6 +264,7 @@ void _gp_operation_draw_free(gp_object* object)
     node = gp_list_node_next(node);
     free(uniform);
   }
+  gp_list_free(&d->mUniforms);
   
   free(d);
 }
@@ -553,6 +555,7 @@ void _gp_pipeline_free(gp_pipeline* pipeline)
     node = gp_list_node_next(node);
     gp_object_unref((gp_object*)op);
   }
+  gp_list_free(&pipeline->mOperations);
   free(pipeline);
 }
 

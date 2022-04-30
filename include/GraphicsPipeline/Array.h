@@ -207,22 +207,22 @@ namespace GP
   ArrayData::ArrayData(gp_array_data* data) : Object((gp_object*)data) {}
   ArrayData::ArrayData() : Object((void*)gp_array_data_new()) {}
   ArrayData::ArrayData(unsigned int size) : Object((void*)gp_array_data_new_with_size(size)) {}
-  void ArrayData::Allocate(unsigned int size) {gp_array_data_allocate((gp_array_data*)GetObject(), size);}
-  void ArrayData::Set(void* data, unsigned int size) {gp_array_data_set((gp_array_data*)GetObject(), data, size);}
-  void ArrayData::SetChunk(void* data, unsigned int size, unsigned int offset) {gp_array_data_set_chunk((gp_array_data*)GetObject(), data, size, offset);}
-  void* ArrayData::GetData() {return gp_array_data_get_data((gp_array_data*)GetObject());}
-  unsigned int ArrayData::GetSize() {return gp_array_data_get_size((gp_array_data*)GetObject());}
+  void ArrayData::Allocate(unsigned int size) {gp_array_data_allocate((gp_array_data*)GetObject(*this), size);}
+  void ArrayData::Set(void* data, unsigned int size) {gp_array_data_set((gp_array_data*)GetObject(*this), data, size);}
+  void ArrayData::SetChunk(void* data, unsigned int size, unsigned int offset) {gp_array_data_set_chunk((gp_array_data*)GetObject(*this), data, size, offset);}
+  void* ArrayData::GetData() {return gp_array_data_get_data((gp_array_data*)GetObject(*this));}
+  unsigned int ArrayData::GetSize() {return gp_array_data_get_size((gp_array_data*)GetObject(*this));}
   
   Array::Array() : Object((void*)0) {}
   Array::Array(gp_array* array) : Object((gp_object*)array) {}
-  Array::Array(const Context& context) : Object((void*)gp_array_new((gp_context*)context.GetObject())) {}
-  void Array::SetData(const ArrayData& ad) {gp_array_set_data((gp_array*)GetObject(), (gp_array_data*)ad.GetObject());}
+  Array::Array(const Context& context) : Object((void*)gp_array_new((gp_context*)GetObject(context))) {}
+  void Array::SetData(const ArrayData& ad) {gp_array_set_data((gp_array*)GetObject(*this), (gp_array_data*)GetObject(ad));}
   void Array::SetDataAsync(const ArrayData& ad, std::function<void(Array*)> callback)
   {
     AsyncData* async = new AsyncData();
     async->mArray = this;
     async->mCallback = callback;
-    gp_array_set_data_async((gp_array*)GetObject(), (gp_array_data*)ad.GetObject(), &Array::AsyncCallback, async);
+    gp_array_set_data_async((gp_array*)GetObject(*this), (gp_array_data*)GetObject(ad), &Array::AsyncCallback, async);
   }
   void Array::AsyncCallback(void* data)
   {

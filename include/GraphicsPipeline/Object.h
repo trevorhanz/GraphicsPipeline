@@ -114,6 +114,17 @@ namespace GP
     inline operator bool () const;
     
   protected:
+    /*!
+     * Get underlying gp_object without incrementing the ref count.
+     * This function is only meant for internal use to allow other
+     * Object types to more efficiently gain access to the interal
+     * gp_object data.
+     * \param object The Object for which to get the gp_object.
+     * \return Underlying gp_object.
+     */
+    inline gp_object* GetObject(const Object& object) const;
+    
+  private:
     gp_object*                mObject;
   };
   
@@ -171,13 +182,14 @@ namespace GP
   }
   bool Object::operator ! () const {return mObject == 0;}
   Object::operator bool () const {return mObject != 0;}
+  gp_object* Object::GetObject(const Object& object) const {return object.mObject;}
   
   Pointer::Pointer() : Object((void*)0) {}
   Pointer::Pointer(gp_pointer* pointer) : Object((gp_object*)pointer) {}
   template <typename T>
   Pointer::Pointer(T* pointer) : Object((void*)gp_pointer_new(pointer, Deleter<T>)) {}
   Pointer::Pointer(void* pointer, gp_free free_func) : Object((void*)gp_pointer_new(pointer, free_func)) {}
-  void* Pointer::GetPointer() {return gp_pointer_get_pointer((gp_pointer*)mObject);}
+  void* Pointer::GetPointer() {return gp_pointer_get_pointer((gp_pointer*)GetObject(*this));}
   template <typename T>
   void Pointer::Deleter(void* data) {delete ((T*)data);}
 }

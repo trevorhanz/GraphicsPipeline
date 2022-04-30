@@ -267,31 +267,31 @@ namespace GP
   TextureData::TextureData() : Object((void*)gp_texture_data_new()) {}
   void TextureData::Set1D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width)
   {
-    gp_texture_data_set_1d((gp_texture_data*)GetObject(), data, format, type, width);
+    gp_texture_data_set_1d((gp_texture_data*)GetObject(*this), data, format, type, width);
   }
   void TextureData::Set1DChunk(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int offset)
   {
-    gp_texture_data_set_1d_chunk((gp_texture_data*)GetObject(), data, format, type, width, offset);
+    gp_texture_data_set_1d_chunk((gp_texture_data*)GetObject(*this), data, format, type, width, offset);
   }
   void TextureData::Set2D(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height)
   {
-    gp_texture_data_set_2d((gp_texture_data*)GetObject(), data, format, type, width, height);
+    gp_texture_data_set_2d((gp_texture_data*)GetObject(*this), data, format, type, width, height);
   }
   void TextureData::Set2DChunk(void* data, GP_FORMAT format, GP_DATA_TYPE type, unsigned int width, unsigned int height, unsigned int w_offset, unsigned int h_offset)
   {
-    gp_texture_data_set_2d_chunk((gp_texture_data*)GetObject(), data, format, type, width, height, w_offset, h_offset);
+    gp_texture_data_set_2d_chunk((gp_texture_data*)GetObject(*this), data, format, type, width, height, w_offset, h_offset);
   }
   
   Texture::Texture() : Object((void*)0) {}
   Texture::Texture(gp_texture* texture) : Object((gp_object*)texture) {}
-  Texture::Texture(const Context& context) : Object((void*)gp_texture_new((gp_context*)context.GetObject())) {}
-  void Texture::SetData(const TextureData& data) {gp_texture_set_data((gp_texture*)GetObject(), (gp_texture_data*)data.GetObject());}
+  Texture::Texture(const Context& context) : Object((void*)gp_texture_new((gp_context*)GetObject(*this))) {}
+  void Texture::SetData(const TextureData& data) {gp_texture_set_data((gp_texture*)GetObject(*this), (gp_texture_data*)GetObject(data));}
   void Texture::SetDataAsync(const TextureData& data, std::function<void(Texture*)> callback)
   {
     AsyncData* async = new AsyncData();
     async->mTexture = this;
     async->mCallback = callback;
-    gp_texture_set_data_async((gp_texture*)GetObject(), (gp_texture_data*)data.GetObject(), &Texture::AsyncCallback, async);
+    gp_texture_set_data_async((gp_texture*)GetObject(*this), (gp_texture_data*)GetObject(data), &Texture::AsyncCallback, async);
   }
   void Texture::AsyncCallback(void* data)
   {

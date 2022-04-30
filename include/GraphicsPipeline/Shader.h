@@ -193,9 +193,9 @@ namespace GP
     inline type Get();\
   };\
   Uniform##CXXname::Uniform##CXXname() : Uniform((void*)0) {}\
-  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name((gp_shader*)shader.GetObject(), name)) {}\
-  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)mObject, data);}\
-  type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)mObject);}
+  Uniform##CXXname::Uniform##CXXname(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_##Cname##_new_by_name((gp_shader*)GetObject(shader), name)) {}\
+  void Uniform##CXXname::Set(type data) {gp_uniform_##Cname##_set((gp_uniform*)GetObject(*this), data);}\
+  type Uniform##CXXname::Get() {return gp_uniform_##Cname##_get((gp_uniform*)GetObject(*this));}
   
   /*!
    * \brief Uniform specialized for Texture
@@ -219,8 +219,8 @@ namespace GP
     inline gp_texture* Get();
   };
   UniformTexture::UniformTexture() : Uniform((void*)0) {}
-  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_texture_new_by_name((gp_shader*)shader.GetObject(), name)) {}
-  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)mObject, (gp_texture*)texture.GetObject());}
+  UniformTexture::UniformTexture(const Shader& shader, const char* name) : Uniform((void*)gp_uniform_texture_new_by_name((gp_shader*)GetObject(shader), name)) {}
+  void UniformTexture::Set(const Texture& texture) {gp_uniform_texture_set((gp_uniform*)GetObject(*this), (gp_texture*)GetObject(texture));}
   gp_texture* UniformTexture::Get() {return 0;}
   
   CXX_UNIFORM(Float, float, float)
@@ -246,15 +246,15 @@ namespace GP
   ShaderSource::ShaderSource() : Object((void*)gp_shader_source_new()) {}
   void ShaderSource::AddString(GP_SHADER_SOURCE_TYPE type, const char* str)
   {
-    gp_shader_source_add_from_string((gp_shader_source*)GetObject(), type, str);
+    gp_shader_source_add_from_string((gp_shader_source*)GetObject(*this), type, str);
   }
   
   Shader::Shader() : Object((void*)0) {}
   Shader::Shader(gp_shader* shader) : Object((gp_object*)shader) {}
-  Shader::Shader(const Context& context) : Object((void*)gp_shader_new((gp_context*)context.GetObject())) {}
+  Shader::Shader(const Context& context) : Object((void*)gp_shader_new((gp_context*)GetObject(context))) {}
   void Shader::Compile(const ShaderSource& source)
   {
-    gp_shader_compile((gp_shader*)GetObject(), (gp_shader_source*)source.GetObject());
+    gp_shader_compile((gp_shader*)GetObject(*this), (gp_shader_source*)GetObject(source));
   }
   
   Uniform::Uniform(void* uniform) : Object((void*)uniform) {}

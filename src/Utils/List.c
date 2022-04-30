@@ -31,6 +31,12 @@ void gp_list_init(gp_list* list)
   list->mEnd->mNext = 0;
 }
 
+void gp_list_free(gp_list* list)
+{
+  free(list->mBegin);
+  free(list->mEnd);
+}
+
 void gp_list_push_front(gp_list* list, gp_list_node* node)
 {
   node->mNext = list->mBegin->mNext;

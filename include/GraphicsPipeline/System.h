@@ -241,8 +241,8 @@ namespace GP
   //
   System::System(gp_system* system) : Object((gp_object*)system) {}
   System::System() : Object((void*)gp_system_new()) {}
-  void System::Run() {gp_system_run((gp_system*)mObject);}
-  void System::Stop() {gp_system_stop((gp_system*)mObject);}
+  void System::Run() {gp_system_run((gp_system*)GetObject(*this));}
+  void System::Stop() {gp_system_stop((gp_system*)GetObject(*this));}
   
   Timer::Timer(gp_timer* timer) : Object((gp_object*)timer) {}
   Timer::Timer(const System& system) : Object((void*)gp_timer_new((gp_system*)system.GetObject())) {}
@@ -252,7 +252,7 @@ namespace GP
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_timer_set_callback((gp_timer*)mObject, HandleTimeout, (gp_pointer*)pointer);
+    gp_timer_set_callback((gp_timer*)GetObject(*this), HandleTimeout, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Timer::HandleTimeout(gp_timer* timer, gp_pointer* userdata)
@@ -261,8 +261,8 @@ namespace GP
     Timer t = timer;
     data->mCallback(t);
   }
-  void Timer::Arm(double seconds) {gp_timer_arm((gp_timer*)mObject, seconds);}
-  void Timer::Disarm() {gp_timer_disarm((gp_timer*)mObject);}
+  void Timer::Arm(double seconds) {gp_timer_arm((gp_timer*)GetObject(*this), seconds);}
+  void Timer::Disarm() {gp_timer_disarm((gp_timer*)GetObject(*this));}
   
   IO::IO(void* io) : Object((void*)io) {}
   IO::IO(gp_io* io) : Object((gp_object*)io) {}
@@ -271,7 +271,7 @@ namespace GP
     CallbackData* data = new CallbackData();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_io_set_callback((gp_io*)mObject, HandleUpdate, (gp_pointer*)pointer);
+    gp_io_set_callback((gp_io*)GetObject(*this), HandleUpdate, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void IO::HandleUpdate(gp_io* io, gp_pointer* userdata)

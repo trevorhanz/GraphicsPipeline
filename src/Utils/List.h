@@ -41,6 +41,7 @@ extern "C" {
 typedef int (*gp_list_compare_t)(gp_list_node* first, gp_list_node* second);
 
 void gp_list_init(gp_list* l);
+void gp_list_free(gp_list* l);
 
 void gp_list_push_front(gp_list* list, gp_list_node* node);
 void gp_list_push_back(gp_list* list, gp_list_node* node);
