@@ -175,6 +175,21 @@ GP_EXPORT void gp_pipeline_remove_operation(gp_pipeline* pipeline, gp_operation*
  */
 GP_EXPORT void gp_pipeline_clear(gp_pipeline* pipeline);
 
+/*!
+ * Set the blending equation to be used for all operations this pipeline.
+ * \param pipeline Pipeline for which to set the blending equation.
+ * \param equation The new equation to be set. The default is GP_EQUATION_ADD.
+ */
+GP_EXPORT void gp_pipeline_set_blend_equation(gp_pipeline* pipeline, GP_EQUATION equation);
+
+/*!
+ * Set the blending function parameters to be used for all operations this pipeline.
+ * \param pipeline Pipeline for which to set the blending function parameters.
+ * \param src The source color to be used in the blending function. The default is GP_COLOR_SRC_ALPHA.
+ * \param dst The destination color to be used in the blending function. The default is GP_COLOR_ONE_MINUS_SRC_ALPHA.
+ */
+GP_EXPORT void gp_pipeline_set_blend_function(gp_pipeline* pipeline, GP_COLOR_SRC src, GP_COLOR_SRC dst);
+
 //! \} // Pipeline
 
 #ifdef __cplusplus
@@ -343,6 +358,19 @@ namespace GP
      */
     inline void Clear();
     
+    /*!
+     * Set the blending equation to be used for all operations this pipeline.
+     * \param equation The new equation to be set. The default is GP_EQUATION_ADD.
+     */
+    inline void SetBlendEquation(GP_EQUATION equation);
+    
+    /*!
+     * Set the blending function parameters to be used for all operations this pipeline.
+     * \param src The source color to be used in the blending function. The default is GP_COLOR_SRC_ALPHA.
+     * \param dst The destination color to be used in the blending function. The default is GP_COLOR_ONE_MINUS_SRC_ALPHA.
+     */
+    inline void SetBlendFunction(GP_COLOR_SRC src, GP_COLOR_SRC dst);
+    
   private:
     gp_pipeline*          mPipeline;
   };
@@ -406,6 +434,14 @@ namespace GP
   void Pipeline::Clear()
   {
     gp_pipeline_clear(mPipeline);
+  }
+  void Pipeline::SetBlendEquation(GP_EQUATION equation)
+  {
+    gp_pipeline_set_blend_equation(mPipeline, equation);
+  }
+  void Pipeline::SetBlendFunction(GP_COLOR_SRC src, GP_COLOR_SRC dst)
+  {
+    gp_pipeline_set_blend_function(mPipeline, src, dst);
   }
 }
 #endif // __cplusplus

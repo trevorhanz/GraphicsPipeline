@@ -48,6 +48,13 @@
   }\
 }
 
+typedef struct
+{
+  GLenum                  mBlendEquation;
+  GLenum                  mBlendFuncSrc;
+  GLenum                  mBlendFuncDst;
+} _gp_pipeline_state;
+
 struct _gp_texture_cache_list
 {
   gp_list_node            mNode;
@@ -60,6 +67,7 @@ struct __gp_draw_context
 {
   gp_shader*              mShader;          // Current shader in use
   gp_list                 mTextureCache;    // Current bound textures
+  _gp_pipeline_state      mState;           // Current state of the pipeline
 };
 typedef struct __gp_draw_context _gp_draw_context;
 
@@ -151,7 +159,8 @@ struct _gp_operation
 struct _gp_pipeline
 {
   gp_list                 mOperations;
-  unsigned int            mState;
+  unsigned int            mStatus;
+  _gp_pipeline_state      mState;
 };
 
 #ifdef __cplusplus

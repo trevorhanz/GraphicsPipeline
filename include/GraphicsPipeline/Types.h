@@ -180,6 +180,29 @@ typedef enum
 } GP_DRAW_MODE;
 
 /*!
+ * Define blending equations.
+ */
+typedef enum
+{
+  GP_EQUATION_ADD,
+  GP_EQUATION_SUB,
+  GP_EQUATION_MIN,
+  GP_EQUATION_MAX
+} GP_EQUATION;
+
+/*!
+ * Define color source.
+ */
+typedef enum
+{
+  GP_COLOR_ZERO,
+  GP_COLOR_ONE,
+  GP_COLOR_SRC_ALPHA,
+  GP_COLOR_DST_ALPHA,
+  GP_COLOR_ONE_MINUS_SRC_ALPHA
+} GP_COLOR_SRC;
+
+/*!
  * Storage for a single color value.
  */
 typedef unsigned int gp_color;

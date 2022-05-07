@@ -74,6 +74,23 @@ void DebugCallbackFunction(GLenum source,
 }
 #endif
 
+void _gp_pipeline_state_update(_gp_pipeline_state* origin, const _gp_pipeline_state* desired)
+{
+  if(origin->mBlendFuncSrc != desired->mBlendFuncDst ||
+     origin->mBlendFuncDst != desired->mBlendFuncDst)
+  {
+    glBlendFunc(desired->mBlendFuncSrc, desired->mBlendFuncDst);
+    origin->mBlendFuncSrc = desired->mBlendFuncSrc;
+    origin->mBlendFuncDst = desired->mBlendFuncDst;
+  }
+  
+  if(origin->mBlendEquation != desired->mBlendEquation)
+  {
+    glBlendEquation(desired->mBlendEquation);
+    origin->mBlendEquation = desired->mBlendEquation;
+  }
+}
+
 void _gp_notification_null(gp_operation* self)
 {
 }
@@ -82,7 +99,7 @@ void gp_operation_set_priority(gp_operation* operation, int priority)
 {
   if(operation->mPipeline && operation->mPriority != priority)
   {
-    operation->mPipeline->mState |= GP_PIPELINE_RESORT;
+    operation->mPipeline->mStatus |= GP_PIPELINE_RESORT;
   }
   operation->mPriority = priority;
 }
@@ -413,7 +430,13 @@ void _gp_operation_viewport_func(gp_operation* operation, _gp_draw_context* cont
   
   glViewport(self->mRect[0], self->mRect[1], self->mRect[2], self->mRect[3]);
   
+  _gp_pipeline_state state;
+  memcpy(&state, (void*)&context->mState, sizeof(_gp_pipeline_state));
+  _gp_pipeline_state_update(&context->mState, &self->mPipeline->mState);
+  
   _gp_pipeline_execute_with_context(self->mPipeline, context);
+  
+  _gp_pipeline_state_update(&context->mState, &state);
   
   glViewport(self->mOrigin[0], self->mOrigin[1], self->mOrigin[2], self->mOrigin[3]);
 }
@@ -465,7 +488,13 @@ void _gp_operation_group_func(gp_operation* operation, _gp_draw_context* context
 {
   _gp_operation_group* self = (_gp_operation_group*)operation;
   
+  _gp_pipeline_state state;
+  memcpy(&state, (void*)&context->mState, sizeof(_gp_pipeline_state));
+  _gp_pipeline_state_update(&context->mState, &self->mPipeline->mState);
+  
   _gp_pipeline_execute_with_context(self->mPipeline, context);
+  
+  _gp_pipeline_state_update(&context->mState, &state);
 }
 
 void _gp_operation_group_free(gp_object* object)
@@ -504,7 +533,7 @@ void gp_pipeline_add_operation(gp_pipeline* pipeline, gp_operation* operation)
   
   operation->mPipeline = pipeline;
   operation->mAdded(operation);
-  pipeline->mState |= GP_PIPELINE_RESORT;
+  pipeline->mStatus |= GP_PIPELINE_RESORT;
   
   gp_object_ref((gp_object*)operation);
   gp_list_push_back(&pipeline->mOperations, (gp_list_node*)&operation->mNode);
@@ -537,11 +566,38 @@ void gp_pipeline_clear(gp_pipeline* pipeline)
   }
 }
 
+void gp_pipeline_set_blend_equation(gp_pipeline* pipeline, GP_EQUATION equation)
+{
+  static const GLenum eq[] = {
+    GL_FUNC_ADD,
+    GL_FUNC_SUBTRACT,
+    GL_MIN,
+    GL_MAX
+  };
+  pipeline->mState.mBlendEquation = eq[equation];
+}
+
+void gp_pipeline_set_blend_function(gp_pipeline* pipeline, GP_COLOR_SRC src, GP_COLOR_SRC dst)
+{
+  static const GLenum color[] = {
+    GL_ZERO,
+    GL_ONE,
+    GL_SRC_ALPHA,
+    GL_DST_ALPHA,
+    GL_ONE_MINUS_SRC_ALPHA
+  };
+  pipeline->mState.mBlendFuncSrc = color[src];
+  pipeline->mState.mBlendFuncDst = color[dst];
+}
+
 gp_pipeline* _gp_pipeline_new()
 {
   gp_pipeline* pipeline = malloc(sizeof(gp_pipeline));
   gp_list_init(&pipeline->mOperations);
-  pipeline->mState = 0;
+  pipeline->mStatus = 0;
+  pipeline->mState.mBlendEquation = GL_FUNC_ADD;
+  pipeline->mState.mBlendFuncSrc = GL_SRC_ALPHA;
+  pipeline->mState.mBlendFuncDst = GL_ONE_MINUS_SRC_ALPHA;
   
   return pipeline;
 }
@@ -568,6 +624,10 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
   int texture_units;
   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
   
+  context->mState.mBlendEquation = GL_FUNC_ADD;
+  context->mState.mBlendFuncSrc = GL_SRC_ALPHA;
+  context->mState.mBlendFuncDst = GL_ONE_MINUS_SRC_ALPHA;
+  
   int i;
   for(i=0; i<texture_units; ++i)
   {
@@ -576,6 +636,10 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
     node->mIndex = i;
     gp_list_push_back(&context->mTextureCache, (gp_list_node*)node);
   }
+  
+  glBlendFunc(context->mState.mBlendFuncSrc, context->mState.mBlendFuncDst);
+  
+  _gp_pipeline_state_update(&context->mState, &pipeline->mState);
   
   _gp_pipeline_execute_with_context(pipeline, context);
   
@@ -599,11 +663,11 @@ int _gp_pipeline_sort(gp_list_node* first, gp_list_node* second)
 
 void _gp_pipeline_execute_with_context(gp_pipeline* pipeline, _gp_draw_context* context)
 {
-  if(pipeline->mState & GP_PIPELINE_RESORT)
+  if(pipeline->mStatus & GP_PIPELINE_RESORT)
   {
     gp_list_sort(&pipeline->mOperations, _gp_pipeline_sort);
     
-    pipeline->mState &= ~GP_PIPELINE_RESORT;
+    pipeline->mStatus &= ~GP_PIPELINE_RESORT;
   }
   
   gp_list_node* node = gp_list_front(&pipeline->mOperations);
@@ -656,7 +720,6 @@ void _gp_api_init_context()
 void _gp_api_prepare_window(unsigned int width, unsigned int height)
 {
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
 #ifdef GP_GL
   glEnable(GL_PROGRAM_POINT_SIZE);
