@@ -187,6 +187,10 @@ namespace GP
    */
   class Operation : public Object
   {
+  protected:
+    //! Constructor
+    inline Operation(void* operation);
+    
   public:
     //! Constructor
     inline Operation(gp_operation* operation);
@@ -346,15 +350,16 @@ namespace GP
   //
   // Implementation
   //
+  Operation::Operation(void* operation) : Object(operation) {}
   Operation::Operation(gp_operation* operation) : Object((gp_object*)operation) {}
   void Operation::SetPriority(int priority) {gp_operation_set_priority((gp_operation*)GetObject(*this), priority);}
   int Operation::GetPriority() {return gp_operation_get_priority((gp_operation*)GetObject(*this));}
   
-  ClearOperation::ClearOperation() : Operation(gp_operation_clear_new()) {}
+  ClearOperation::ClearOperation() : Operation((void*)gp_operation_clear_new()) {}
   void ClearOperation::SetColor(float r, float g, float b, float a) {
     gp_operation_clear_set_color((gp_operation*)GetObject(*this), r, g, b,  a);
   }
-  DrawOperation::DrawOperation() : Operation(gp_operation_draw_new()) {}
+  DrawOperation::DrawOperation() : Operation((void*)gp_operation_draw_new()) {}
   void DrawOperation::SetShader(const Shader& shader)
   {
     gp_operation_draw_set_shader((gp_operation*)GetObject(*this), (gp_shader*)GetObject(shader));
@@ -371,7 +376,7 @@ namespace GP
   void DrawOperation::SetMode(GP_DRAW_MODE mode) {gp_operation_draw_set_mode((gp_operation*)GetObject(*this), mode);}
   
   ViewportOperation::ViewportOperation()
-    : Operation(gp_operation_viewport_new())
+    : Operation((void*)gp_operation_viewport_new())
     {}
   Pipeline ViewportOperation::GetPipeline() {return Pipeline(gp_operation_viewport_get_pipeline((gp_operation*)GetObject(*this)));}
   void ViewportOperation::SetDimensions(int x, int y, int width, int height)
@@ -380,7 +385,7 @@ namespace GP
   }
   
   GroupOperation::GroupOperation()
-    : Operation(gp_operation_group_new())
+    : Operation((void*)gp_operation_group_new())
     {}
   Pipeline GroupOperation::GetPipeline() {return Pipeline(gp_operation_group_get_pipeline((gp_operation*)GetObject(*this)));}
   

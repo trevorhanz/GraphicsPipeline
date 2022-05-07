@@ -104,7 +104,7 @@ namespace Qt
   Context::Context() : GP::Context(gp_qt_context_new()) {}
   
   Window::Window(const GP::Context& context) : GP::Window(context) {}
-  QWidget* Window::GetQWidget() {return gp_window_get_qwidget((gp_window*)GetObject());}
+  QWidget* Window::GetQWidget() {return gp_window_get_qwidget((gp_window*)GetObject(*this));}
 }
 }
 

@@ -408,24 +408,24 @@ namespace GP
   //
   Window::Window() : Object((void*)0) {}
   Window::Window(gp_window* window) : Object((gp_object*)window) {}
-  Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)context.GetObject())) {}
-  Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject()));}
-  void Window::Redraw() {gp_window_redraw((gp_window*)GetObject());}
-  void Window::SetTitle(const char* title) {gp_window_set_title((gp_window*)GetObject(), title);}
-  void Window::SetType(GP_WINDOW_TYPE type) {gp_window_set_type((gp_window*)GetObject(), type);}
-  void Window::SetMinSize(int width, int height) {gp_window_set_min_size((gp_window*)GetObject(), width, height);}
-  void Window::SetMaxSize(int width, int height) {gp_window_set_max_size((gp_window*)GetObject(), width, height);}
-  void Window::SetSize(unsigned int width, unsigned int height) {gp_window_set_size((gp_window*)GetObject(), width, height);}
-  void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size((gp_window*)GetObject(), width, height);}
-  void Window::SetPosition(unsigned int x, unsigned int y) {gp_window_set_position((gp_window*)GetObject(), x, y);}
-  void Window::GetPosition(unsigned int* x, unsigned int* y) {gp_window_get_position((gp_window*)GetObject(), x, y);}
-  void Window::Show() {gp_window_show((gp_window*)GetObject());}
-  void Window::Hide() {gp_window_hide((gp_window*)GetObject());}
-  bool Window::GetShown() {return (bool)gp_window_get_shown((gp_window*)GetObject());}
-  void Window::SetFullscreen(Monitor monitor) {gp_window_set_fullscreen((gp_window*)GetObject(), (gp_monitor*)monitor.GetObject());}
+  Window::Window(const Context& context) : Object((void*)gp_window_new((gp_context*)GetObject(context))) {}
+  Pipeline Window::GetPipeline() {return Pipeline(gp_window_get_pipeline((gp_window*)GetObject(*this)));}
+  void Window::Redraw() {gp_window_redraw((gp_window*)GetObject(*this));}
+  void Window::SetTitle(const char* title) {gp_window_set_title((gp_window*)GetObject(*this), title);}
+  void Window::SetType(GP_WINDOW_TYPE type) {gp_window_set_type((gp_window*)GetObject(*this), type);}
+  void Window::SetMinSize(int width, int height) {gp_window_set_min_size((gp_window*)GetObject(*this), width, height);}
+  void Window::SetMaxSize(int width, int height) {gp_window_set_max_size((gp_window*)GetObject(*this), width, height);}
+  void Window::SetSize(unsigned int width, unsigned int height) {gp_window_set_size((gp_window*)GetObject(*this), width, height);}
+  void Window::GetSize(unsigned int* width, unsigned int* height) {gp_window_get_size((gp_window*)GetObject(*this), width, height);}
+  void Window::SetPosition(unsigned int x, unsigned int y) {gp_window_set_position((gp_window*)GetObject(*this), x, y);}
+  void Window::GetPosition(unsigned int* x, unsigned int* y) {gp_window_get_position((gp_window*)GetObject(*this), x, y);}
+  void Window::Show() {gp_window_show((gp_window*)GetObject(*this));}
+  void Window::Hide() {gp_window_hide((gp_window*)GetObject(*this));}
+  bool Window::GetShown() {return (bool)gp_window_get_shown((gp_window*)GetObject(*this));}
+  void Window::SetFullscreen(Monitor monitor) {gp_window_set_fullscreen((gp_window*)GetObject(*this), (gp_monitor*)GetObject(monitor));}
   Monitor Window::GetFullscreen()
   {
-    gp_monitor* monitor = gp_window_get_fullscreen((gp_window*)GetObject());
+    gp_monitor* monitor = gp_window_get_fullscreen((gp_window*)GetObject(*this));
     Monitor result(monitor);
     gp_object_unref((gp_object*)monitor);
     return result;
@@ -435,7 +435,7 @@ namespace GP
     auto data = new CallbackData<ClickCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_click_callback((gp_window*)GetObject(), HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
+    gp_window_set_click_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_click_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetScrollCallback(std::function<void(const gp_event_scroll_t*)> callback)
@@ -443,7 +443,7 @@ namespace GP
     auto data = new CallbackData<ScrollCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_scroll_callback((gp_window*)GetObject(), HandleCallback<gp_event_scroll_t>, (gp_pointer*)pointer);
+    gp_window_set_scroll_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_scroll_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetTrackCallback(std::function<void(const gp_event_track_t*)> callback)
@@ -451,7 +451,7 @@ namespace GP
     auto data = new CallbackData<TrackCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_track_callback((gp_window*)GetObject(), HandleCallback<gp_event_track_t>, (gp_pointer*)pointer);
+    gp_window_set_track_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_track_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetEnterCallback(std::function<void(const gp_event_enter_t*)> callback)
@@ -459,7 +459,7 @@ namespace GP
     auto data = new CallbackData<EnterCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_enter_callback((gp_window*)GetObject(), HandleCallback<gp_event_enter_t>, (gp_pointer*)pointer);
+    gp_window_set_enter_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_enter_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetKeyCallback(std::function<void(const gp_event_key_t*)> callback)
@@ -467,7 +467,7 @@ namespace GP
     auto data = new CallbackData<KeyCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_key_callback((gp_window*)GetObject(), HandleCallback<gp_event_key_t>, (gp_pointer*)pointer);
+    gp_window_set_key_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_key_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetResizeCallback(std::function<void(const gp_event_resize_t*)> callback)
@@ -475,7 +475,7 @@ namespace GP
     auto data = new CallbackData<ResizeCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_resize_callback((gp_window*)GetObject(), HandleCallback<gp_event_resize_t>, (gp_pointer*)pointer);
+    gp_window_set_resize_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_resize_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   void Window::SetMoveCallback(std::function<void(const gp_event_move_t*)> callback)
@@ -483,7 +483,7 @@ namespace GP
     auto data = new CallbackData<MoveCallback>();
     data->mCallback = callback;
     auto pointer = Pointer(data).GetObject();
-    gp_window_set_move_callback((gp_window*)GetObject(), HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
+    gp_window_set_move_callback((gp_window*)GetObject(*this), HandleCallback<gp_event_move_t>, (gp_pointer*)pointer);
     gp_object_unref(pointer);
   }
   template <typename T>

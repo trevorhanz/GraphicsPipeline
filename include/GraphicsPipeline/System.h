@@ -281,9 +281,9 @@ namespace GP
     data->mCallback(i);
   }
   
-  ReadIO::ReadIO(const System& system, int fd) : IO((void*)gp_io_read_new((gp_system*)system.GetObject(), fd)) {}
+  ReadIO::ReadIO(const System& system, int fd) : IO((void*)gp_io_read_new((gp_system*)GetObject(system), fd)) {}
   
-  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)system.GetObject(), fd)) {}
+  WriteIO::WriteIO(const System& system, int fd) : IO(gp_io_write_new((gp_system*)GetObject(system), fd)) {}
 }
 #endif // __cplusplus
 

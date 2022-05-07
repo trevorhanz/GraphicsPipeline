@@ -153,13 +153,13 @@ namespace GP
   //
   FrameBuffer::FrameBuffer() : Object((void*)0) {}
   FrameBuffer::FrameBuffer(gp_frame_buffer* frame_buffer) : Object((gp_object*)frame_buffer) {}
-  FrameBuffer::FrameBuffer(const Context& context) : Object((void*)gp_frame_buffer_new((gp_context*)context.GetObject())) {}
-  Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline((gp_frame_buffer*)GetObject()));}
-  void FrameBuffer::Redraw() {gp_frame_buffer_redraw((gp_frame_buffer*)GetObject());}
-  void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach((gp_frame_buffer*)GetObject(), (gp_texture*)texture.GetObject());}
-  void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size((gp_frame_buffer*)GetObject(), width, height);}
-  void FrameBuffer::GetSize(int* width, int* height) {gp_frame_buffer_get_size((gp_frame_buffer*)GetObject(), width, height);}
-  void FrameBuffer::GetPixel(int width, int height, gp_color* c) {gp_frame_buffer_get_pixel((gp_frame_buffer*)GetObject(), width, height, c);}
+  FrameBuffer::FrameBuffer(const Context& context) : Object((void*)gp_frame_buffer_new((gp_context*)GetObject(context))) {}
+  Pipeline FrameBuffer::GetPipeline() {return Pipeline(gp_frame_buffer_get_pipeline((gp_frame_buffer*)GetObject(*this)));}
+  void FrameBuffer::Redraw() {gp_frame_buffer_redraw((gp_frame_buffer*)GetObject(*this));}
+  void FrameBuffer::Attach(const Texture& texture) {gp_frame_buffer_attach((gp_frame_buffer*)GetObject(*this), (gp_texture*)GetObject(texture));}
+  void FrameBuffer::SetSize(int width, int height) {gp_frame_buffer_set_size((gp_frame_buffer*)GetObject(*this), width, height);}
+  void FrameBuffer::GetSize(int* width, int* height) {gp_frame_buffer_get_size((gp_frame_buffer*)GetObject(*this), width, height);}
+  void FrameBuffer::GetPixel(int width, int height, gp_color* c) {gp_frame_buffer_get_pixel((gp_frame_buffer*)GetObject(*this), width, height, c);}
 }
 
 #endif // __cplusplus

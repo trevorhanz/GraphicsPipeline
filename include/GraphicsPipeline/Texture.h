@@ -299,8 +299,8 @@ namespace GP
     async->mCallback(async->mTexture);
     delete async;
   }
-  void Texture::SetWrapX(GP_WRAP wrap) {gp_texture_set_wrap_x((gp_texture*)GetObject(), wrap);}
-  void Texture::SetWrapY(GP_WRAP wrap) {gp_texture_set_wrap_y((gp_texture*)GetObject(), wrap);}
+  void Texture::SetWrapX(GP_WRAP wrap) {gp_texture_set_wrap_x((gp_texture*)GetObject(*this), wrap);}
+  void Texture::SetWrapY(GP_WRAP wrap) {gp_texture_set_wrap_y((gp_texture*)GetObject(*this), wrap);}
 }
 
 #endif // __cplusplus

@@ -549,7 +549,7 @@ gp_pipeline* _gp_pipeline_new()
 void _gp_pipeline_free(gp_pipeline* pipeline)
 {
   gp_list_node* node = gp_list_front(&pipeline->mOperations);
-  while(node)
+  while(node != gp_list_end(&pipeline->mOperations))
   {
     gp_operation* op = (gp_operation*)GP_OBJECT_FROM_LIST_NODE(node);
     node = gp_list_node_next(node);
@@ -580,12 +580,13 @@ void _gp_pipeline_execute(gp_pipeline* pipeline)
   _gp_pipeline_execute_with_context(pipeline, context);
   
   gp_list_node* node = gp_list_front(&context->mTextureCache);
-  while(node != NULL)
+  while(node != gp_list_end(&context->mTextureCache))
   {
     gp_list_node* temp = node;
     node = gp_list_node_next(node);
     free(temp);
   }
+  gp_list_free(&context->mTextureCache);
   free(context);
 }
 
