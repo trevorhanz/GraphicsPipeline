@@ -274,15 +274,14 @@ configure_package_config_file(../cmake/GraphicsPipelineConfig.cmake.in
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
 
 write_basic_package_version_file(
-    ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineVersion.cmake
-    VERSION 0.0.0
-    COMPATIBILITY SameMajorVersion
+  ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfigVersion.cmake
+  COMPATIBILITY SameMinorVersion
 )
 
 set(EXPORT_TARGETS GP_Interface GP_Native)
 
 install(FILES ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfig.cmake
-              ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineVersion.cmake
+              ${PROJECT_BINARY_DIR}/cmake/GraphicsPipelineConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ COMPONENT devel)
 install(DIRECTORY ../include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT devel)

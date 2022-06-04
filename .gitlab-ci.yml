@@ -13,24 +13,6 @@ stages:
     paths:
       - build
     expire_in: 1 day
-  
-build_ubuntu_16:
-  extends: .default_build
-  image: $REGISTRY_ROOT/ubuntu:16
-  script:
-    - mkdir build
-    - cd build
-    - cmake -DGP_BUILD_EXAMPLES=ON ../
-    - make
-
-build_ubuntu_18:
-  extends: .default_build
-  image: $REGISTRY_ROOT/ubuntu:18
-  script:
-    - mkdir build
-    - cd build
-    - cmake -DGP_BUILD_EXAMPLES=ON ../
-    - make
 
 build_ubuntu_20:
   extends: .default_build
