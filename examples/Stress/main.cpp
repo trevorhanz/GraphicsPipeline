@@ -24,6 +24,8 @@
 #define RENDER_TEXTURE  1
 
 #include <vector>
+#include <cstdlib>
+
 #ifdef _WIN32
 #pragma warning( push )
 #pragma warning( disable : 26451 ) // Potential overflow from '*' operator
