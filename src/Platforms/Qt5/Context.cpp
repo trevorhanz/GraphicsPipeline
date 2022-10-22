@@ -88,6 +88,9 @@ extern "C" gp_context* gp_qt_context_new()
   
   gp_log_info("Qt Version: %s", qVersion());
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   int major, minor;
   functions->glGetIntegerv(GL_MAJOR_VERSION, &major);
   functions->glGetIntegerv(GL_MINOR_VERSION, &minor);

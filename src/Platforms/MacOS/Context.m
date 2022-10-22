@@ -124,6 +124,9 @@ gp_context* gp_context_new(gp_system* system)
   
   _gp_api_init_context();
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   // NOTE: GL functions need a context to be bound to get information from
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);

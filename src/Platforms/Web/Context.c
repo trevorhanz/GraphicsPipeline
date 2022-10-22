@@ -149,6 +149,9 @@ void _gp_context_build(gp_context* context)
   
   _gp_api_init_context();
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   const GLubyte* glVersion = glGetString(GL_VERSION);
   gp_log_info("GL Version: %s", glVersion);
   

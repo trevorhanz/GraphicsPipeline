@@ -254,6 +254,9 @@ gp_context* gp_context_new(gp_system* system)
   // NOTE: Context needs window first time it is made current.
   glXMakeCurrent(context->mDisplay, context->mWindow, context->mShare);
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   // NOTE: GL functions need a context to be bound to get information from
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);

@@ -80,6 +80,9 @@ gp_context* gp_context_new(gp_system* system)
       return NULL;
     }
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   gp_log_error("GL Version: %s", glGetString(GL_VERSION));
   
   return context;

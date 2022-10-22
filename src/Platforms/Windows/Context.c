@@ -378,6 +378,9 @@ gp_context* gp_context_new(gp_system* system)
   
   gp_log_info("OS: %s", OS);
   
+  const GLubyte* renderer = glGetString(GL_RENDERER);
+  gp_log_info("Renderer: %s", renderer);
+  
   int major, minor;
   glGetIntegerv(GL_MAJOR_VERSION, &major);
   glGetIntegerv(GL_MINOR_VERSION, &minor);
