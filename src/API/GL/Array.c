@@ -139,6 +139,11 @@ void _gp_array_async_func(void* userdata)
   _gp_array_async* async = (_gp_array_async*)userdata;
   
   gp_array_set_data(async->mArray, async->mData);
+  
+  gp_object_unref((gp_object*)async->mArray);
+  gp_object_unref((gp_object*)async->mData);
+  
+  glFlush();
 }
 
 void _gp_array_join_func(void* userdata)
@@ -160,6 +165,9 @@ void gp_array_set_data_async(gp_array* array, gp_array_data* data, void (*callba
   async->mData = data;
   async->mCallback = callback;
   async->mUserData = userdata;
+  
+  gp_object_ref((gp_object*)array);
+  gp_object_ref((gp_object*)data);
   
   _gp_api_work(_gp_array_async_func, _gp_array_join_func, async);
 }

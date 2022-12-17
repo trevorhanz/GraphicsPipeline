@@ -405,6 +405,11 @@ void _gp_texture_async_func(void* data)
   _gp_texture_async* async = (_gp_texture_async*)data;
   
   gp_texture_set_data(async->mTexture, async->mData);
+  
+  gp_object_unref((gp_object*)async->mTexture);
+  gp_object_unref((gp_object*)async->mData);
+  
+  glFlush();
 }
 
 void _gp_texture_join_func(void* data)
@@ -426,6 +431,9 @@ void gp_texture_set_data_async(gp_texture* texture, gp_texture_data* data, void 
   async->mData = data;
   async->mCallback = callback;
   async->mUserData = userdata;
+  
+  gp_object_ref((gp_object*)texture);
+  gp_object_ref((gp_object*)data);
   
   _gp_api_work(_gp_texture_async_func, _gp_texture_join_func, (void*)async);
 }
